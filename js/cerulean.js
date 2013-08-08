@@ -31,14 +31,28 @@ var Cerulean = function () {
 			ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize, 
 				room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
+			ctx.fillStyle = "#bbddbb";
+			room.doors.forEach(function (door) {
+				ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize, 
+					GameConsts.tileSize, GameConsts.tileSize);
+			});
+
 			ctx.fillStyle = "white";
 			ctx.fillRect(playerPos.x, playerPos.y, 32, 32);
 		}
 	}
 
+	var Door = function (x, y) {
+		this.pos = new Pos(x,y);
+	}
+
 	var Room = function (x, y, width, height) {
 		this.pos = new Pos(x, y);
 		this.size = new Pos(width, height);
+		this.doors = [];
+		this.addDoor = function (x, y) {
+			this.doors.push(new Door(x,y));
+		}
 	}
 
 	this.start = function () {
@@ -48,6 +62,7 @@ var Cerulean = function () {
 		var desiredFps = 60;
 
 		var room = new Room(2,2,5,5);
+		room.addDoor(4,2);
 		var playerPos = new Pos(0,0);
 
 		var update = function () {
