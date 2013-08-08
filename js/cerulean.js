@@ -28,6 +28,8 @@ var Cerulean = function () {
 		var gameWindow = new GameWindow();
 		var renderer = new Renderer(gameWindow);
 		var keyboard = new Keyboard();
+		var desiredFps = 60;
+
 		var playerPos = new Pos(0,0);
 
 		var update = function () {
@@ -52,9 +54,9 @@ var Cerulean = function () {
 		window.setInterval(function () {
 			update();
 			requestAnimationFrame(function() {
-				renderer.draw(playerPos);
+				renderer.draw(playerPos, room);
 			});
-		});
+		}, 1000/desiredFps);
 	}
 
 }
