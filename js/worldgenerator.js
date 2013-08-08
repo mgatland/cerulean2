@@ -211,7 +211,6 @@ var WorldGenerator = function () {
 					console.log("Weird expansion dir " + rndDir);
 			}
 		}
-		console.log("Expansions: " + expansionCount);
 
 		var newRoom = new Room(x, y, width, height);
 		//addDoorsBetween(startRoom, newRoom, direction);
