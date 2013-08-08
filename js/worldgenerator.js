@@ -11,9 +11,6 @@ var WorldGenerator = function () {
 		this.size = new Pos(width, height);
 		this.doors = [];
 		this.addDoor = function (x, y) {
-			/*console.log("Adding door");
-			console.log(this.toString());
-			console.log(x + "," + y);*/
 			this.doors.push(new Door(x,y));
 		}
 
@@ -101,20 +98,20 @@ var WorldGenerator = function () {
 		var y;
 		switch (direction) {
 			case Dir.UP:
-				x = startRoom.pos.x;
+				x = rand(startRoom.pos.x-width+3, startRoom.pos.x + startRoom.size.x - 3);
 				y = startRoom.pos.y - height;
 			break;
 			case Dir.DOWN:
-				x = startRoom.pos.x;
+				x = rand(startRoom.pos.x-width+3, startRoom.pos.x + startRoom.size.x - 3);
 				y = startRoom.pos.y + startRoom.size.y;
 			break;
 			case Dir.LEFT:
 				x = startRoom.pos.x - width;
-				y = startRoom.pos.y;
+				y = rand(startRoom.pos.y-height+3, startRoom.pos.y + startRoom.size.y - 3);
 			break;
 			case Dir.RIGHT:
 				x = startRoom.pos.x + startRoom.size.x;
-				y = startRoom.pos.y;
+				y = rand(startRoom.pos.y-height+3, startRoom.pos.y + startRoom.size.y - 3);
 			break;
 		}
 		if (x < 0 || y < 0 || x > worldWidth || y > worldHeight) return;
