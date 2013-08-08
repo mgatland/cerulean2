@@ -100,7 +100,7 @@ var WorldGenerator = function () {
 		if (randRoomValue < 95) { //normal or jumbo rooms
 			width = 5;
 			height = 5;
-			maxExpansions = rand(0,100) < 70 ? rand(5,6) : 20;
+			maxExpansions = rand(0,100) < 70 ? rand(5,6) : 15;
 		} else { //hallway rooms
 			hallway = true;
 			if (rand(0,2) == 1) {
@@ -168,7 +168,7 @@ var WorldGenerator = function () {
 				case Dir.UP:
 					if (nearbyRooms.some(function (room) {
 						return roomCollidesWith(room, x, y - 1, width, 1);
-					})) {
+					}) || y == 0) {
 						expansions = expansions.filter(function (e) {return e != rndDir});
 					} else {
 						y--;
@@ -179,7 +179,7 @@ var WorldGenerator = function () {
 				case Dir.DOWN:
 					if (nearbyRooms.some(function (room) {
 						return roomCollidesWith(room, x, y + height, width, 1);
-					})) {
+					}) || y + height == worldHeight) {
 						expansions = expansions.filter(function (e) {return e != rndDir});
 					} else {
 						height++;
@@ -189,7 +189,7 @@ var WorldGenerator = function () {
 				case Dir.LEFT:
 					if (nearbyRooms.some(function (room) {
 						return roomCollidesWith(room, x-1, y, 1, height);
-					})) {
+					}) || x == 0) {
 						expansions = expansions.filter(function (e) {return e != rndDir});
 					} else {
 						x--;
@@ -200,7 +200,7 @@ var WorldGenerator = function () {
 				case Dir.RIGHT:
 					if (nearbyRooms.some(function (room) {
 						return roomCollidesWith(room, x+width, y, 1, height);
-					})) {
+					}) || x + width == worldWidth) {
 						expansions = expansions.filter(function (i) {i != rndDir});
 					} else {
 						width++;
