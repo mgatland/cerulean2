@@ -90,10 +90,29 @@ var WorldGenerator = function () {
 			console.log("Too many rooms!");
 			return; //abort
 		}
-		var width = rand(3, 11);
-		var height = rand(3, 11);
-		if (width == 3) height = Math.max(5, height); //passageways should be long
-		if (height == 3) width = Math.max(5, width);
+
+		var width;
+		var height;
+		var maxExpansions;
+		var hallway = false;
+
+		var randRoomValue = rand(0, 10);
+		if (randRoomValue < 8) { //normal rooms
+			width = 5;
+			height = 5;
+			maxExpansions = rand(5,30);
+		} else { //hallway rooms
+			hallway = true;
+			if (rand(0,2) == 1) {
+				width = 3;
+				height = 6;
+			} else {
+				width = 6;
+				height = 3;
+			}
+			maxExpansions = 6;
+		}
+
 		var x;
 		var y;
 		switch (direction) {
@@ -116,12 +135,80 @@ var WorldGenerator = function () {
 		}
 		if (x < 0 || y < 0 || x > worldWidth || y > worldHeight) return;
 
-		if (closedRooms.some(function (room) {
+		var nearbyClosedRooms = closedRooms.filter(function (room) {
+			return roomCollidesWith(room, x-maxExpansions-1, y-maxExpansions-1, width+maxExpansions*2+2, height+maxExpansions*2+2);
+		});
+		var nearbyOpenRooms = openRooms.filter(function (room) {
+			return roomCollidesWith(room, x-maxExpansions-1, y-maxExpansions-1, width+maxExpansions*2+2, height+maxExpansions*2+2);
+		});
+		var nearbyRooms = nearbyOpenRooms.concat(nearbyClosedRooms);
+
+		//Are we already colliding? If so, abort, this room will never fit.
+		if (nearbyRooms.some(function (room) {
 			return roomCollidesWith(room, x, y, width, height);
 		})) return;
-		if (openRooms.some(function (room) {
-			return roomCollidesWith(room, x, y, width, height);
-		})) return;
+
+		//direction we can expand:
+		var expansions = [Dir.LEFT, Dir.RIGHT, Dir.UP, Dir.DOWN];
+
+		//special rules for hallways - never get wider
+		if (hallway) {
+			if (width > height) {
+				expansions = [Dir.LEFT, Dir.RIGHT];
+			} else {
+				expansions = [Dir.UP, Dir.DOWN];
+			}
+		}
+
+		var expansionCount = 0;
+		while (expansions.length > 0 && expansionCount < maxExpansions) {
+			expansionCount++;
+			var rnd = rand(0, expansions.length);
+			var rndDir = expansions[rnd];
+			switch(rndDir) {
+				case Dir.UP:
+					if (nearbyRooms.some(function (room) {
+						return roomCollidesWith(room, x, y - 1, width, 1);
+					})) {
+						expansions = expansions.filter(function (e) {return e != rndDir});
+					} else {
+						y--;
+						height++;
+					}
+					break;
+				case Dir.DOWN:
+					if (nearbyRooms.some(function (room) {
+						return roomCollidesWith(room, x, y + height, width, 1);
+					})) {
+						expansions = expansions.filter(function (e) {return e != rndDir});
+					} else {
+						height++;
+					}
+					break;
+				case Dir.LEFT:
+					if (nearbyRooms.some(function (room) {
+						return roomCollidesWith(room, x-1, y, 1, height);
+					})) {
+						expansions = expansions.filter(function (e) {return e != rndDir});
+					} else {
+						x--;
+						width++;
+					}
+					break;
+				case Dir.RIGHT:
+					if (nearbyRooms.some(function (room) {
+						return roomCollidesWith(room, x+width, y, 1, height);
+					})) {
+						expansions = expansions.filter(function (i) {i != rndDir});
+					} else {
+						width++;
+					}
+					break;
+				default:
+					console.log("Weird expansion dir " + rndDir);
+			}
+		}
+		console.log("Expansions: " + expansionCount);
 
 		var newRoom = new Room(x, y, width, height);
 		addDoorsBetween(startRoom, newRoom, direction);
@@ -138,8 +225,8 @@ var WorldGenerator = function () {
 			var room = (Math.random() > 0.5) ? openRooms.shift() : openRooms.pop();
 			closedRooms.push(room);
 			addRoom(room, Dir.UP, openRooms, closedRooms, worldWidth, worldHeight);
-			addRoom(room, Dir.DOWN, openRooms, closedRooms, worldWidth, worldHeight);
 			addRoom(room, Dir.LEFT, openRooms, closedRooms, worldWidth, worldHeight);
+			addRoom(room, Dir.DOWN, openRooms, closedRooms, worldWidth, worldHeight);
 			addRoom(room, Dir.RIGHT, openRooms, closedRooms, worldWidth, worldHeight);
 		}
 		console.log("Room count: " + closedRooms.length);

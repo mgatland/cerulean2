@@ -7,8 +7,8 @@ var Cerulean = function () {
 
 	var GameConsts = {
 		tileSize: 5,
-		worldWidth: 290,
-		worldHeight: 200
+		worldWidth: 180,
+		worldHeight: 130
 	};
 
 	var Renderer = function (gameWindow) {
