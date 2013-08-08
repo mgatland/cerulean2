@@ -7,8 +7,8 @@ var Cerulean = function () {
 
 	var GameConsts = {
 		tileSize: 32,
-		worldWidth: 300,
-		worldHeight: 300
+		worldWidth: 100,
+		worldHeight: 100
 	};
 
 	var Renderer = function (gameWindow) {
@@ -44,30 +44,14 @@ var Cerulean = function () {
 		}
 	}
 
-	var Door = function (x, y) {
-		this.pos = new Pos(x,y);
-	}
-
-	var Room = function (x, y, width, height) {
-		this.pos = new Pos(x, y);
-		this.size = new Pos(width, height);
-		this.doors = [];
-		this.addDoor = function (x, y) {
-			this.doors.push(new Door(x,y));
-		}
-	}
-
 	this.start = function () {
 		var gameWindow = new GameWindow();
 		var renderer = new Renderer(gameWindow);
 		var keyboard = new Keyboard();
+		var worldGenerator = new WorldGenerator();
 		var desiredFps = 60;
 
-		var rooms = [];
-		var room = new Room(2,2,5,5);
-		room.addDoor(4,2);
-		rooms.push(room);
-		rooms.push(new Room(10,3,4,4));
+		var rooms = worldGenerator.generate(GameConsts.worldWidth, GameConsts.worldHeight);
 		var playerPos = new Pos(0,0);
 
 		var update = function () {
