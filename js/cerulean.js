@@ -14,7 +14,7 @@ var Cerulean = function () {
 	var Renderer = function (gameWindow) {
 		var canvas;
 		var ctx;
-		
+
 		canvas = document.getElementById('gamescreen');
 		ctx = canvas.getContext("2d");
 		canvas.width = gameWindow.width;
@@ -29,12 +29,16 @@ var Cerulean = function () {
 
 			rooms.forEach(function (room) {
 				ctx.fillStyle = "#bbffbb";
-				ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize, 
+				ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
 				ctx.fillStyle = "#bbddbb";
+				ctx.fillRect((room.pos.x+1)*GameConsts.tileSize, (room.pos.y+1)*GameConsts.tileSize,
+					(room.size.x-2)*GameConsts.tileSize, (room.size.y-2)*GameConsts.tileSize);
+
+				ctx.fillStyle = "#bbddbb";
 				room.doors.forEach(function (door) {
-					ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize, 
+					ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize,
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
 			});

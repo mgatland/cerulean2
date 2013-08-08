@@ -33,15 +33,15 @@ var WorldGenerator = function () {
 				x = startRoom.pos.x;
 				y = startRoom.pos.y - height;
 			break;
-			case Dir.DOWN: 
+			case Dir.DOWN:
 				x = startRoom.pos.x;
 				y = startRoom.pos.y + startRoom.size.y;
 			break;
-			case Dir.LEFT: 
+			case Dir.LEFT:
 				x = startRoom.pos.x - width;
 				y = startRoom.pos.y;
 			break;
-			case Dir.RIGHT: 
+			case Dir.RIGHT:
 				x = startRoom.pos.x + startRoom.size.x;
 				y = startRoom.pos.y;
 			break;
