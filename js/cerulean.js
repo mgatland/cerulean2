@@ -20,21 +20,23 @@ var Cerulean = function () {
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
-		this.draw = function (playerPos, room) {
+		this.draw = function (playerPos, rooms) {
 			ctx.fillStyle = "#3f303f";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 			ctx.fillStyle = "white";
 			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 			ctx.fillText("Cerulean 2…", 40, gameWindow.height - 32);
 
-			ctx.fillStyle = "#bbffbb";
-			ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize, 
-				room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
+			rooms.forEach(function (room) {
+				ctx.fillStyle = "#bbffbb";
+				ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize, 
+					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
-			ctx.fillStyle = "#bbddbb";
-			room.doors.forEach(function (door) {
-				ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize, 
-					GameConsts.tileSize, GameConsts.tileSize);
+				ctx.fillStyle = "#bbddbb";
+				room.doors.forEach(function (door) {
+					ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize, 
+						GameConsts.tileSize, GameConsts.tileSize);
+				});
 			});
 
 			ctx.fillStyle = "white";
@@ -61,8 +63,11 @@ var Cerulean = function () {
 		var keyboard = new Keyboard();
 		var desiredFps = 60;
 
+		var rooms = [];
 		var room = new Room(2,2,5,5);
 		room.addDoor(4,2);
+		rooms.push(room);
+		rooms.push(new Room(10,3,4,4));
 		var playerPos = new Pos(0,0);
 
 		var update = function () {
@@ -87,7 +92,7 @@ var Cerulean = function () {
 		window.setInterval(function () {
 			update();
 			requestAnimationFrame(function() {
-				renderer.draw(playerPos, room);
+				renderer.draw(playerPos, rooms);
 			});
 		}, 1000/desiredFps);
 	}
