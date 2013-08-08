@@ -96,11 +96,11 @@ var WorldGenerator = function () {
 		var maxExpansions;
 		var hallway = false;
 
-		var randRoomValue = rand(0, 10);
-		if (randRoomValue < 8) { //normal rooms
+		var randRoomValue = rand(0, 100);
+		if (randRoomValue < 95) { //normal or jumbo rooms
 			width = 5;
 			height = 5;
-			maxExpansions = rand(5,30);
+			maxExpansions = rand(0,100) < 70 ? rand(5,6) : 20;
 		} else { //hallway rooms
 			hallway = true;
 			if (rand(0,2) == 1) {
@@ -110,7 +110,7 @@ var WorldGenerator = function () {
 				width = 6;
 				height = 3;
 			}
-			maxExpansions = 6;
+			maxExpansions = 9;
 		}
 
 		var x;
@@ -162,7 +162,6 @@ var WorldGenerator = function () {
 
 		var expansionCount = 0;
 		while (expansions.length > 0 && expansionCount < maxExpansions) {
-			expansionCount++;
 			var rnd = rand(0, expansions.length);
 			var rndDir = expansions[rnd];
 			switch(rndDir) {
@@ -174,6 +173,7 @@ var WorldGenerator = function () {
 					} else {
 						y--;
 						height++;
+						expansionCount++;
 					}
 					break;
 				case Dir.DOWN:
@@ -183,6 +183,7 @@ var WorldGenerator = function () {
 						expansions = expansions.filter(function (e) {return e != rndDir});
 					} else {
 						height++;
+						expansionCount++;
 					}
 					break;
 				case Dir.LEFT:
@@ -193,6 +194,7 @@ var WorldGenerator = function () {
 					} else {
 						x--;
 						width++;
+						expansionCount++;
 					}
 					break;
 				case Dir.RIGHT:
@@ -202,6 +204,7 @@ var WorldGenerator = function () {
 						expansions = expansions.filter(function (i) {i != rndDir});
 					} else {
 						width++;
+						expansionCount++;
 					}
 					break;
 				default:
@@ -211,7 +214,33 @@ var WorldGenerator = function () {
 		console.log("Expansions: " + expansionCount);
 
 		var newRoom = new Room(x, y, width, height);
-		addDoorsBetween(startRoom, newRoom, direction);
+		//addDoorsBetween(startRoom, newRoom, direction);
+
+		//Find rooms to add doorways to
+		nearbyRooms.filter(function (room) {
+			return roomCollidesWith(room, x - 1, y+2, 1, height-4);
+		}).forEach(function (room) {
+			addDoorsBetween(newRoom, room, Dir.LEFT);
+		});
+
+		nearbyRooms.filter(function (room) {
+			return roomCollidesWith(room, x + width, y+2, 1, height-4);
+		}).forEach(function (room) {
+			addDoorsBetween(newRoom, room, Dir.RIGHT);
+		});
+
+		nearbyRooms.filter(function (room) {
+			return roomCollidesWith(room, x+2, y-1, width-4, 1);
+		}).forEach(function (room) {
+			addDoorsBetween(newRoom, room, Dir.UP);
+		});
+
+		nearbyRooms.filter(function (room) {
+			return roomCollidesWith(room, x+2, y+height, width-4, 1);
+		}).forEach(function (room) {
+			addDoorsBetween(newRoom, room, Dir.DOWN);
+		});
+
 		openRooms.push(newRoom);
 	}
 
