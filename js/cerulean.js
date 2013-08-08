@@ -6,9 +6,9 @@ var Cerulean = function () {
 	}
 
 	var GameConsts = {
-		tileSize: 32,
-		worldWidth: 100,
-		worldHeight: 100
+		tileSize: 14,
+		worldWidth: 29,
+		worldHeight: 20
 	};
 
 	var Renderer = function (gameWindow) {
@@ -28,21 +28,20 @@ var Cerulean = function () {
 			ctx.fillText("Cerulean 2…", 40, gameWindow.height - 32);
 
 			rooms.forEach(function (room) {
-				ctx.fillStyle = "#bbffbb";
+				ctx.fillStyle = "#bbddbb";
 				ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
-				ctx.fillStyle = "#bbddbb";
-				ctx.fillRect((room.pos.x+1)*GameConsts.tileSize, (room.pos.y+1)*GameConsts.tileSize,
-					(room.size.x-2)*GameConsts.tileSize, (room.size.y-2)*GameConsts.tileSize);
+				ctx.fillStyle = "#bbffbb";
+				ctx.fillRect((room.pos.x)*GameConsts.tileSize+5, (room.pos.y)*GameConsts.tileSize+5,
+					(room.size.x)*GameConsts.tileSize-10, (room.size.y)*GameConsts.tileSize-10);
 
-				ctx.fillStyle = "#bbddbb";
+				ctx.fillStyle = "#bbffbb";
 				room.doors.forEach(function (door) {
 					ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize,
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
 			});
-
 			ctx.fillStyle = "white";
 			ctx.fillRect(playerPos.x, playerPos.y, 32, 32);
 		}

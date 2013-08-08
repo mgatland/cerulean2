@@ -11,6 +11,9 @@ var WorldGenerator = function () {
 		this.size = new Pos(width, height);
 		this.doors = [];
 		this.addDoor = function (x, y) {
+			/*console.log("Adding door");
+			console.log(this.toString());
+			console.log(x + "," + y);*/
 			this.doors.push(new Door(x,y));
 		}
 
@@ -19,13 +22,75 @@ var WorldGenerator = function () {
 		};
 	}
 
+	var addDoorsBetween = function (room, newRoom, direction) {
+		var minX;
+		var maxX;
+		switch (direction) {
+			case Dir.UP:
+			case Dir.DOWN:
+				minX = Math.max(newRoom.pos.x + 1, room.pos.x + 1);
+				maxX = Math.min(newRoom.pos.x + newRoom.size.x - 2, room.pos.x + room.size.x - 2);
+				break;
+			case Dir.LEFT:
+				minX = room.pos.x;
+				maxX = minX;
+				break;
+			case Dir.RIGHT:
+				minX = room.pos.x + room.size.x - 1;
+				maxX = minX;
+				break;
+			break;
+		}
+		var minY;
+		var maxY;
+		switch (direction) {
+			case Dir.LEFT:
+			case Dir.RIGHT:
+				minY = Math.max(newRoom.pos.y + 1, room.pos.y + 1);
+				maxY = Math.min(newRoom.pos.y + newRoom.size.y - 2, room.pos.y + room.size.y - 2);
+				break;
+			case Dir.UP:
+				minY = room.pos.y;
+				maxY = minY;
+				break;
+			case Dir.DOWN:
+				minY = room.pos.y + room.size.y - 1;
+				maxY = minY;
+				break;
+			break;
+		}
+		var x = Math.floor(minX + Math.random() * (maxX - minX));
+		var y = Math.floor(minY + Math.random() * (maxY - minY));
+		room.addDoor(x, y);
+		switch (direction) {
+			case Dir.LEFT:
+				x--;
+				break;
+			case Dir.RIGHT:
+				x++;
+				break;
+			case Dir.UP:
+				y--;
+				break;
+			case Dir.DOWN:
+				y++;
+				break;
+		}
+		newRoom.addDoor(x, y);
+	};
+
+	var roomCollidesWith = function (room, x, y, width, height) {
+		return (room.pos.x < x + width && room.pos.x + room.size.x > x
+			&& room.pos.y < y + height  && room.pos.y + room.size.y > y);
+	}
+
 	var addRoom = function (startRoom, direction, openRooms, closedRooms, worldWidth, worldHeight) {
-		if (closedRooms.length > 200) {
+		if (closedRooms.length > 2000) {
 			console.log("Too many rooms!");
 			return; //abort
 		}
-		var width = 10;
-		var height = 10;
+		var width = 3;
+		var height = 3;
 		var x;
 		var y;
 		switch (direction) {
@@ -46,23 +111,28 @@ var WorldGenerator = function () {
 				y = startRoom.pos.y;
 			break;
 		}
-		if (x < 0 || y < 0 || x > worldWidth || y > worldWidth) return;
+		if (x < 0 || y < 0 || x > worldWidth || y > worldHeight) return;
+
 		if (closedRooms.some(function (room) {
-			return (room.pos.x < x + width && room.pos.x + room.size.x > x
-				&& room.pos.y < y + height  && room.pos.y + room.size.y > y);
-		})) return; //we overlap with another room
+			return roomCollidesWith(room, x, y, width, height);
+		})) return;
+		if (openRooms.some(function (room) {
+			return roomCollidesWith(room, x, y, width, height);
+		})) return;
+
 		var newRoom = new Room(x, y, width, height);
+		addDoorsBetween(startRoom, newRoom, direction);
 		openRooms.push(newRoom);
 	}
 
 	this.generate = function (worldWidth, worldHeight) {
 		var openRooms = [];
 		var closedRooms = [];
-		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 10, 10);
+		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 3, 3);
 		openRooms.push(firstRoom);
 
 		while (openRooms.length > 0) {
-			var room = openRooms.pop();
+			var room = (Math.random() > 0.5) ? openRooms.shift() : openRooms.pop();
 			closedRooms.push(room);
 			addRoom(room, Dir.UP, openRooms, closedRooms, worldWidth, worldHeight);
 			addRoom(room, Dir.DOWN, openRooms, closedRooms, worldWidth, worldHeight);
