@@ -84,13 +84,19 @@ var WorldGenerator = function () {
 			&& room.pos.y < y + height  && room.pos.y + room.size.y > y);
 	}
 
+	var rand = function (min, max) {
+		return Math.floor(Math.random() * (max-min) + min);
+	}
+
 	var addRoom = function (startRoom, direction, openRooms, closedRooms, worldWidth, worldHeight) {
 		if (closedRooms.length > 2000) {
 			console.log("Too many rooms!");
 			return; //abort
 		}
-		var width = 3;
-		var height = 3;
+		var width = rand(3, 11);
+		var height = rand(3, 11);
+		if (width == 3) height = Math.max(5, height); //passageways should be long
+		if (height == 3) width = Math.max(5, width);
 		var x;
 		var y;
 		switch (direction) {
@@ -128,7 +134,7 @@ var WorldGenerator = function () {
 	this.generate = function (worldWidth, worldHeight) {
 		var openRooms = [];
 		var closedRooms = [];
-		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 3, 3);
+		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 11, 11);
 		openRooms.push(firstRoom);
 
 		while (openRooms.length > 0) {

@@ -6,9 +6,9 @@ var Cerulean = function () {
 	}
 
 	var GameConsts = {
-		tileSize: 14,
-		worldWidth: 29,
-		worldHeight: 20
+		tileSize: 5,
+		worldWidth: 290,
+		worldHeight: 200
 	};
 
 	var Renderer = function (gameWindow) {
@@ -28,15 +28,15 @@ var Cerulean = function () {
 			ctx.fillText("Cerulean 2…", 40, gameWindow.height - 32);
 
 			rooms.forEach(function (room) {
-				ctx.fillStyle = "#bbddbb";
+				ctx.fillStyle = "#000000";
 				ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
-				ctx.fillStyle = "#bbffbb";
+				ctx.fillStyle = "#ccccff";
 				ctx.fillRect((room.pos.x)*GameConsts.tileSize+5, (room.pos.y)*GameConsts.tileSize+5,
 					(room.size.x)*GameConsts.tileSize-10, (room.size.y)*GameConsts.tileSize-10);
 
-				ctx.fillStyle = "#bbffbb";
+				ctx.fillStyle = "#ccecff";
 				room.doors.forEach(function (door) {
 					ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize,
 						GameConsts.tileSize, GameConsts.tileSize);
