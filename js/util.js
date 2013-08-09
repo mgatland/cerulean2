@@ -7,7 +7,9 @@ var Pos = function (x, y) {
 	}
 
 	this.distanceTo = function (other) {
-		return (Math.abs(this.x - other.x) + Math.abs(this.y - other.y));
+		var xDiff = this.x - other.x;
+		var yDiff = this.y - other.y;
+		return Math.floor(Math.sqrt(xDiff * xDiff + yDiff * yDiff));
 	}
 
 	this.clone = function () {
