@@ -51,14 +51,23 @@ var Cerulean = function () {
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
 
-				ctx.fillStyle = "#ff0f0f";
 				room.enemies.forEach(function (enemy) {
+					if (enemy.targetted) {
+						ctx.fillStyle = "#00ff00";
+					} else {
+						ctx.fillStyle = "#ff0f0f";
+					}
 					ctx.fillRect(enemy.pos.x-camera.pos.x, enemy.pos.y-camera.pos.y,
 						enemy.size.x, enemy.size.y);
 				});
 
 				ctx.fillStyle = "#ff0f0f";
 				room.shots.forEach(function (shot) {
+					if (shot.targetted) {
+						ctx.fillStyle = "#00ff00";
+					} else {
+						ctx.fillStyle = "#ff0f0f";
+					}
 					ctx.fillRect(shot.pos.x-camera.pos.x-5, shot.pos.y-camera.pos.y-5,
 						10, 10);
 				});
@@ -114,6 +123,12 @@ var Cerulean = function () {
 			this.lastRoom = null;
 		}
 
+		//duplicate code with Enemy.getCenter
+		this.getCenter = function () {
+			var x = Math.floor(this.pos.x + this.size.x / 2);
+			var y = Math.floor(this.pos.y + this.size.y / 2);
+			return new Pos(x, y);
+		}
 
 		this._updateControls = function (keyboard) {
 			if (this.health <= 0) return;
@@ -158,6 +173,15 @@ var Cerulean = function () {
 						this.attackCharge = this.maxAttackCharge;
 					}
 				} else {
+					if (this.attackCharge > 0) {
+						var player = this;
+						this.room.enemies.forEach(function (enemy) {
+							enemy.shocked(player.attackPowerOn(enemy));
+						});
+						this.room.shots.forEach(function (shot) {
+							shot.shocked(player.attackPowerOn(shot));
+						});
+					}
 					this.attackCharge = 0;
 				}
 			}
@@ -187,7 +211,11 @@ var Cerulean = function () {
 			} else {
 				this.invlunerableTime = 60; //we won't respawn until this wears off
 			}
+		}
 
+		this.attackPowerOn = function (enemy) {
+			var dist = this.getCenter().distanceTo(enemy.getCenter());
+			return Math.floor(100 * this.attackCharge / this.maxAttackCharge - dist/10);
 		}
 	}
 
@@ -196,6 +224,8 @@ var Cerulean = function () {
 		this.pos = pos;
 		this.speed = 1;
 		this.live = true;
+		this.targetted = false;
+		this.health = 1;
 		this.update = function (player) {
 			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
 			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
@@ -208,6 +238,24 @@ var Cerulean = function () {
 				player.hit();
 				this.live = false;
 			}
+
+			//update highlight status
+			if (player.attackPowerOn(this) > this.health) {
+				this.targetted = true;
+			} else {
+				this.targetted = false;
+			}
+		}
+
+		this.getCenter = function () {
+			return this.pos;
+		}
+
+		this.shocked = function (damage) {
+			if (damage > this.health) {
+				this.health = 0;
+				this.live = false;
+			}
 		}
 	}
 
@@ -217,8 +265,10 @@ var Cerulean = function () {
 		this.size = new Pos(32, 32);
 		this.dest = null;
 		this.refireTimer = 0;
+		this.health = 20;
+		this.live = true;
 
-		this._getCenter = function () {
+		this.getCenter = function () {
 			var x = Math.floor(this.pos.x + this.size.x / 2);
 			var y = Math.floor(this.pos.y + this.size.y / 2);
 			return new Pos(x, y);
@@ -241,13 +291,30 @@ var Cerulean = function () {
 			//shoot
 			if (this.refireTimer == 0) {
 				console.log("shoot");
-				var shot = new Shot(this._getCenter(), room, this.pos.angleTo(player.pos));
+				var shot = new Shot(this.getCenter(), room, this.pos.angleTo(player.pos));
 				room.shots.push(shot);
 				this.refireTimer = 25;
 			} else {
 				this.refireTimer--;
 			}
+
+			//duplicate code from Shot
+			//update highlight status
+			if (player.attackPowerOn(this) > this.health) {
+				this.targetted = true;
+			} else {
+				this.targetted = false;
+			}
 		}
+
+		//duplicate code from Shot
+		this.shocked = function (damage) {
+			if (damage > this.health) {
+				this.health = 0;
+				this.live = false;
+			}
+		}
+
 	}
 
 	this.start = function () {
