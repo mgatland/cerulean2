@@ -74,9 +74,44 @@ var Cerulean = function () {
 	}
 
 	var Player = function () {
+		this.health = 0;
+		this.invlunerableTime = 0;
+		this.shieldRechange = 0;
+		this.home = null;
 		this.isCollidingWith = function (point) {
 			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
 				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
+		}
+
+		this.setHome = function (room) {
+			this.home = room;
+		}
+
+		this.respawn = function () {
+			this.health = 5;
+			this.pos = this.home.getCenter();
+			this.pos.x *= GameConsts.tileSize;
+			this.pos.y *= GameConsts.tileSize;
+			this.room = this.home;
+			this.lastRoom = null;
+		}
+
+		this.update = function () {
+			if (this.invlunerableTime > 0) {
+				this.invlunerableTime--;
+			}
+		}
+
+		this.hit = function () {
+			if (this.invlunerableTime > 0) return;
+			this.health--;
+			console.log('hit!');
+			if (this.health > 0) {
+				this.invlunerableTime = 15;
+			} else {
+				this.respawn();
+			}
+
 		}
 	}
 
@@ -94,6 +129,7 @@ var Cerulean = function () {
 				this.live = false;
 			}
 			if (player.isCollidingWith(this)) {
+				player.hit();
 				this.live = false;
 			}
 		}
@@ -155,11 +191,9 @@ var Cerulean = function () {
 		var rooms = worldGenerator.generate();
 
 		var player = new Player();
-		player.pos = rooms[0].getCenter();
-		player.pos.x *= GameConsts.tileSize;
-		player.pos.y *= GameConsts.tileSize;
-		player.room = rooms[0];
 		player.size = new Pos(GameConsts.tileSize-4, GameConsts.tileSize-4);
+		player.setHome(rooms[0]);
+		player.respawn();
 
 		rooms[0].explored = true;
 		roomsExplored++;
@@ -188,6 +222,7 @@ var Cerulean = function () {
 				}
 			}
 
+			player.update();
 			player.room.update(player);
 			if (player.lastRoom) player.lastRoom.update(player);
 
