@@ -31,14 +31,15 @@ var Cerulean = function () {
 			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 			ctx.fillText("Cerulean 2…", 40, gameWindow.height - 32);
 
+			var wallWidth = GameConsts.tileSize;
 			rooms.forEach(function (room) {
 				ctx.fillStyle = "#000000";
 				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
 				ctx.fillStyle = "#ccccff";
-				ctx.fillRect((room.pos.x)*GameConsts.tileSize+5-camera.pos.x, (room.pos.y)*GameConsts.tileSize+5-camera.pos.y,
-					(room.size.x)*GameConsts.tileSize-10, (room.size.y)*GameConsts.tileSize-10);
+				ctx.fillRect((room.pos.x)*GameConsts.tileSize+wallWidth-camera.pos.x, (room.pos.y)*GameConsts.tileSize+wallWidth-camera.pos.y,
+					(room.size.x)*GameConsts.tileSize-wallWidth*2, (room.size.y)*GameConsts.tileSize-wallWidth*2);
 
 				ctx.fillStyle = "#ccecff";
 				room.doors.forEach(function (door) {
@@ -56,11 +57,13 @@ var Cerulean = function () {
 		var renderer = new Renderer(gameWindow);
 		var keyboard = new Keyboard();
 		var camera = new Camera();
-		var worldGenerator = new WorldGenerator();
+		var worldGenerator = new WorldGenerator(GameConsts);
 		var desiredFps = 60;
 
-		var rooms = worldGenerator.generate(GameConsts.worldWidth, GameConsts.worldHeight);
-		var playerPos = new Pos(0,0);
+		var rooms = worldGenerator.generate();
+		var playerPos = rooms[0].getCenter();
+		playerPos.x *= GameConsts.tileSize;
+		playerPos.y *= GameConsts.tileSize;
 
 		var update = function () {
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {

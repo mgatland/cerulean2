@@ -1,4 +1,4 @@
-var WorldGenerator = function () {
+var WorldGenerator = function (gameConsts) {
 
 	var Dir = {UP: 0, DOWN: 1, LEFT:2, RIGHT: 3};
 
@@ -12,6 +12,12 @@ var WorldGenerator = function () {
 		this.doors = [];
 		this.addDoor = function (x, y) {
 			this.doors.push(new Door(x,y));
+		}
+
+		this.getCenter = function () {
+			var x = this.pos.x + this.size.x / 2;
+			var y = this.pos.y + this.size.y / 2;
+			return new Pos(Math.floor(x), Math.floor(y));
 		}
 
 		this.toString = function () {
@@ -243,7 +249,9 @@ var WorldGenerator = function () {
 		openRooms.push(newRoom);
 	}
 
-	this.generate = function (worldWidth, worldHeight) {
+	this.generate = function () {
+		var worldWidth = gameConsts.worldWidth;
+		var worldHeight = gameConsts.worldHeight;
 		var openRooms = [];
 		var closedRooms = [];
 		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 11, 11);
