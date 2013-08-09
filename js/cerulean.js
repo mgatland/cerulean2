@@ -148,6 +148,8 @@ var Cerulean = function () {
 						}
 					}
 				});
+			} else {
+				player.lastRoom = null;
 			}
 
 			keyboard.update();
