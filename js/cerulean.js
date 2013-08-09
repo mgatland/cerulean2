@@ -63,8 +63,9 @@ var Cerulean = function () {
 	var Player = function () {
 	}
 
-	var Enemy = function (pos) {
+	var Enemy = function (pos, room) {
 		this.pos = pos;
+		this.room = room;
 		this.size = new Pos(32, 32);
 	}
 
