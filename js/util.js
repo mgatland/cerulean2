@@ -9,4 +9,8 @@ var Pos = function (x, y) {
 	this.distanceTo = function (other) {
 		return (Math.abs(this.x - other.x) + Math.abs(this.y - other.y));
 	}
+
+	this.clone = function () {
+		return new Pos(this.x, this.y);
+	}
 }

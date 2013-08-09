@@ -12,10 +12,15 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.size = new Pos(width, height);
 		this.doors = [];
 		this.enemies = [];
+		this.shots = [];
 
 		this.update = function () {
 			this.enemies.forEach(function (enemy) {
 				enemy.update();
+			});
+
+			this.shots.forEach(function (shot) {
+				shot.update();
 			});
 		}
 

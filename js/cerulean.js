@@ -50,6 +50,12 @@ var Cerulean = function () {
 					ctx.fillRect(enemy.pos.x-camera.pos.x, enemy.pos.y-camera.pos.y,
 						enemy.size.x, enemy.size.y);
 				});
+
+				ctx.fillStyle = "#ff0f0f";
+				room.shots.forEach(function (shot) {
+					ctx.fillRect(shot.pos.x-camera.pos.x, shot.pos.y-camera.pos.y,
+						10, 10);
+				});
 			});
 			ctx.fillStyle = "white";
 			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
@@ -63,13 +69,22 @@ var Cerulean = function () {
 	var Player = function () {
 	}
 
+	var Shot = function (pos, room) {
+		this.pos = pos.clone();
+		this.update = function () {
+			this.pos.y--;
+		}
+	}
+
 	var Enemy = function (pos, room) {
 		this.pos = pos;
 		this.room = room;
 		this.size = new Pos(32, 32);
 		this.dest = null;
+		this.refireTimer = 0;
 
 		this.update = function () {
+			//move
 			if (!this.dest) {
 				this.dest = room.getRandomPointInside();
 			}
@@ -81,6 +96,15 @@ var Cerulean = function () {
 
 			if (this.pos.distanceTo(this.dest) < 16) {
 				this.dest = null;
+			}
+			//shoot
+			if (this.refireTimer == 0) {
+				console.log("shoot");
+				var shot = new Shot(this.pos, room);
+				room.shots.push(shot);
+				this.refireTimer = 25;
+			} else {
+				this.refireTimer--;
 			}
 		}
 	}
