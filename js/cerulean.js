@@ -24,13 +24,13 @@ var Cerulean = function () {
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
-		this.draw = function (player, rooms, camera, roomsExplored) {
+		this.draw = function (player, rooms, camera, roomsExplored, currentFps) {
 			ctx.fillStyle = "#3f303f";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 
 			var wallWidth = GameConsts.tileSize;
 			rooms.forEach(function (room) {
-				//if (!room.explored) return;
+				if (!room.explored) return;
 				if ((room.pos.x + room.size.x) * GameConsts.tileSize < camera.pos.x) return;
 				if ((room.pos.y + room.size.y) * GameConsts.tileSize < camera.pos.y) return;
 
@@ -69,6 +69,7 @@ var Cerulean = function () {
 			ctx.fillStyle = "white";
 			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 			ctx.fillText("Rooms explored: " + roomsExplored + " of " + rooms.length, 40, gameWindow.height - 32);
+			ctx.fillText("FPS: " + currentFps, 512, gameWindow.height - 32);
 		}
 	}
 
@@ -137,6 +138,11 @@ var Cerulean = function () {
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
 		var desiredFps = 60;
+
+		//fps  counter
+		var currentFps = 0;
+		var framesThisSecond = 0;
+		var thisSecond = 0;
 
 		var roomsExplored = 0;
 		var rooms = worldGenerator.generate();
@@ -212,7 +218,14 @@ var Cerulean = function () {
 			camera.pos.y = player.pos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
 
 			requestAnimationFrame(function() {
-				renderer.draw(player, rooms, camera, roomsExplored);
+				renderer.draw(player, rooms, camera, roomsExplored, currentFps);
+				var newSecond = Math.floor(Date.now() / 1000);
+				if (newSecond != thisSecond) {
+					thisSecond = newSecond;
+					currentFps = framesThisSecond;
+					framesThisSecond = 0;
+				}
+				framesThisSecond++;
 			});
 		}, 1000/desiredFps);
 	}
