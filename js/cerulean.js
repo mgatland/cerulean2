@@ -97,10 +97,40 @@ var Cerulean = function () {
 			this.lastRoom = null;
 		}
 
-		this.update = function () {
+
+		this._updateControls = function (keyboard) {
+			if (this.health <= 0) return;
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
+				this.pos.x += 4;
+				while (this.room.isCollidingWith(this)) {
+					this.pos.x -= 1;
+				}
+			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) {
+				this.pos.x -= 4;
+				while (this.room.isCollidingWith(this)) {
+					this.pos.x += 1;
+				}
+			}
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) {
+				this.pos.y -= 4;
+				while (this.room.isCollidingWith(this)) {
+					this.pos.y += 1;
+				}
+			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
+				this.pos.y += 4;
+				while (this.room.isCollidingWith(this)) {
+					this.pos.y -= 1;
+				}
+			}
+		}
+
+		this.update = function (keyboard) {
+			this._updateControls(keyboard);
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
 			} else {
+				if (this.health == 0) this.respawn();
+
 				if (this.health < this.maxHealth) {
 					this.shieldRechange++;
 					if (this.shieldRechange > 30) {
@@ -119,7 +149,7 @@ var Cerulean = function () {
 			if (this.health > 0) {
 				this.invlunerableTime = 15;
 			} else {
-				this.respawn();
+				this.invlunerableTime = 60; //we won't respawn until this wears off
 			}
 
 		}
@@ -209,30 +239,7 @@ var Cerulean = function () {
 		roomsExplored++;
 
 		var update = function () {
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
-				player.pos.x += 4;
-				while (player.room.isCollidingWith(player)) {
-					player.pos.x -= 1;
-				}
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) {
-				player.pos.x -= 4;
-				while (player.room.isCollidingWith(player)) {
-					player.pos.x += 1;
-				}
-			}
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) {
-				player.pos.y -= 4;
-				while (player.room.isCollidingWith(player)) {
-					player.pos.y += 1;
-				}
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
-				player.pos.y += 4;
-				while (player.room.isCollidingWith(player)) {
-					player.pos.y -= 1;
-				}
-			}
-
-			player.update();
+			player.update(keyboard);
 			player.room.update(player);
 			if (player.lastRoom) player.lastRoom.update(player);
 
