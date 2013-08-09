@@ -165,7 +165,7 @@ var Cerulean = function () {
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
 			} else {
-				if (this.health == 0) this.respawn();
+				if (this.health <= 0) this.respawn();
 
 				if (this.health < this.maxHealth) {
 					this.shieldRechange++;
@@ -178,7 +178,7 @@ var Cerulean = function () {
 		}
 
 		this.hit = function () {
-			if (this.invlunerableTime > 0) return;
+			if (this.invlunerableTime > 0 || this.health <= 0) return;
 			this.health--;
 			this.shieldRechange = 0;
 			console.log('hit!');
