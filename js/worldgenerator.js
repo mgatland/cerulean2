@@ -11,6 +11,7 @@ var WorldGenerator = function (gameConsts) {
 		this.pos = new Pos(x, y);
 		this.size = new Pos(width, height);
 		this.doors = [];
+
 		this.addDoor = function (x, y, otherRoom) {
 			this.doors.push(new Door(x,y, otherRoom));
 		}

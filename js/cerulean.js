@@ -24,12 +24,9 @@ var Cerulean = function () {
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
-		this.draw = function (player, rooms, camera) {
+		this.draw = function (player, rooms, camera, roomsExplored) {
 			ctx.fillStyle = "#3f303f";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
-			ctx.fillStyle = "white";
-			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-			ctx.fillText("Cerulean 2…", 40, gameWindow.height - 32);
 
 			var wallWidth = GameConsts.tileSize;
 			rooms.forEach(function (room) {
@@ -50,6 +47,10 @@ var Cerulean = function () {
 			});
 			ctx.fillStyle = "white";
 			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
+
+			ctx.fillStyle = "white";
+			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
+			ctx.fillText("Rooms explored: " + roomsExplored + " out of " + rooms.length, 40, gameWindow.height - 32);
 		}
 	}
 
@@ -64,6 +65,7 @@ var Cerulean = function () {
 		var worldGenerator = new WorldGenerator(GameConsts);
 		var desiredFps = 60;
 
+		var roomsExplored = 0;
 		var rooms = worldGenerator.generate();
 
 		var player = new Player();
@@ -74,6 +76,7 @@ var Cerulean = function () {
 		player.size = new Pos(GameConsts.tileSize-4, GameConsts.tileSize-4);
 
 		rooms[0].explored = true;
+		roomsExplored++;
 
 		var update = function () {
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
@@ -101,11 +104,13 @@ var Cerulean = function () {
 			if (!player.room.containsAllOf(player)) {
 				player.room.doors.forEach(function (door) {
 					if (door.otherRoom.containsSomeOf(player)) {
-						door.otherRoom.explored = true;
+						if (!door.otherRoom.explored) {
+							door.otherRoom.explored = true;
+							roomsExplored++;
+						}
 						if (door.otherRoom.containsCenterOf(player)) {
 							player.lastRoom = player.room;
 							player.room = door.otherRoom;
-							console.log("Moved to room " + player.room);
 						} else {
 							player.lastRoom = door.otherRoom;
 						}
@@ -128,7 +133,7 @@ var Cerulean = function () {
 			camera.pos.y = player.pos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
 
 			requestAnimationFrame(function() {
-				renderer.draw(player, rooms, camera);
+				renderer.draw(player, rooms, camera, roomsExplored);
 			});
 		}, 1000/desiredFps);
 	}
