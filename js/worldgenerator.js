@@ -29,7 +29,11 @@ var WorldGenerator = function (gameConsts) {
 			var gridY = Math.floor(y / gameConsts.tileSize);
 			if (gridX == this.pos.x || gridX == this.pos.x + this.size.x - 1
 				|| gridY == this.pos.y || gridY == this.pos.y + this.size.y - 1) {
-				return true;
+
+				//it's wall unless it's a door.
+				return !(this.doors.some(function (door) {
+					return (gridX == door.pos.x && gridY == door.pos.y);
+				}));
 			}
 			return false;
 		}
