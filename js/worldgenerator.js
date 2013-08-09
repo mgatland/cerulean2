@@ -23,7 +23,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			});
 
 			this.shots.forEach(function (shot) {
-				shot.update();
+				shot.update(player);
 			});
 		}
 

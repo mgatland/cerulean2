@@ -59,7 +59,7 @@ var Cerulean = function () {
 
 				ctx.fillStyle = "#ff0f0f";
 				room.shots.forEach(function (shot) {
-					ctx.fillRect(shot.pos.x-camera.pos.x, shot.pos.y-camera.pos.y,
+					ctx.fillRect(shot.pos.x-camera.pos.x-5, shot.pos.y-camera.pos.y-5,
 						10, 10);
 				});
 			});
@@ -74,6 +74,10 @@ var Cerulean = function () {
 	}
 
 	var Player = function () {
+		this.isCollidingWith = function (point) {
+			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
+				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
+		}
 	}
 
 	var Shot = function (pos, room, angle) {
@@ -81,12 +85,15 @@ var Cerulean = function () {
 		this.pos = pos;
 		this.speed = 1;
 		this.live = true;
-		this.update = function () {
+		this.update = function (player) {
 			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
 			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
 			this.pos.x += xSpeed;
 			this.pos.y += ySpeed;
 			if (room.isCollidingWith(this, true)) {
+				this.live = false;
+			}
+			if (player.isCollidingWith(this)) {
 				this.live = false;
 			}
 		}
