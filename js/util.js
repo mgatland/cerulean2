@@ -13,4 +13,10 @@ var Pos = function (x, y) {
 	this.clone = function () {
 		return new Pos(this.x, this.y);
 	}
+
+	this.angleTo = function (other) {
+		var angle = (Math.atan2(other.y - this.y, other.x - this.x) * 180 / Math.PI);
+		angle += 90;
+		return angle;
+	}
 }

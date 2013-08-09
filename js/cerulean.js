@@ -69,10 +69,15 @@ var Cerulean = function () {
 	var Player = function () {
 	}
 
-	var Shot = function (pos, room) {
-		this.pos = pos.clone();
+	var Shot = function (pos, room, angle) {
+		this.angle = angle;
+		this.pos = pos;
+		this.speed = 1;
 		this.update = function () {
-			this.pos.y--;
+			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
+			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
+			this.pos.x += xSpeed;
+			this.pos.y += ySpeed;
 		}
 	}
 
@@ -83,7 +88,13 @@ var Cerulean = function () {
 		this.dest = null;
 		this.refireTimer = 0;
 
-		this.update = function () {
+		this._getCenter = function () {
+			var x = Math.floor(this.pos.x + this.size.x / 2);
+			var y = Math.floor(this.pos.y + this.size.y / 2);
+			return new Pos(x, y);
+		}
+
+		this.update = function (player) {
 			//move
 			if (!this.dest) {
 				this.dest = room.getRandomPointInside();
@@ -100,7 +111,7 @@ var Cerulean = function () {
 			//shoot
 			if (this.refireTimer == 0) {
 				console.log("shoot");
-				var shot = new Shot(this.pos, room);
+				var shot = new Shot(this._getCenter(), room, this.pos.angleTo(player.pos));
 				room.shots.push(shot);
 				this.refireTimer = 25;
 			} else {
@@ -154,8 +165,8 @@ var Cerulean = function () {
 				}
 			}
 
-			player.room.update();
-			if (player.lastRoom) player.lastRoom.update();
+			player.room.update(player);
+			if (player.lastRoom) player.lastRoom.update(player);
 
 			if (!player.room.containsAllOf(player)) {
 				player.room.doors.forEach(function (door) {

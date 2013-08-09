@@ -14,9 +14,9 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.enemies = [];
 		this.shots = [];
 
-		this.update = function () {
+		this.update = function (player) {
 			this.enemies.forEach(function (enemy) {
-				enemy.update();
+				enemy.update(player);
 			});
 
 			this.shots.forEach(function (shot) {
