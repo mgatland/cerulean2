@@ -6,10 +6,14 @@ var Cerulean = function () {
 	}
 
 	var GameConsts = {
-		tileSize: 5,
+		tileSize: 32,
 		worldWidth: 280,
 		worldHeight: 230
 	};
+
+	var Camera = function () {
+		this.pos = new Pos();
+	}
 
 	var Renderer = function (gameWindow) {
 		var canvas;
@@ -20,7 +24,7 @@ var Cerulean = function () {
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
-		this.draw = function (playerPos, rooms) {
+		this.draw = function (playerPos, rooms, camera) {
 			ctx.fillStyle = "#3f303f";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 			ctx.fillStyle = "white";
@@ -29,21 +33,21 @@ var Cerulean = function () {
 
 			rooms.forEach(function (room) {
 				ctx.fillStyle = "#000000";
-				ctx.fillRect(room.pos.x*GameConsts.tileSize, room.pos.y*GameConsts.tileSize,
+				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
 				ctx.fillStyle = "#ccccff";
-				ctx.fillRect((room.pos.x)*GameConsts.tileSize+5, (room.pos.y)*GameConsts.tileSize+5,
+				ctx.fillRect((room.pos.x)*GameConsts.tileSize+5-camera.pos.x, (room.pos.y)*GameConsts.tileSize+5-camera.pos.y,
 					(room.size.x)*GameConsts.tileSize-10, (room.size.y)*GameConsts.tileSize-10);
 
 				ctx.fillStyle = "#ccecff";
 				room.doors.forEach(function (door) {
-					ctx.fillRect(door.pos.x*GameConsts.tileSize, door.pos.y*GameConsts.tileSize,
+					ctx.fillRect(door.pos.x*GameConsts.tileSize-camera.pos.x, door.pos.y*GameConsts.tileSize-camera.pos.y,
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
 			});
 			ctx.fillStyle = "white";
-			ctx.fillRect(playerPos.x, playerPos.y, 32, 32);
+			ctx.fillRect(playerPos.x-camera.pos.x, playerPos.y-camera.pos.y, 32, 32);
 		}
 	}
 
@@ -51,6 +55,7 @@ var Cerulean = function () {
 		var gameWindow = new GameWindow();
 		var renderer = new Renderer(gameWindow);
 		var keyboard = new Keyboard();
+		var camera = new Camera();
 		var worldGenerator = new WorldGenerator();
 		var desiredFps = 60;
 
@@ -78,8 +83,12 @@ var Cerulean = function () {
 
 		window.setInterval(function () {
 			update();
+
+			camera.pos.x = playerPos.x - gameWindow.width / 2 + GameConsts.tileSize / 2;
+			camera.pos.y = playerPos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
+
 			requestAnimationFrame(function() {
-				renderer.draw(playerPos, rooms);
+				renderer.draw(playerPos, rooms, camera);
 			});
 		}, 1000/desiredFps);
 	}
