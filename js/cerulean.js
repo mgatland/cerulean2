@@ -63,7 +63,12 @@ var Cerulean = function () {
 						10, 10);
 				});
 			});
-			ctx.fillStyle = "white";
+
+			if (player.invlunerableTime > 0) {
+				ctx.fillStyle = "#ffff00";
+			} else {
+				ctx.fillStyle = "white";
+			}
 			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
 
 			ctx.fillStyle = "white";
