@@ -5,6 +5,4 @@ var Pos = function (x, y) {
 	this.toString = function () {
 		return "(" + this.x + "," + this.y + ")";
 	}
-
-
 }

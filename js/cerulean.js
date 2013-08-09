@@ -44,17 +44,28 @@ var Cerulean = function () {
 					ctx.fillRect(door.pos.x*GameConsts.tileSize-camera.pos.x, door.pos.y*GameConsts.tileSize-camera.pos.y,
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
+
+				ctx.fillStyle = "#ff0f0f";
+				room.enemies.forEach(function (enemy) {
+					ctx.fillRect(enemy.pos.x-camera.pos.x, enemy.pos.y-camera.pos.y,
+						enemy.size.x, enemy.size.y);
+				});
 			});
 			ctx.fillStyle = "white";
 			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
 
 			ctx.fillStyle = "white";
 			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-			ctx.fillText("Rooms explored: " + roomsExplored + " out of " + rooms.length, 40, gameWindow.height - 32);
+			ctx.fillText("Rooms explored: " + roomsExplored + " of " + rooms.length, 40, gameWindow.height - 32);
 		}
 	}
 
 	var Player = function () {
+	}
+
+	var Enemy = function (pos) {
+		this.pos = pos;
+		this.size = new Pos(32, 32);
 	}
 
 	this.start = function () {
@@ -62,7 +73,7 @@ var Cerulean = function () {
 		var renderer = new Renderer(gameWindow);
 		var keyboard = new Keyboard();
 		var camera = new Camera();
-		var worldGenerator = new WorldGenerator(GameConsts);
+		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
 		var desiredFps = 60;
 
 		var roomsExplored = 0;

@@ -1,4 +1,4 @@
-var WorldGenerator = function (gameConsts) {
+var WorldGenerator = function (gameConsts, Enemy) {
 
 	var Dir = {UP: 0, DOWN: 1, LEFT:2, RIGHT: 3};
 
@@ -11,6 +11,7 @@ var WorldGenerator = function (gameConsts) {
 		this.pos = new Pos(x, y);
 		this.size = new Pos(width, height);
 		this.doors = [];
+		this.enemies = [];
 
 		this.addDoor = function (x, y, otherRoom) {
 			this.doors.push(new Door(x,y, otherRoom));
@@ -74,6 +75,12 @@ var WorldGenerator = function (gameConsts) {
 			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;
 			if (this._isCollidingWithPoint(player.pos.x, player.pos.y+player.size.y)) return true;
 			return false;
+		}
+
+		this.getRandomPointInside = function () {
+			var x = rand(this.pos.x + 1, this.pos.x + this.size.x - 2);
+			var y = rand(this.pos.y + 1, this.pos.y + this.size.y - 2);
+			return new Pos(x * gameConsts.tileSize, y * gameConsts.tileSize);
 		}
 	}
 
@@ -299,6 +306,25 @@ var WorldGenerator = function (gameConsts) {
 		});
 
 		openRooms.push(newRoom);
+
+		//set up enemies in room
+		var area = (width - 2) * (height - 2);
+		if (area < 16) return;
+		if (area <= 20) {
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+		} else if (area < 40) {
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+		} else if (area < 60) {
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+		} else {
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside()));
+		}
 	}
 
 	this.generate = function () {
