@@ -74,6 +74,7 @@ var Cerulean = function () {
 	}
 
 	var Player = function () {
+		this.maxHealth = 5;
 		this.health = 0;
 		this.invlunerableTime = 0;
 		this.shieldRechange = 0;
@@ -88,7 +89,7 @@ var Cerulean = function () {
 		}
 
 		this.respawn = function () {
-			this.health = 5;
+			this.health = this.maxHealth;
 			this.pos = this.home.getCenter();
 			this.pos.x *= GameConsts.tileSize;
 			this.pos.y *= GameConsts.tileSize;
@@ -99,12 +100,21 @@ var Cerulean = function () {
 		this.update = function () {
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
+			} else {
+				if (this.health < this.maxHealth) {
+					this.shieldRechange++;
+					if (this.shieldRechange > 30) {
+						this.shieldRechange = 0;
+						this.health++;
+					}
+				}
 			}
 		}
 
 		this.hit = function () {
 			if (this.invlunerableTime > 0) return;
 			this.health--;
+			this.shieldRechange = 0;
 			console.log('hit!');
 			if (this.health > 0) {
 				this.invlunerableTime = 15;
