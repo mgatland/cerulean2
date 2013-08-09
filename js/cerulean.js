@@ -64,6 +64,7 @@ var Cerulean = function () {
 				});
 			});
 
+			//drawplayer
 			if (player.invlunerableTime > 0) {
 				ctx.fillStyle = "#ffff00";
 			} else {
@@ -71,10 +72,16 @@ var Cerulean = function () {
 			}
 			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
 
+			//draw attack attackCharge
+
+			ctx.fillStyle = "#ffff00";
+			var width = Math.floor(gameWindow.width * player.attackCharge / player.maxAttackCharge);
+			ctx.fillRect(0, gameWindow.height - 32, width, 32);
+
 			ctx.fillStyle = "white";
 			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-			ctx.fillText("Rooms explored: " + roomsExplored + " of " + rooms.length, 40, gameWindow.height - 32);
-			ctx.fillText("FPS: " + currentFps, 512, gameWindow.height - 32);
+			ctx.fillText("Rooms explored: " + roomsExplored + " of " + rooms.length, 40, gameWindow.height - 64);
+			ctx.fillText("FPS: " + currentFps, 512, gameWindow.height - 64);
 		}
 	}
 
@@ -84,6 +91,11 @@ var Cerulean = function () {
 		this.invlunerableTime = 0;
 		this.shieldRechange = 0;
 		this.home = null;
+
+		this.attackCharge = 0;
+		this.maxAttackCharge = 5 * 60;
+		var isChargingAttack = false;
+
 		this.isCollidingWith = function (point) {
 			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
 				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
@@ -105,6 +117,13 @@ var Cerulean = function () {
 
 		this._updateControls = function (keyboard) {
 			if (this.health <= 0) return;
+
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_SPACE)) {
+				isChargingAttack = true;
+			} else {
+				isChargingAttack = false;
+			}
+
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
 				this.pos.x += 4;
 				while (this.room.isCollidingWith(this)) {
@@ -131,6 +150,18 @@ var Cerulean = function () {
 
 		this.update = function (keyboard) {
 			this._updateControls(keyboard);
+
+			if (this.health > 0) {
+				if (isChargingAttack) {
+					this.attackCharge++;
+					if (this.attackCharge > this.maxAttackCharge) {
+						this.attackCharge = this.maxAttackCharge;
+					}
+				} else {
+					this.attackCharge = 0;
+				}
+			}
+
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
 			} else {
