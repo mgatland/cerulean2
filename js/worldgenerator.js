@@ -2,8 +2,9 @@ var WorldGenerator = function (gameConsts) {
 
 	var Dir = {UP: 0, DOWN: 1, LEFT:2, RIGHT: 3};
 
-	var Door = function (x, y) {
+	var Door = function (x, y, otherRoom) {
 		this.pos = new Pos(x,y);
+		this.otherRoom = otherRoom;
 	}
 
 	var Room = function (x, y, width, height) {
@@ -38,8 +39,35 @@ var WorldGenerator = function (gameConsts) {
 			return false;
 		}
 
+		this._containsPos = function (x, y) {
+			var gridX = Math.floor(x / gameConsts.tileSize);
+			var gridY = Math.floor(y / gameConsts.tileSize);
+			return (this.pos.x <= gridX && this.pos.x + this.size.x > gridX
+				&& this.pos.y <= gridY && this.pos.y + this.size.y > gridY);
+		}
+
+		this.containsCenterOf = function (player) {
+			return (this._containsPos(player.pos.x+player.size.x/2, player.pos.y+player.size.y/2));
+		}
+
+		this.containsAllOf = function (player) {
+			if (!this._containsPos(player.pos.x, player.pos.y)) return false;
+			if (!this._containsPos(player.pos.x+player.size.x, player.pos.y)) return false;
+			if (!this._containsPos(player.pos.x+player.size.x, player.pos.y+player.size.y)) return false;
+			if (!this._containsPos(player.pos.x, player.pos.y+player.size.y)) return false;
+			return true;
+		}
+
+		this.containsSomeOf = function (player) {
+			if (this._containsPos(player.pos.x, player.pos.y)) return true;
+			if (this._containsPos(player.pos.x+player.size.x, player.pos.y)) return true;
+			if (this._containsPos(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;
+			if (this._containsPos(player.pos.x, player.pos.y+player.size.y)) return true;
+			return false;
+		}
+
 		this.isCollidingWith = function (player) {
-			//check each corner. This only works for objects one tile size large or smaller.
+			//check each corner. This only works for objects one tile large or smaller.
 			if (this._isCollidingWithPoint(player.pos.x, player.pos.y)) return true;
 			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y)) return true;
 			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;

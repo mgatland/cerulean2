@@ -98,6 +98,21 @@ var Cerulean = function () {
 					player.pos.y -= 1;
 				}
 			}
+			if (!player.room.containsAllOf(player)) {
+				player.room.doors.forEach(function (door) {
+					if (door.otherRoom.containsSomeOf(player)) {
+						door.otherRoom.explored = true;
+						if (door.otherRoom.containsCenterOf(player)) {
+							player.lastRoom = player.room;
+							player.room = door.otherRoom;
+							console.log("Moved to room " + player.room);
+						} else {
+							player.lastRoom = door.otherRoom;
+						}
+					}
+				});
+			}
+
 			keyboard.update();
 		}
 
