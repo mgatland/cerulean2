@@ -24,7 +24,7 @@ var Cerulean = function () {
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
-		this.draw = function (playerPos, rooms, camera) {
+		this.draw = function (player, rooms, camera) {
 			ctx.fillStyle = "#3f303f";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 			ctx.fillStyle = "white";
@@ -33,6 +33,7 @@ var Cerulean = function () {
 
 			var wallWidth = GameConsts.tileSize;
 			rooms.forEach(function (room) {
+				if (!room.explored) return;
 				ctx.fillStyle = "#000000";
 				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
@@ -48,8 +49,11 @@ var Cerulean = function () {
 				});
 			});
 			ctx.fillStyle = "white";
-			ctx.fillRect(playerPos.x-camera.pos.x, playerPos.y-camera.pos.y, 32, 32);
+			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
 		}
+	}
+
+	var Player = function () {
 	}
 
 	this.start = function () {
@@ -61,20 +65,38 @@ var Cerulean = function () {
 		var desiredFps = 60;
 
 		var rooms = worldGenerator.generate();
-		var playerPos = rooms[0].getCenter();
-		playerPos.x *= GameConsts.tileSize;
-		playerPos.y *= GameConsts.tileSize;
+
+		var player = new Player();
+		player.pos = rooms[0].getCenter();
+		player.pos.x *= GameConsts.tileSize;
+		player.pos.y *= GameConsts.tileSize;
+		player.room = rooms[0];
+		player.size = new Pos(GameConsts.tileSize-4, GameConsts.tileSize-4);
+
+		rooms[0].explored = true;
 
 		var update = function () {
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
-				playerPos.x++;
+				player.pos.x += 4;
+				while (player.room.isCollidingWith(player)) {
+					player.pos.x -= 1;
+				}
 			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) {
-				playerPos.x--;
+				player.pos.x -= 4;
+				while (player.room.isCollidingWith(player)) {
+					player.pos.x += 1;
+				}
 			}
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) {
-				playerPos.y--;
+				player.pos.y -= 4;
+				while (player.room.isCollidingWith(player)) {
+					player.pos.y += 1;
+				}
 			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
-				playerPos.y++;
+				player.pos.y += 4;
+				while (player.room.isCollidingWith(player)) {
+					player.pos.y -= 1;
+				}
 			}
 			keyboard.update();
 		}
@@ -87,11 +109,11 @@ var Cerulean = function () {
 		window.setInterval(function () {
 			update();
 
-			camera.pos.x = playerPos.x - gameWindow.width / 2 + GameConsts.tileSize / 2;
-			camera.pos.y = playerPos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
+			camera.pos.x = player.pos.x - gameWindow.width / 2 + GameConsts.tileSize / 2;
+			camera.pos.y = player.pos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
 
 			requestAnimationFrame(function() {
-				renderer.draw(playerPos, rooms, camera);
+				renderer.draw(player, rooms, camera);
 			});
 		}, 1000/desiredFps);
 	}

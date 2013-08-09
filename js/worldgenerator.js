@@ -10,8 +10,8 @@ var WorldGenerator = function (gameConsts) {
 		this.pos = new Pos(x, y);
 		this.size = new Pos(width, height);
 		this.doors = [];
-		this.addDoor = function (x, y) {
-			this.doors.push(new Door(x,y));
+		this.addDoor = function (x, y, otherRoom) {
+			this.doors.push(new Door(x,y, otherRoom));
 		}
 
 		this.getCenter = function () {
@@ -23,6 +23,25 @@ var WorldGenerator = function (gameConsts) {
 		this.toString = function () {
 			return "Room " + this.pos + "|" + this.size;
 		};
+
+		this._isCollidingWithPoint = function (x, y) {
+			var gridX = Math.floor(x / gameConsts.tileSize);
+			var gridY = Math.floor(y / gameConsts.tileSize);
+			if (gridX == this.pos.x || gridX == this.pos.x + this.size.x - 1
+				|| gridY == this.pos.y || gridY == this.pos.y + this.size.y - 1) {
+				return true;
+			}
+			return false;
+		}
+
+		this.isCollidingWith = function (player) {
+			//check each corner. This only works for objects one tile size large or smaller.
+			if (this._isCollidingWithPoint(player.pos.x, player.pos.y)) return true;
+			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y)) return true;
+			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;
+			if (this._isCollidingWithPoint(player.pos.x, player.pos.y+player.size.y)) return true;
+			return false;
+		}
 	}
 
 	var addDoorsBetween = function (room, newRoom, direction) {
@@ -64,7 +83,7 @@ var WorldGenerator = function (gameConsts) {
 		}
 		var x = Math.floor(minX + Math.random() * (maxX - minX));
 		var y = Math.floor(minY + Math.random() * (maxY - minY));
-		room.addDoor(x, y);
+		room.addDoor(x, y, newRoom);
 		switch (direction) {
 			case Dir.LEFT:
 				x--;
@@ -79,7 +98,7 @@ var WorldGenerator = function (gameConsts) {
 				y++;
 				break;
 		}
-		newRoom.addDoor(x, y);
+		newRoom.addDoor(x, y, room);
 	};
 
 	var roomCollidesWith = function (room, x, y, width, height) {
