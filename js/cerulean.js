@@ -73,11 +73,15 @@ var Cerulean = function () {
 		this.angle = angle;
 		this.pos = pos;
 		this.speed = 1;
+		this.live = true;
 		this.update = function () {
 			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
 			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
 			this.pos.x += xSpeed;
 			this.pos.y += ySpeed;
+			if (room.isCollidingWith(this, true)) {
+				this.live = false;
+			}
 		}
 	}
 

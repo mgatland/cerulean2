@@ -15,6 +15,9 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.shots = [];
 
 		this.update = function (player) {
+
+			this.shots = this.shots.filter(function (s) {return s.live});
+
 			this.enemies.forEach(function (enemy) {
 				enemy.update(player);
 			});
@@ -38,13 +41,14 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			return "Room " + this.pos + "|" + this.size;
 		};
 
-		this._isCollidingWithPoint = function (x, y) {
+		this._isCollidingWithPoint = function (x, y, blockDoorways) {
 			var gridX = Math.floor(x / gameConsts.tileSize);
 			var gridY = Math.floor(y / gameConsts.tileSize);
 			if (gridX == this.pos.x || gridX == this.pos.x + this.size.x - 1
 				|| gridY == this.pos.y || gridY == this.pos.y + this.size.y - 1) {
 
 				//it's wall unless it's a door.
+				if (blockDoorways) return true;
 				return !(this.doors.some(function (door) {
 					return (gridX == door.pos.x && gridY == door.pos.y);
 				}));
@@ -79,12 +83,14 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			return false;
 		}
 
-		this.isCollidingWith = function (player) {
+		this.isCollidingWith = function (thing, blockDoorways) {
 			//check each corner. This only works for objects one tile large or smaller.
-			if (this._isCollidingWithPoint(player.pos.x, player.pos.y)) return true;
-			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y)) return true;
-			if (this._isCollidingWithPoint(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;
-			if (this._isCollidingWithPoint(player.pos.x, player.pos.y+player.size.y)) return true;
+			if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y, blockDoorways)) return true;
+			if (thing.size) {
+				if (this._isCollidingWithPoint(thing.pos.x+thing.size.x, thing.pos.y, blockDoorways)) return true;
+				if (this._isCollidingWithPoint(thing.pos.x+thing.size.x, thing.pos.y+thing.size.y, blockDoorways)) return true;
+				if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y+thing.size.y, blockDoorways)) return true;
+			}
 			return false;
 		}
 
