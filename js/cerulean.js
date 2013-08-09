@@ -30,7 +30,13 @@ var Cerulean = function () {
 
 			var wallWidth = GameConsts.tileSize;
 			rooms.forEach(function (room) {
-				if (!room.explored) return;
+				//if (!room.explored) return;
+				if ((room.pos.x + room.size.x) * GameConsts.tileSize < camera.pos.x) return;
+				if ((room.pos.y + room.size.y) * GameConsts.tileSize < camera.pos.y) return;
+
+				if (room.pos.x * GameConsts.tileSize > camera.pos.x + gameWindow.width) return;
+				if (room.pos.y * GameConsts.tileSize > camera.pos.y + gameWindow.height) return;
+
 				ctx.fillStyle = "#000000";
 				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
