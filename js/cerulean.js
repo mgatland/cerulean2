@@ -67,6 +67,22 @@ var Cerulean = function () {
 		this.pos = pos;
 		this.room = room;
 		this.size = new Pos(32, 32);
+		this.dest = null;
+
+		this.update = function () {
+			if (!this.dest) {
+				this.dest = room.getRandomPointInside();
+			}
+
+			if (this.pos.x > this.dest.x) this.pos.x -= 1;
+			if (this.pos.x < this.dest.x) this.pos.x += 1;
+			if (this.pos.y > this.dest.y) this.pos.y -= 1;
+			if (this.pos.y < this.dest.y) this.pos.y += 1;
+
+			if (this.pos.distanceTo(this.dest) < 16) {
+				this.dest = null;
+			}
+		}
 	}
 
 	this.start = function () {
@@ -113,6 +129,10 @@ var Cerulean = function () {
 					player.pos.y -= 1;
 				}
 			}
+
+			player.room.update();
+			if (player.lastRoom) player.lastRoom.update();
+
 			if (!player.room.containsAllOf(player)) {
 				player.room.doors.forEach(function (door) {
 					if (door.otherRoom.containsSomeOf(player)) {

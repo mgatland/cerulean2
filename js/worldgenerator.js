@@ -13,6 +13,12 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.doors = [];
 		this.enemies = [];
 
+		this.update = function () {
+			this.enemies.forEach(function (enemy) {
+				enemy.update();
+			});
+		}
+
 		this.addDoor = function (x, y, otherRoom) {
 			this.doors.push(new Door(x,y, otherRoom));
 		}
@@ -78,8 +84,8 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		}
 
 		this.getRandomPointInside = function () {
-			var x = rand(this.pos.x + 1, this.pos.x + this.size.x - 2);
-			var y = rand(this.pos.y + 1, this.pos.y + this.size.y - 2);
+			var x = rand(this.pos.x + 1, this.pos.x + this.size.x - 1);
+			var y = rand(this.pos.y + 1, this.pos.y + this.size.y - 1);
 			return new Pos(x * gameConsts.tileSize, y * gameConsts.tileSize);
 		}
 	}
