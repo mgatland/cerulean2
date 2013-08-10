@@ -19,14 +19,23 @@ var Cerulean = function () {
 	var Renderer = function (gameWindow) {
 		var canvas;
 		var ctx;
+		var flicker = false;
+		var flickerCounter = 0;
 
 		canvas = document.getElementById('gamescreen');
 		ctx = canvas.getContext("2d");
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
+		this.fillRect = function (x, y, width, height, camera) {
+			ctx.fillRect(x-camera.pos.x, y-camera.pos.y, width, height);
+		}
+
 		this.draw = function (player, rooms, camera, roomsExplored, currentFps) {
-			ctx.fillStyle = "#3f303f";
+			flickerCounter ++;
+			if (flickerCounter == 4) flickerCounter = 0;
+			flicker = (flickerCounter <= 1);
+			ctx.fillStyle = "#000000";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 
 			var wallWidth = GameConsts.wallWidth;
@@ -38,15 +47,15 @@ var Cerulean = function () {
 				if (room.pos.x * GameConsts.tileSize > camera.pos.x + gameWindow.width) return;
 				if (room.pos.y * GameConsts.tileSize > camera.pos.y + gameWindow.height) return;
 
-				ctx.fillStyle = "#000000";
+				ctx.fillStyle = "#5DE100";
 				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
-				ctx.fillStyle = "#ccccff";
+				ctx.fillStyle = "#000000";
 				ctx.fillRect((room.pos.x)*GameConsts.tileSize+wallWidth-camera.pos.x, (room.pos.y)*GameConsts.tileSize+wallWidth-camera.pos.y,
 					(room.size.x)*GameConsts.tileSize-wallWidth*2, (room.size.y)*GameConsts.tileSize-wallWidth*2);
 
-				ctx.fillStyle = "#ccecff";
+				ctx.fillStyle = "#000000";
 				room.doors.forEach(function (door) {
 					ctx.fillRect(door.pos.x*GameConsts.tileSize-camera.pos.x, door.pos.y*GameConsts.tileSize-camera.pos.y,
 						GameConsts.tileSize, GameConsts.tileSize);
@@ -55,7 +64,7 @@ var Cerulean = function () {
 				if (room != player.room && room != player.lastRoom) return;
 
 				room.enemies.forEach(function (enemy) {
-					if (enemy.targetted) {
+					if (enemy.targetted && flicker) {
 						ctx.fillStyle = "#00ff00";
 					} else {
 						ctx.fillStyle = "#ff0f0f";
@@ -64,9 +73,8 @@ var Cerulean = function () {
 						enemy.size.x, enemy.size.y);
 				});
 
-				ctx.fillStyle = "#ff0f0f";
 				room.shots.forEach(function (shot) {
-					if (shot.targetted) {
+					if (shot.targetted && flicker) {
 						ctx.fillStyle = "#00ff00";
 					} else {
 						ctx.fillStyle = "#ff0f0f";
@@ -77,20 +85,29 @@ var Cerulean = function () {
 			});
 
 			//drawplayer
-			if (player.invlunerableTime > 0) {
-				ctx.fillStyle = "#ffff00";
+			if (player.invlunerableTime > 0 && flicker) {
+				ctx.fillStyle = "#000000";
 			} else {
-				ctx.fillStyle = "white";
+				ctx.fillStyle = "#5DE100";
 			}
-			ctx.fillRect(player.pos.x-camera.pos.x, player.pos.y-camera.pos.y, player.size.x, player.size.y);
+			this.fillRect(player.pos.x, player.pos.y, player.size.x, player.size.y, camera);
+			ctx.fillStyle = "#000000";
+			var insetX = player.pos.x + 2;
+			var insetY = player.pos.y + 2;
+			var insetSizeX = player.size.x - 4;
+			var insetSizeY = player.size.y - 4;
+			if (player.health < 5) this.fillRect(insetX, insetY, insetSizeX/2, insetSizeY/2, camera);
+			if (player.health < 4) this.fillRect(insetX+insetSizeX/2, insetY+insetSizeY/2, insetSizeX/2, insetSizeY/2, camera);
+			if (player.health < 3) this.fillRect(insetX+insetSizeX/2, insetY, insetSizeX/2, insetSizeY/2, camera);
+			if (player.health < 2) this.fillRect(insetX, insetY+insetSizeY/2, insetSizeX/2, insetSizeY/2, camera);
 
 			//draw attack attackCharge
 
-			ctx.fillStyle = "#ffff00";
+			ctx.fillStyle = "#5DE100";
 			var width = Math.floor(gameWindow.width * player.attackCharge / player.maxAttackCharge);
 			ctx.fillRect(0, gameWindow.height - 32, width, 32);
 
-			ctx.fillStyle = "white";
+			ctx.fillStyle = "5DE100";
 			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 			ctx.fillText("Rooms explored: " + roomsExplored + " of " + rooms.length, 40, gameWindow.height - 64);
 			ctx.fillText("FPS: " + currentFps, 512, gameWindow.height - 64);
