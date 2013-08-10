@@ -84,7 +84,7 @@ var Cerulean = function () {
 				if (room != player.room && room != player.lastRoom) return;
 
 				room.items.forEach(function (item) {
-					ctx.fillStyle = "5DE100";
+					ctx.fillStyle = "#5DE100";
 					renderer.fillRect(item.pos.x-2, item.pos.y-2, 4, 4, camera);
 				});
 
@@ -132,8 +132,8 @@ var Cerulean = function () {
 			var width = Math.floor(gameWindow.width * player.attackCharge / player.maxAttackCharge);
 			ctx.fillRect(0, gameWindow.height - 32, width, 32);
 
-			ctx.fillStyle = "5DE100";
-			ctx.font = '32px Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
+			ctx.fillStyle = "#5DE100";
+			ctx.font = '32px "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
 			//ctx.font = '32px "Lucida Sans Typewriter", "Lucida Console", Monaco, "Bitstream Vera Sans Mono", monospace';
 			ctx.fillText("BITSCORE: " + player.items, 40, gameWindow.height - 64);
 			ctx.fillText("ROOMS EXPLORED: " + roomsExplored + " OF " + rooms.length, 350, gameWindow.height - 64);
