@@ -21,21 +21,25 @@ var Cerulean = function () {
 		var ctx;
 		var flicker = false;
 		var flickerCounter = 0;
+		var blackColor = "#000000";
 
 		canvas = document.getElementById('gamescreen');
 		ctx = canvas.getContext("2d");
 		canvas.width = gameWindow.width;
 		canvas.height = gameWindow.height;
 
+		var overlay = new Overlay("overlay", gameWindow);
+
 		this.fillRect = function (x, y, width, height, camera) {
 			ctx.fillRect(x-camera.pos.x, y-camera.pos.y, width, height);
 		}
 
 		this.draw = function (player, rooms, camera, roomsExplored, currentFps) {
+			overlay.draw();
 			flickerCounter ++;
 			if (flickerCounter == 4) flickerCounter = 0;
 			flicker = (flickerCounter <= 1);
-			ctx.fillStyle = "#000000";
+			ctx.fillStyle = blackColor;
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 
 			var wallWidth = GameConsts.wallWidth;
@@ -51,11 +55,11 @@ var Cerulean = function () {
 				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
-				ctx.fillStyle = "#000000";
+				ctx.fillStyle = blackColor;
 				ctx.fillRect((room.pos.x)*GameConsts.tileSize+wallWidth-camera.pos.x, (room.pos.y)*GameConsts.tileSize+wallWidth-camera.pos.y,
 					(room.size.x)*GameConsts.tileSize-wallWidth*2, (room.size.y)*GameConsts.tileSize-wallWidth*2);
 
-				ctx.fillStyle = "#000000";
+				ctx.fillStyle = blackColor;
 				room.doors.forEach(function (door) {
 					ctx.fillRect(door.pos.x*GameConsts.tileSize-camera.pos.x, door.pos.y*GameConsts.tileSize-camera.pos.y,
 						GameConsts.tileSize, GameConsts.tileSize);
@@ -86,12 +90,12 @@ var Cerulean = function () {
 
 			//drawplayer
 			if (player.invlunerableTime > 0 && flicker) {
-				ctx.fillStyle = "#000000";
+				ctx.fillStyle = blackColor;
 			} else {
 				ctx.fillStyle = "#5DE100";
 			}
 			this.fillRect(player.pos.x, player.pos.y, player.size.x, player.size.y, camera);
-			ctx.fillStyle = "#000000";
+			ctx.fillStyle = blackColor;
 			var insetX = player.pos.x + 2;
 			var insetY = player.pos.y + 2;
 			var insetSizeX = player.size.x - 4;
@@ -108,9 +112,10 @@ var Cerulean = function () {
 			ctx.fillRect(0, gameWindow.height - 32, width, 32);
 
 			ctx.fillStyle = "5DE100";
-			ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-			ctx.fillText("Rooms explored: " + roomsExplored + " of " + rooms.length, 40, gameWindow.height - 64);
-			ctx.fillText("FPS: " + currentFps, 512, gameWindow.height - 64);
+			ctx.font = '32px Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
+			//ctx.font = '32px "Lucida Sans Typewriter", "Lucida Console", Monaco, "Bitstream Vera Sans Mono", monospace';
+			ctx.fillText("ROOMS EXPLORED: " + roomsExplored + " OF " + rooms.length, 40, gameWindow.height - 64);
+			ctx.fillText("FPS: " + currentFps, 612, gameWindow.height - 64);
 		}
 	}
 
@@ -370,6 +375,7 @@ var Cerulean = function () {
 		var keyboard = new Keyboard();
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
+
 		var desiredFps = 60;
 
 		//fps  counter
