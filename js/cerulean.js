@@ -277,6 +277,8 @@ var Cerulean = function () {
 		this.refireTimer = 0;
 		this.health = 20;
 		this.live = true;
+		this.angle = 0;
+		this.speed = 0.5;
 
 		this.getCenter = function () {
 			var x = Math.floor(this.pos.x + this.size.x / 2);
@@ -288,12 +290,13 @@ var Cerulean = function () {
 			//move
 			if (!this.dest) {
 				this.dest = room.getRandomPointInside();
+				this.angle = this.pos.angleTo(this.dest);
 			}
 
-			if (this.pos.x > this.dest.x) this.pos.x -= 1;
-			if (this.pos.x < this.dest.x) this.pos.x += 1;
-			if (this.pos.y > this.dest.y) this.pos.y -= 1;
-			if (this.pos.y < this.dest.y) this.pos.y += 1;
+			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
+			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
+			this.pos.x += xSpeed;
+			this.pos.y += ySpeed;
 
 			if (this.pos.distanceTo(this.dest) < 16) {
 				this.dest = null;
