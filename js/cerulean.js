@@ -121,8 +121,9 @@ var Cerulean = function () {
 			ctx.fillStyle = "5DE100";
 			ctx.font = '32px Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
 			//ctx.font = '32px "Lucida Sans Typewriter", "Lucida Console", Monaco, "Bitstream Vera Sans Mono", monospace';
-			ctx.fillText("ROOMS EXPLORED: " + roomsExplored + " OF " + rooms.length, 40, gameWindow.height - 64);
-			ctx.fillText("FPS: " + currentFps, 612, gameWindow.height - 64);
+			ctx.fillText("BITSCORE: " + player.items, 40, gameWindow.height - 64);
+			ctx.fillText("ROOMS EXPLORED: " + roomsExplored + " OF " + rooms.length, 350, gameWindow.height - 64);
+			ctx.fillText("FPS: " + currentFps, 850, gameWindow.height - 64);
 		}
 	}
 
