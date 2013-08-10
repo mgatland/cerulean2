@@ -261,6 +261,7 @@ var Cerulean = function () {
 		}
 
 		this.shocked = function (damage) {
+			if (!this.live) return;
 			if (damage > this.health) {
 				this.health = 0;
 				this.live = false;
@@ -318,6 +319,7 @@ var Cerulean = function () {
 
 		//duplicate code from Shot
 		this.shocked = function (damage) {
+			if (!this.live) return;
 			if (damage > this.health) {
 				this.health = 0;
 				this.live = false;
