@@ -43,6 +43,8 @@ var Cerulean = function () {
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 
 			var wallWidth = GameConsts.wallWidth;
+
+			var renderer = this;
 			rooms.forEach(function (room) {
 				if (!room.explored) return;
 				if ((room.pos.x + room.size.x) * GameConsts.tileSize < camera.pos.x) return;
@@ -67,6 +69,11 @@ var Cerulean = function () {
 
 				if (room != player.room && room != player.lastRoom) return;
 
+				room.items.forEach(function (item) {
+					ctx.fillStyle = "5DE100";
+					renderer.fillRect(item.pos.x-2, item.pos.y-2, 4, 4, camera);
+				});
+
 				room.enemies.forEach(function (enemy) {
 					if (enemy.targetted && flicker) {
 						ctx.fillStyle = "#00ff00";
@@ -83,9 +90,9 @@ var Cerulean = function () {
 					} else {
 						ctx.fillStyle = "#ff0f0f";
 					}
-					ctx.fillRect(shot.pos.x-camera.pos.x-5, shot.pos.y-camera.pos.y-5,
-						10, 10);
+					renderer.fillRect(shot.pos.x-5, shot.pos.y-5, 10, 10, camera);
 				});
+
 			});
 
 			//drawplayer
@@ -125,6 +132,7 @@ var Cerulean = function () {
 		this.invlunerableTime = 0;
 		this.shieldRechange = 0;
 		this.home = null;
+		this.items = 0;
 
 		this.attackCharge = 0;
 		this.maxAttackCharge = 5 * 60;
@@ -288,8 +296,30 @@ var Cerulean = function () {
 			if (damage > this.health) {
 				this.health = 0;
 				this.live = false;
+				room.items.push(new Item(this.pos));
 			}
 		}
+	}
+
+	var Item = function (pos) {
+		this.live = true;
+		this.pos = pos;
+
+		this.update = function (player) {
+			var distance = this.pos.distanceTo(player.getCenter());
+			if (distance < 128) {
+				var angle = this.pos.angleTo(player.getCenter());
+				var speed = 6 * (128 - distance) / 128;
+				var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
+				var ySpeed = (speed * -Math.cos(3.14159 / 180 * angle));
+				this.pos.x += xSpeed;
+				this.pos.y += ySpeed;
+			}
+			if (distance < player.size.x / 2 || distance < player.size.y / 2) {
+				this.live = false;
+				player.items++;
+			}
+		};
 	}
 
 	var Enemy = function (pos, room, type) {
@@ -382,9 +412,13 @@ var Cerulean = function () {
 			if (damage > this.health) {
 				this.health = 0;
 				this.live = false;
+				for (var x = this.pos.x; x < this.pos.x + this.size.x; x += 5) {
+					for (var y = this.pos.y; y < this.pos.y + this.size.y; y += 5) {
+						this.room.items.push(new Item(new Pos(x, y)));
+					}
+				}
 			}
 		}
-
 	}
 
 	this.start = function () {

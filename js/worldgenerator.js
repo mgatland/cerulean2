@@ -13,11 +13,13 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.doors = [];
 		this.enemies = [];
 		this.shots = [];
+		this.items = [];
 
 		this.update = function (player) {
 
 			this.shots = this.shots.filter(function (s) {return s.live});
 			this.enemies = this.enemies.filter(function (e) {return e.live});
+			this.items = this.items.filter(function (i) {return i.live});
 
 			this.enemies.forEach(function (enemy) {
 				enemy.update(player);
@@ -25,6 +27,10 @@ var WorldGenerator = function (gameConsts, Enemy) {
 
 			this.shots.forEach(function (shot) {
 				shot.update(player);
+			});
+
+			this.items.forEach(function (item) {
+				item.update(player);
 			});
 		}
 
