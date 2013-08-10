@@ -41,6 +41,10 @@ var Cerulean = function () {
 			flicker = (flickerCounter <= 1);
 			ctx.fillStyle = blackColor;
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
+			ctx.fillStyle = "#ff0f0f";
+			for (var y = 0; y < gameWindow.height + GameConsts.tileSize*2; y+= GameConsts.tileSize*2) {
+				ctx.fillRect(0, y - camera.pos.y % (GameConsts.tileSize*2), gameWindow.width, 1);
+			}
 
 			var wallWidth = GameConsts.wallWidth;
 
