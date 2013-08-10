@@ -235,6 +235,7 @@ var Cerulean = function () {
 			if (this.health > 0) {
 				this.invlunerableTime = 2;
 			} else {
+				this.attackCharge = 0;
 				this.invlunerableTime = 60; //we won't respawn until this wears off
 			}
 		}
