@@ -16,6 +16,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.items = [];
 
 		this.update = function (player) {
+			if (this.flashing) this.flashing--;
 
 			this.shots = this.shots.filter(function (s) {return s.live});
 			this.enemies = this.enemies.filter(function (e) {return e.live});

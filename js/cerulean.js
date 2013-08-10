@@ -61,6 +61,7 @@ var Cerulean = function () {
 				ctx.fillRect(room.pos.x*GameConsts.tileSize-camera.pos.x, room.pos.y*GameConsts.tileSize-camera.pos.y,
 					room.size.x*GameConsts.tileSize, room.size.y*GameConsts.tileSize);
 
+
 				ctx.fillStyle = blackColor;
 				ctx.fillRect((room.pos.x)*GameConsts.tileSize+wallWidth-camera.pos.x, (room.pos.y)*GameConsts.tileSize+wallWidth-camera.pos.y,
 					(room.size.x)*GameConsts.tileSize-wallWidth*2, (room.size.y)*GameConsts.tileSize-wallWidth*2);
@@ -70,6 +71,15 @@ var Cerulean = function () {
 					ctx.fillRect(door.pos.x*GameConsts.tileSize-camera.pos.x, door.pos.y*GameConsts.tileSize-camera.pos.y,
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
+
+				if (room.flashing) {
+					ctx.fillStyle = "#5DE100";
+					for (var y = room.pos.y*GameConsts.tileSize; y < (room.pos.y + room.size.y)*GameConsts.tileSize; y+= 16) {
+						var lineStart = (Math.random() * room.size.x * GameConsts.tileSize);
+						var lineWidth = Math.random() * (room.size.x * GameConsts.tileSize - lineStart);
+						renderer.fillRect(room.pos.x * GameConsts.tileSize + lineStart, y, lineWidth, 1, camera);
+					}
+				}
 
 				if (room != player.room && room != player.lastRoom) return;
 
@@ -203,6 +213,7 @@ var Cerulean = function () {
 
 		this.attack = function (roomToAttack) {
 			var player = this;
+			roomToAttack.flashing = Math.floor(Math.max(3, 25 * player.attackCharge / player.maxAttackCharge));
 			roomToAttack.enemies.forEach(function (enemy) {
 				enemy.shocked(player.attackPowerOn(enemy));
 			});
@@ -452,9 +463,9 @@ var Cerulean = function () {
 		roomsExplored++;
 
 		var update = function () {
-			player.update(keyboard);
 			player.room.update(player);
 			if (player.lastRoom) player.lastRoom.update(player);
+			player.update(keyboard);
 
 			if (!player.room.containsAllOf(player)) {
 				player.room.doors.forEach(function (door) {
