@@ -8,7 +8,8 @@ var Cerulean = function () {
 	var GameConsts = {
 		tileSize: 32,
 		worldWidth: 280,
-		worldHeight: 230
+		worldHeight: 230,
+		wallWidth: 8
 	};
 
 	var Camera = function () {
@@ -28,7 +29,7 @@ var Cerulean = function () {
 			ctx.fillStyle = "#3f303f";
 			ctx.fillRect(0,0, gameWindow.width, gameWindow.height);
 
-			var wallWidth = GameConsts.tileSize;
+			var wallWidth = GameConsts.wallWidth;
 			rooms.forEach(function (room) {
 				if (!room.explored) return;
 				if ((room.pos.x + room.size.x) * GameConsts.tileSize < camera.pos.x) return;

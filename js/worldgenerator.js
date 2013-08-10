@@ -43,15 +43,22 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		};
 
 		this._isCollidingWithPoint = function (x, y, blockDoorways) {
-			var gridX = Math.floor(x / gameConsts.tileSize);
-			var gridY = Math.floor(y / gameConsts.tileSize);
-			if (gridX == this.pos.x || gridX == this.pos.x + this.size.x - 1
-				|| gridY == this.pos.y || gridY == this.pos.y + this.size.y - 1) {
+			if (!this._containsPos(x, y)) return false;
+			var gridX = x / gameConsts.tileSize;
+			var gridY = y / gameConsts.tileSize;
+			var wallWidth = gameConsts.wallWidth / gameConsts.tileSize;
+			var leftWall = (gridX < this.pos.x + wallWidth);
+			var rightWall = (gridX >= this.pos.x + this.size.x - wallWidth);
+			var upWall = (gridY < this.pos.y + wallWidth);
+			var downWall = (gridY >= this.pos.y + this.size.y - wallWidth);
+			if (leftWall || rightWall || upWall || downWall) {
 
 				//it's wall unless it's a door.
 				if (blockDoorways) return true;
+				var gridXfloored = Math.floor(gridX);
+				var gridYfloored = Math.floor(gridY);
 				return !(this.doors.some(function (door) {
-					return (gridX == door.pos.x && gridY == door.pos.y);
+					return (gridXfloored == door.pos.x && gridYfloored == door.pos.y);
 				}));
 			}
 			return false;
@@ -84,16 +91,57 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			return false;
 		}
 
+		this._isTileCollidingWith = function (x, y, thing, blockDoorways) {
+			var typeType;
+			var left = (x == this.pos.x);
+			var right = (x == this.pos.x + this.size.x - 1);
+			var up = (y == this.pos.y);
+			var down = (y == this.pos.y + this.size.y - 1);
+
+			if (!left && !right && !up && !down) return false; //floor never collides
+
+			if (!blockDoorways) {
+				var doorway = this.doors.some(function (d) {
+					return d.pos.x == x && d.pos.y == y;
+				});
+				if (doorway) return false;
+			}
+
+			var hitWall = false;
+			if (left) {
+				hitWall = hitWall || (thing.pos.x < x * gameConsts.tileSize + gameConsts.wallWidth);
+			}
+			if (right) {
+				hitWall = hitWall || (thing.pos.x + thing.size.x > (x+1) * gameConsts.tileSize - gameConsts.wallWidth);
+			}
+			if (up) {
+				hitWall = hitWall || (thing.pos.y < y * gameConsts.tileSize + gameConsts.wallWidth);
+			}
+			if (down) {
+				hitWall = hitWall || (thing.pos.y + thing.size.y > (y+1) * gameConsts.tileSize - gameConsts.wallWidth);
+			}
+			return hitWall;
+		};
+
+		//Is this thing colliding with the walls of the room?
 		this.isCollidingWith = function (thing, blockDoorways) {
-			//check each corner. This only works for objects one tile large or smaller.
-			if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y, blockDoorways)) return true;
+
 			if (thing.size) {
-				if (this._isCollidingWithPoint(thing.pos.x+thing.size.x, thing.pos.y, blockDoorways)) return true;
-				if (this._isCollidingWithPoint(thing.pos.x+thing.size.x, thing.pos.y+thing.size.y, blockDoorways)) return true;
-				if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y+thing.size.y, blockDoorways)) return true;
+				var minTileX = Math.floor(thing.pos.x / gameConsts.tileSize);
+				var maxTileX = Math.floor((thing.pos.x + thing.size.x) / gameConsts.tileSize);
+				var minTileY = Math.floor(thing.pos.y / gameConsts.tileSize);
+				var maxTileY = Math.floor((thing.pos.y + thing.size.y) / gameConsts.tileSize);
+				for (var x = minTileX; x <= maxTileX; x++) {
+					for (var y = minTileY; y <= maxTileY; y++) {
+						if (this._isTileCollidingWith(x, y, thing, blockDoorways)) return true;
+					}
+				}
+				return false;
+			} else {
+				if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y, blockDoorways)) return true;
 			}
 			return false;
-		}
+		};
 
 		this.getRandomPointInside = function () {
 			var x = rand(this.pos.x + 1, this.pos.x + this.size.x - 1);
