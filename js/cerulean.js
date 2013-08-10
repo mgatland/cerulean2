@@ -52,6 +52,8 @@ var Cerulean = function () {
 						GameConsts.tileSize, GameConsts.tileSize);
 				});
 
+				if (room != player.room && room != player.lastRoom) return;
+
 				room.enemies.forEach(function (enemy) {
 					if (enemy.targetted) {
 						ctx.fillStyle = "#00ff00";
@@ -164,6 +166,17 @@ var Cerulean = function () {
 			}
 		}
 
+		this.attack = function (roomToAttack) {
+			var player = this;
+			roomToAttack.enemies.forEach(function (enemy) {
+				enemy.shocked(player.attackPowerOn(enemy));
+			});
+			roomToAttack.shots.forEach(function (shot) {
+				shot.shocked(player.attackPowerOn(shot));
+			});
+
+		}
+
 		this.update = function (keyboard) {
 			this._updateControls(keyboard);
 
@@ -175,13 +188,8 @@ var Cerulean = function () {
 					}
 				} else {
 					if (this.attackCharge > 0) {
-						var player = this;
-						this.room.enemies.forEach(function (enemy) {
-							enemy.shocked(player.attackPowerOn(enemy));
-						});
-						this.room.shots.forEach(function (shot) {
-							shot.shocked(player.attackPowerOn(shot));
-						});
+						this.attack(this.room);
+						if (this.lastRoom) this.attack(this.lastRoom);
 					}
 					this.attackCharge = 0;
 				}
@@ -208,7 +216,7 @@ var Cerulean = function () {
 			this.shieldRechange = 0;
 			console.log('hit!');
 			if (this.health > 0) {
-				this.invlunerableTime = 15;
+				this.invlunerableTime = 2;
 			} else {
 				this.invlunerableTime = 60; //we won't respawn until this wears off
 			}
@@ -357,6 +365,7 @@ var Cerulean = function () {
 						if (door.otherRoom.containsCenterOf(player)) {
 							player.lastRoom = player.room;
 							player.room = door.otherRoom;
+							player.attackCharge = 0; //discharge attack
 						} else {
 							player.lastRoom = door.otherRoom;
 						}
