@@ -202,7 +202,7 @@ var Cerulean = function () {
 
 				if (this.health < this.maxHealth) {
 					this.shieldRechange++;
-					if (this.shieldRechange > 30) {
+					if (this.shieldRechange > 60) {
 						this.shieldRechange = 0;
 						this.health++;
 					}
@@ -231,7 +231,7 @@ var Cerulean = function () {
 	var Shot = function (pos, room, angle) {
 		this.angle = angle;
 		this.pos = pos;
-		this.speed = 1;
+		this.speed = 2;
 		this.live = true;
 		this.targetted = false;
 		this.health = 1;
@@ -278,7 +278,9 @@ var Cerulean = function () {
 		this.health = 20;
 		this.live = true;
 		this.angle = 0;
-		this.speed = 0.5;
+		this.speed = 0.3;
+		this.fireAngle = Math.floor(Math.random() * 360);
+		this.type = Math.floor(Math.random() * 2);
 
 		this.getCenter = function () {
 			var x = Math.floor(this.pos.x + this.size.x / 2);
@@ -304,9 +306,22 @@ var Cerulean = function () {
 			//shoot
 			if (this.refireTimer == 0) {
 				console.log("shoot");
-				var shot = new Shot(this.getCenter(), room, this.pos.angleTo(player.pos));
-				room.shots.push(shot);
-				this.refireTimer = 25;
+
+				if (this.type == 0) {
+					//the seeking shot
+					var angle = this.pos.angleTo(player.pos);
+					var shot = new Shot(this.getCenter(), room, angle);
+					room.shots.push(shot);
+					this.refireTimer = 15;
+				} else {
+					//the spinner shot
+					this.fireAngle += 25;
+					if (this.fireAngle > 360) this.fireAngle -= 360;
+					var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
+					room.shots.push(shot2);
+					this.refireTimer = 7;
+				}
+
 			} else {
 				this.refireTimer--;
 			}
