@@ -292,18 +292,30 @@ var Cerulean = function () {
 		}
 	}
 
-	var Enemy = function (pos, room) {
+	var Enemy = function (pos, room, type) {
 		this.pos = pos;
 		this.room = room;
-		this.size = new Pos(32, 32);
 		this.dest = null;
 		this.refireTimer = 0;
 		this.health = 20;
 		this.live = true;
 		this.angle = 0;
-		this.speed = 0.3;
 		this.fireAngle = Math.floor(Math.random() * 360);
-		this.type = Math.floor(Math.random() * 2);
+		this.type = type;
+
+		if (this.type == 0) {
+			this.size = new Pos(25, 25);
+			this.speed = 0.3;
+			this.health = 20;
+		} else if (this.type == 1) {
+			this.size = new Pos(32, 20);
+			this.speed = 0.0;
+			this.health = 15;
+		} else {
+			this.size = new Pos(44, 44);
+			this.speed = 0.2;
+			this.health = 30;
+		}
 
 		this.getCenter = function () {
 			var x = Math.floor(this.pos.x + this.size.x / 2);
@@ -336,13 +348,19 @@ var Cerulean = function () {
 					var shot = new Shot(this.getCenter(), room, angle);
 					room.shots.push(shot);
 					this.refireTimer = 15;
-				} else {
+				} else if (this.type == 1) {
 					//the spinner shot
 					this.fireAngle += 25;
 					if (this.fireAngle > 360) this.fireAngle -= 360;
 					var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
 					room.shots.push(shot2);
 					this.refireTimer = 7;
+				} else {
+					var angle = this.pos.angleTo(player.pos);
+					for (var i = -2; i <= 2; i++) {
+						room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
+					}
+					this.refireTimer = 15;
 				}
 
 			} else {

@@ -374,21 +374,24 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		openRooms.push(newRoom);
 
 		//set up enemies in room
-		var area = (width - 2) * (height - 2);
+		var area = width * height;
 		var enemyCount = 0;
-		if (area < 16) {
+		if (width <= 3 || height <= 3) {
 			enemyCount = 0;
-		} else if (area <= 20) {
+		} else if (area <= 6*6) {
 			enemyCount = 1;
-		} else if (area < 40) {
+		} else if (area <= 7*8) {
 			enemyCount = 2;
-		} else if (area < 60) {
+		} else if (area < 9*9) {
 			enemyCount = 3;
-		} else {
+		} else if (area < 10*10) {
 			enemyCount = 4;
+		} else {
+			enemyCount = 5;
 		}
 		for (var i = 0; i < enemyCount; i++) {
-			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside(), newRoom));
+			var type = Math.floor(Math.random() * 3); //3 is number of enemy types
+			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside(), newRoom, type));
 		}
 	}
 
