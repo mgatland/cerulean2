@@ -415,7 +415,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		for (var i = 0; i < enemyCount; i++) {
 			var type = null;
 			while (type == null) {
-				var type = Math.floor(Math.random() * 3); //3 is number of enemy types
+				var type = Math.floor(Math.random() * 4); //number of enemy types
 				if (!allowBigEnemies && type == 2) type = null; //hack to remove big enemies from small rooms
 			};
 			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside(), newRoom, type));

@@ -408,10 +408,14 @@ var Cerulean = function () {
 			this.size = new Pos(32, 20);
 			this.speed = 0.0;
 			this.health = 15;
-		} else {
+		} else if (this.type == 2) {
 			this.size = new Pos(44, 44);
 			this.speed = 0.2;
 			this.health = 30;
+		} else {
+			this.size = new Pos(20, 32);
+			this.speed = 0.3;
+			this.health = 10;
 		}
 
 		this.getCenter = function () {
@@ -452,12 +456,18 @@ var Cerulean = function () {
 					var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
 					room.shots.push(shot2);
 					this.refireTimer = 7;
-				} else {
+				} else if (this.type == 2) {
 					var angle = this.pos.angleTo(player.pos);
 					for (var i = -2; i <= 2; i++) {
 						room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
 					}
 					this.refireTimer = 15;
+				} else {
+					var angle = this.pos.angleTo(player.pos);
+					for (var i = -1; i <= 1; i+= 2) {
+						room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
+					}
+					this.refireTimer = 8;
 				}
 
 			} else {
