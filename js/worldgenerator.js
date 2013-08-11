@@ -383,6 +383,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		//set up enemies in room
 		var area = width * height;
 		var enemyCount = 0;
+		var allowBigEnemies = (width >= 6 && height >= 6);
 		if (width <= 3 || height <= 3) {
 			enemyCount = 0;
 		} else if (area <= 6*6) {
@@ -397,7 +398,11 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			enemyCount = 5;
 		}
 		for (var i = 0; i < enemyCount; i++) {
-			var type = Math.floor(Math.random() * 3); //3 is number of enemy types
+			var type = null;
+			while (type == null) {
+				var type = Math.floor(Math.random() * 3); //3 is number of enemy types
+				if (!allowBigEnemies && type == 2) type = null; //hack to remove big enemies from small rooms
+			};
 			newRoom.enemies.push(new Enemy(newRoom.getRandomPointInside(), newRoom, type));
 		}
 	}

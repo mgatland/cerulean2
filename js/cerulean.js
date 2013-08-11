@@ -455,7 +455,7 @@ var Cerulean = function () {
 		var rooms = worldGenerator.generate();
 
 		var player = new Player();
-		player.size = new Pos(GameConsts.tileSize-4, GameConsts.tileSize-4);
+		player.size = new Pos(20, 20);
 		player.setHome(rooms[0]);
 		player.respawn();
 
