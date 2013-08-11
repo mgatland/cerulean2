@@ -178,10 +178,50 @@ var Cerulean = function () {
 			return new Pos(x, y);
 		}
 
-		this._moveInDir = function (dir) {
-			this.pos.moveInDir(dir, 4);
+		this._moveInDir = function (dir, maxSpeed) {
+			var speed = maxSpeed ? Math.min(maxSpeed, 4) : 4;
+			this.pos.moveInDir(dir, speed);
 			while (this.room.isCollidingWith(this)) {
 				this.pos.moveInDir(dir, -1);
+			}
+		}
+
+		//horizontal or vertical
+		this._moveTowards = function (destination, moveType) {
+			var center = this.getCenter();
+			if (moveType == "horizontal") {
+				var distance = Math.abs(destination.x - center.x);
+				if (distance == 0) return;
+				if (destination.x < center.x) {
+					this._moveInDir(Dir.LEFT, distance);
+				} else {
+					this._moveInDir(Dir.RIGHT, distance);
+				}
+			} else if (moveType == "vertical") {
+				var distance = Math.abs(destination.y - center.y);
+				if (distance == 0) return;
+				if (destination.y < center.y) {
+					this._moveInDir(Dir.UP, distance);
+				} else {
+					this._moveInDir(Dir.DOWN, distance);
+				}
+			}
+		}
+
+		this._autoMove = function (moveType) {
+			var player = this;
+			var myDoor = this.room.doors.filter(function (d) {
+				return d.overlaps(player);
+			});
+			if (myDoor.length > 0) {
+				var door = myDoor[0];
+				var doorCenter = door.getCenter();
+				if (moveType == "vertical" && door.direction.isHorizontal) {
+					this._moveTowards(doorCenter, "vertical");
+				} else if (moveType == "horizontal" && !door.direction.isHorizontal) {
+					var doorCenter = door.getCenter();
+					this._moveTowards(doorCenter, "horizontal");
+				}
 			}
 		}
 
@@ -194,16 +234,29 @@ var Cerulean = function () {
 				isChargingAttack = false;
 			}
 
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
+			var up = keyboard.isKeyDown(KeyEvent.DOM_VK_UP);
+			var down = keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN);
+			var left = keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT);
+			var right = keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT);
+
+			var oldPos = this.pos.clone();
+
+			if (right) {
 				this._moveInDir(Dir.RIGHT);
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) {
+			} else if (left) {
 				this._moveInDir(Dir.LEFT);
 			}
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) {
+
+			if (up) {
 				this._moveInDir(Dir.UP);
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
+			} else if (down) {
 				this._moveInDir(Dir.DOWN);
 			}
+
+			//If we're running into a wall, make an automove.
+			if (oldPos.x == this.pos.x && (left || right)) this._autoMove("vertical");
+			if (oldPos.y == this.pos.y && (up || down)) this._autoMove("horizontal");
+
 		}
 
 		this.attack = function (roomToAttack) {

@@ -1,4 +1,13 @@
-var Dir = {UP:"up", DOWN:"down", LEFT:"left", RIGHT:"right"};
+var Dir = {};
+Dir.UP = {isHorizontal: false};
+Dir.DOWN = {isHorizontal: false};
+Dir.LEFT = {isHorizontal: true};
+Dir.RIGHT = {isHorizontal: true};
+
+Dir.UP.reverse = Dir.DOWN;
+Dir.DOWN.reverse = Dir.UP;
+Dir.LEFT.reverse = Dir.RIGHT;
+Dir.RIGHT.reverse = Dir.LEFT;
 
 var Pos = function (x, y) {
 	this.x = x;

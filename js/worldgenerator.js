@@ -1,10 +1,25 @@
 var WorldGenerator = function (gameConsts, Enemy) {
 
-	var Dir = {UP: 0, DOWN: 1, LEFT:2, RIGHT: 3};
-
-	var Door = function (x, y, otherRoom) {
+	var Door = function (x, y, otherRoom, direction) {
 		this.pos = new Pos(x,y);
 		this.otherRoom = otherRoom;
+		this.direction = direction;
+
+		this.overlaps = function (rect) {
+			var x = this.pos.x * gameConsts.tileSize;
+			var y = this.pos.y * gameConsts.tileSize;
+			return (x < rect.pos.x + rect.size.x
+				&& x + gameConsts.tileSize > rect.pos.x
+				&& y < rect.pos.y + rect.size.y
+				&& y + gameConsts.tileSize > rect.pos.y);
+		}
+
+		this.getCenter = function () {
+			var x = Math.floor(this.pos.x * gameConsts.tileSize + gameConsts.tileSize / 2);
+			var y = Math.floor(this.pos.y * gameConsts.tileSize + gameConsts.tileSize / 2);
+			return new Pos(x, y);
+		}
+
 	}
 
 	var Room = function (x, y, width, height) {
@@ -35,8 +50,8 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			});
 		}
 
-		this.addDoor = function (x, y, otherRoom) {
-			this.doors.push(new Door(x,y, otherRoom));
+		this.addDoor = function (x, y, otherRoom, direction) {
+			this.doors.push(new Door(x,y, otherRoom, direction));
 		}
 
 		this.getCenter = function () {
@@ -196,7 +211,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		}
 		var x = Math.floor(minX + Math.random() * (maxX - minX));
 		var y = Math.floor(minY + Math.random() * (maxY - minY));
-		room.addDoor(x, y, newRoom);
+		room.addDoor(x, y, newRoom, direction);
 		switch (direction) {
 			case Dir.LEFT:
 				x--;
@@ -211,7 +226,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 				y++;
 				break;
 		}
-		newRoom.addDoor(x, y, room);
+		newRoom.addDoor(x, y, room, direction.reverse);
 	};
 
 	var roomCollidesWith = function (room, x, y, width, height) {
