@@ -1,9 +1,20 @@
+var Dir = {UP:"up", DOWN:"down", LEFT:"left", RIGHT:"right"};
+
 var Pos = function (x, y) {
 	this.x = x;
 	this.y = y;
 
 	this.toString = function () {
 		return "(" + this.x + "," + this.y + ")";
+	}
+
+	this.moveInDir = function (dir, distance) {
+		switch (dir) {
+			case Dir.UP: this.y -= distance; break;
+			case Dir.DOWN: this.y += distance; break;
+			case Dir.LEFT: this.x -= distance; break;
+			case Dir.RIGHT: this.x += distance; break;
+		}
 	}
 
 	this.distanceTo = function (other) {

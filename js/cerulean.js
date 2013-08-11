@@ -178,6 +178,13 @@ var Cerulean = function () {
 			return new Pos(x, y);
 		}
 
+		this._moveInDir = function (dir) {
+			this.pos.moveInDir(dir, 4);
+			while (this.room.isCollidingWith(this)) {
+				this.pos.moveInDir(dir, -1);
+			}
+		}
+
 		this._updateControls = function (keyboard) {
 			if (this.health <= 0) return;
 
@@ -188,26 +195,14 @@ var Cerulean = function () {
 			}
 
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) {
-				this.pos.x += 4;
-				while (this.room.isCollidingWith(this)) {
-					this.pos.x -= 1;
-				}
+				this._moveInDir(Dir.RIGHT);
 			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) {
-				this.pos.x -= 4;
-				while (this.room.isCollidingWith(this)) {
-					this.pos.x += 1;
-				}
+				this._moveInDir(Dir.LEFT);
 			}
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) {
-				this.pos.y -= 4;
-				while (this.room.isCollidingWith(this)) {
-					this.pos.y += 1;
-				}
+				this._moveInDir(Dir.UP);
 			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
-				this.pos.y += 4;
-				while (this.room.isCollidingWith(this)) {
-					this.pos.y -= 1;
-				}
+				this._moveInDir(Dir.DOWN);
 			}
 		}
 
