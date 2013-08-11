@@ -516,6 +516,7 @@ var Cerulean = function () {
 			player.update(keyboard);
 
 			if (!player.room.containsAllOf(player)) {
+				player.attackCharge = 0; //discharge attack when between rooms
 				player.room.doors.forEach(function (door) {
 					if (door.otherRoom.containsSomeOf(player)) {
 						if (!door.otherRoom.explored) {
@@ -525,7 +526,6 @@ var Cerulean = function () {
 						if (door.otherRoom.containsCenterOf(player)) {
 							player.lastRoom = player.room;
 							player.room = door.otherRoom;
-							player.attackCharge = 0; //discharge attack
 						} else {
 							player.lastRoom = door.otherRoom;
 						}
