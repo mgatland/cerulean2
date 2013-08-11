@@ -42,3 +42,12 @@ var Pos = function (x, y) {
 		return angle;
 	}
 }
+
+var track = function (action, label, number) {
+	console.log("_trackEvent: " + action + ", " + label + ", " + number);
+	try {
+		_gaq.push(['_trackEvent',"cerulean", action, ""+label, number]);;
+	} catch (e) {
+
+	}
+}

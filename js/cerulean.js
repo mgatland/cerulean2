@@ -271,7 +271,7 @@ var Cerulean = function () {
 
 		}
 
-		this.update = function (keyboard) {
+		this.update = function (keyboard, roomsExplored) {
 			this._updateControls(keyboard);
 
 			if (this.health > 0) {
@@ -292,7 +292,10 @@ var Cerulean = function () {
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
 			} else {
-				if (this.health <= 0) this.respawn();
+				if (this.health <= 0) {
+					track("respawned", ""+roomsExplored);
+					this.respawn();
+				}
 
 				if (this.health < this.maxHealth) {
 					this.shieldRechange++;
@@ -513,7 +516,7 @@ var Cerulean = function () {
 		var update = function () {
 			player.room.update(player);
 			if (player.lastRoom) player.lastRoom.update(player);
-			player.update(keyboard);
+			player.update(keyboard, roomsExplored); //roomsExplored is just for analytics
 
 			if (!player.room.containsAllOf(player)) {
 				player.attackCharge = 0; //discharge attack when between rooms
@@ -522,6 +525,9 @@ var Cerulean = function () {
 						if (!door.otherRoom.explored) {
 							door.otherRoom.explored = true;
 							roomsExplored++;
+							if (roomsExplored % 10 == 0) {
+								track("explored", ""+roomsExplored);
+							}
 						}
 						if (door.otherRoom.containsCenterOf(player)) {
 							player.lastRoom = player.room;
