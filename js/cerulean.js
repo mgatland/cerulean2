@@ -23,6 +23,10 @@ var Cerulean = function () {
 		var flickerCounter = 0;
 		var blackColor = "#000000";
 
+		container = document.getElementById('gamecontainer');
+		container.style.width = gameWindow.width;
+		container.style.height = gameWindow.height;
+
 		canvas = document.getElementById('gamescreen');
 		ctx = canvas.getContext("2d");
 		canvas.width = gameWindow.width;
@@ -537,6 +541,11 @@ var Cerulean = function () {
 							roomsExplored++;
 							if (roomsExplored % 10 == 0) {
 								track("explored", ""+roomsExplored);
+							}
+
+							//Hack to hide instructions
+							if (roomsExplored == 10) {
+								document.getElementById('instructions').style.display = "none";
 							}
 						}
 						if (door.otherRoom.containsCenterOf(player)) {

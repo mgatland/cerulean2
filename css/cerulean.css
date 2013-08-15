@@ -1,8 +1,12 @@
 body {
 	background-color: black;
-	color: white;
+	color: #5DE100;
 	font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
 	font-size: 18px;
+}
+
+a {
+	color: #ff0f0f;
 }
 
 #gamecontainer {
