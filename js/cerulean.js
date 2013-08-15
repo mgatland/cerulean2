@@ -404,21 +404,25 @@ var Cerulean = function () {
 		this.fireAngle = Math.floor(Math.random() * 360);
 		this.type = type;
 
-		if (this.type == 0) {
+		if (this.type == 0) { //fires at player square
 			this.size = new Pos(25, 25);
 			this.speed = 0.3;
 			this.health = 20;
-		} else if (this.type == 1) {
-			this.size = new Pos(32, 20);
+		} else if (this.type == 1) { //fires in a spiral horizontal line
+			this.size = new Pos(35, 20);
 			this.speed = 0.0;
 			this.health = 15;
-		} else if (this.type == 2) {
+		} else if (this.type == 2) { //fires 5 shots at player (big square)
 			this.size = new Pos(44, 44);
 			this.speed = 0.2;
 			this.health = 30;
-		} else {
-			this.size = new Pos(20, 32);
+		} else if (this.type == 3) {//rapidfire left and right of player (vertical line)
+			this.size = new Pos(20, 35);
 			this.speed = 0.3;
+			this.health = 10;
+		} else { //fires radially
+			this.size = new Pos(44, 30); //big horziontal line
+			this.speed = 0.0;
 			this.health = 10;
 		}
 
@@ -466,12 +470,18 @@ var Cerulean = function () {
 						room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
 					}
 					this.refireTimer = 15;
-				} else {
+				} else if (this.type == 3) {
 					var angle = this.pos.angleTo(player.pos);
 					for (var i = -1; i <= 1; i+= 2) {
 						room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
 					}
 					this.refireTimer = 8;
+				} else {
+					var angle = 0;
+					for (var i = 0; i < 360; i+= 30) {
+						room.shots.push(new Shot(this.getCenter(), room, angle + i));
+					}
+					this.refireTimer = 30;
 				}
 
 			} else {
