@@ -78,10 +78,10 @@ function AudioUtil() {
 		return 440 * Math.pow(2,(note-69)/12);
 	}
 
-	function noteOn( note, velocity, now ) {
+	function noteOn( note, velocity, now, volume ) {
 		if (voices[note] == null) {
 			// Create a new synth node
-			voices[note] = new Voice(note, velocity, now);
+			voices[note] = new Voice(note, velocity, now, volume);
 		}
 	}
 
@@ -403,7 +403,7 @@ function AudioUtil() {
 		return filterFrequency;
 	}
 
-	function Voice( note, velocity, now ) {
+	function Voice( note, velocity, now, volume ) {
 		this.originalFrequency = frequencyFromNoteNumber( note );
 
 		// create osc 1
@@ -462,7 +462,15 @@ function AudioUtil() {
 		// create the volume envelope
 		this.envelope = audioContext.createGain();
 		this.filter2.connect( this.envelope );
-		this.envelope.connect( effectChain );
+
+		if (volume == undefined || volume == null) {
+			this.envelope.connect( effectChain );
+		} else {
+			this.extraVolumeNode = audioContext.createGain();
+			this.envelope.connect(this.extraVolumeNode);
+			this.extraVolumeNode.connect(effectChain);
+			this.extraVolumeNode.gain.value = volume;
+		}
 
 		// set up the volume and filter envelopes
 		var now = now ? now : audioContext.currentTime;
@@ -721,13 +729,13 @@ function AudioUtil() {
 	this.shotHitPlayer = function (healthLeft) {
 			var now = audioContext.currentTime;
 			var lowNotes = [97, 98, 100, 101, 103];
-			scheduleNote(lowNotes[healthLeft], now, 0.25);
-			scheduleNote(105, now, 0.25);
+			scheduleNote(lowNotes[healthLeft], now, 0.25, 0.5, 0.3);
+			scheduleNote(105, now, 0.25, 0.5, 0.3);
 	}
 	this.playerDied = function () {
 		var now = audioContext.currentTime;
-		scheduleNote(97, now, 1.1);
-		scheduleNote(105, now, 1.1);
+		scheduleNote(97, now, 1.1, 0.5, 0.3);
+		scheduleNote(105, now, 1.1, 0.5, 0.3);
 	}
 
 	var bitCollectionTimer = 0;
@@ -754,8 +762,10 @@ function AudioUtil() {
 		}
 	}
 
-	var scheduleNote = function (note, start, duration) {
-		noteOn(note, 0.75, start);
+	var scheduleNote = function (note, start, duration, attack, volume) {
+		attack = attack ? attack : 0.75;
+		volume = volume ? volume : null;
+		noteOn(note, attack, start, volume);
 		noteOff(note, start+duration);
 	}
 
