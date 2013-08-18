@@ -78,17 +78,17 @@ function AudioUtil() {
 		return 440 * Math.pow(2,(note-69)/12);
 	}
 
-	function noteOn( note, velocity ) {
+	function noteOn( note, velocity, now ) {
 		if (voices[note] == null) {
 			// Create a new synth node
-			voices[note] = new Voice(note, velocity);
+			voices[note] = new Voice(note, velocity, now);
 		}
 	}
 
-	function noteOff( note ) {
+	function noteOff( note, now ) {
 		if (voices[note] != null) {
 			// Shut off the note playing and clear it
-			voices[note].noteOff();
+			voices[note].noteOff(now);
 			voices[note] = null;
 		}
 	}
@@ -403,7 +403,7 @@ function AudioUtil() {
 		return filterFrequency;
 	}
 
-	function Voice( note, velocity ) {
+	function Voice( note, velocity, now ) {
 		this.originalFrequency = frequencyFromNoteNumber( note );
 
 		// create osc 1
@@ -465,7 +465,7 @@ function AudioUtil() {
 		this.envelope.connect( effectChain );
 
 		// set up the volume and filter envelopes
-		var now = audioContext.currentTime;
+		var now = now ? now : audioContext.currentTime;
 		var envAttackEnd = now + (currentEnvA/20.0);
 
 		this.envelope.gain.value = 0.0;
@@ -492,9 +492,9 @@ function AudioUtil() {
 		this.filter2.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
 		this.filter2.frequency.setTargetValueAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
 
-		this.osc1.start(0);
-		this.osc2.start(0);
-		this.modOsc.start(0);
+		this.osc1.start(now);
+		this.osc2.start(now);
+		this.modOsc.start(now);
 	}
 
 
@@ -558,8 +558,8 @@ function AudioUtil() {
 		this.modFilterGain.gain.value = currentFilterMod*10;
 	}
 
-	Voice.prototype.noteOff = function() {
-		var now =  audioContext.currentTime;
+	Voice.prototype.noteOff = function(now) {
+		var now = now ? now : audioContext.currentTime;
 		var release = now + (currentEnvR/10.0);
 	    var initFilter = filterFrequencyFromCutoff( this.originalFrequency, currentFilterCutoff/100 * (1.0-(currentFilterEnv/100.0)) );
 
@@ -695,6 +695,11 @@ function AudioUtil() {
 			noteOff(chargeNote);
 		}
 
+		if (isCharging && wasCharging) {
+			var voice = voices[chargeNote];
+			voice.osc1Gain.gain.value += 0.002;
+		}
+
 		wasCharging = isCharging;
 	}
 	this.playerResetCharge = function () {
@@ -751,6 +756,22 @@ function AudioUtil() {
 			noteOn(playerAttackNote1, 1.0);
 			noteOn(playerAttackNote2, 1.0);
 		}
+	}
+
+	var scheduleNote = function (note, start, duration) {
+		noteOn(note, 0.75, start);
+		noteOff(note, start+duration);
+	}
+
+	this.playIntro = function () {
+		var bpm = 80;
+		var beat = 60 / bpm;
+		var extra = beat / 10;
+		var now = audioContext.currentTime;
+		scheduleNote(62, now, beat*8 + extra);
+		scheduleNote(65, now+beat*1, beat*7 + extra);
+		scheduleNote(67, now+beat*2, beat*6 + extra);
+		scheduleNote(71, now+beat*3, beat*5 + extra);
 	}
 
 	this.update = function () {
