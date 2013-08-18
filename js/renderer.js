@@ -1,4 +1,4 @@
-var Renderer = function (gameWindow, gameConsts) {
+var Renderer = function (gameWindow, gameConsts, shaders) {
 	var canvas;
 	var ctx;
 	var flicker = false;
@@ -24,7 +24,7 @@ var Renderer = function (gameWindow, gameConsts) {
 	var vertexColorAttribute;
 	var vertexCount = 0;
 
-	initShaders();
+	initShaders(shaders);
 	//initBuffers(); now called every frame
 
 	ctx = canvas.getContext("2d");
@@ -128,9 +128,9 @@ var Renderer = function (gameWindow, gameConsts) {
 	  return gl;
 	}
 
-	function initShaders() {
-	  var fragmentShader = getShader(gl, "shader-fs");
-	  var vertexShader = getShader(gl, "shader-vs");
+	function initShaders(shaders) {
+	  var fragmentShader = getShader(gl, shaders[0], "fragment");
+	  var vertexShader = getShader(gl, shaders[1], "vertex");
 
 	  // Create the shader program
 
@@ -153,29 +153,12 @@ var Renderer = function (gameWindow, gameConsts) {
 	  gl.enableVertexAttribArray(vertexColorAttribute);
 	}
 
-	function getShader(gl, id) {
-	  var shaderScript, theSource, currentChild, shader;
+	function getShader(gl, theSource, type) {
+	  var theSource, shader;
 
-	  shaderScript = document.getElementById(id);
-
-	  if (!shaderScript) {
-	    return null;
-	  }
-
-	  theSource = "";
-	  currentChild = shaderScript.firstChild;
-
-	  while(currentChild) {
-	    if (currentChild.nodeType == currentChild.TEXT_NODE) {
-	      theSource += currentChild.textContent;
-	    }
-
-	    currentChild = currentChild.nextSibling;
-	  }
-
-	if (shaderScript.type == "x-shader/x-fragment") {
+	if (type == "fragment") {
 	    shader = gl.createShader(gl.FRAGMENT_SHADER);
-	  } else if (shaderScript.type == "x-shader/x-vertex") {
+	  } else if (type == "vertex") {
 	    shader = gl.createShader(gl.VERTEX_SHADER);
 	  } else {
 	     // Unknown shader type

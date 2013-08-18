@@ -391,9 +391,18 @@ var Cerulean = function () {
 		}
 	}
 
-	this.start = function () {
+	this.load = function () {
+
+		loadFiles(['shaders/fragment.glsl', 'shaders/vertex.glsl'], function (shaders) {
+			start(shaders);
+		}, function (url) {
+		    alert('Failed to download "' + url + '"');
+		});
+	}
+
+	var start = function (shaders) {
 		var gameWindow = new GameWindow();
-		var renderer = new Renderer(gameWindow, GameConsts);
+		var renderer = new Renderer(gameWindow, GameConsts, shaders);
 		var keyboard = new Keyboard();
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
@@ -493,5 +502,5 @@ var Cerulean = function () {
 
 window.onload = function () {
 	var cerulean = new Cerulean();
-	cerulean.start();
+	cerulean.load();
 };
