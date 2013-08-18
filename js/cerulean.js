@@ -171,6 +171,8 @@ var Cerulean = function () {
 			this.pos = this.home.getCenter();
 			this.pos.x *= GameConsts.tileSize;
 			this.pos.y *= GameConsts.tileSize;
+			if (this.room) this.room.cleanUp();
+			if (this.lastRoom) this.lastRoom.cleanUp();
 			this.room = this.home;
 			this.lastRoom = null;
 		}
@@ -345,13 +347,13 @@ var Cerulean = function () {
 			if (room.isCollidingWith(this, true)) {
 				this.live = false;
 			}
-			if (player.isCollidingWith(this)) {
+			if (player && player.isCollidingWith(this)) {
 				player.hit();
 				this.live = false;
 			}
 
 			//update highlight status
-			if (player.attackPowerOn(this) > this.health) {
+			if (player && player.attackPowerOn(this) > this.health) {
 				this.targetted = true;
 			} else {
 				this.targetted = false;
@@ -377,18 +379,20 @@ var Cerulean = function () {
 		this.pos = pos;
 
 		this.update = function (player) {
-			var distance = this.pos.distanceTo(player.getCenter());
-			if (distance < 128) {
-				var angle = this.pos.angleTo(player.getCenter());
-				var speed = 6 * (128 - distance) / 128;
-				var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
-				var ySpeed = (speed * -Math.cos(3.14159 / 180 * angle));
-				this.pos.x += xSpeed;
-				this.pos.y += ySpeed;
-			}
-			if (distance < player.size.x / 2 || distance < player.size.y / 2) {
-				this.live = false;
-				player.items++;
+			if (player) {
+				var distance = this.pos.distanceTo(player.getCenter());
+				if (distance < 128) {
+					var angle = this.pos.angleTo(player.getCenter());
+					var speed = 6 * (128 - distance) / 128;
+					var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
+					var ySpeed = (speed * -Math.cos(3.14159 / 180 * angle));
+					this.pos.x += xSpeed;
+					this.pos.y += ySpeed;
+				}
+				if (distance < player.size.x / 2 || distance < player.size.y / 2) {
+					this.live = false;
+					player.items++;
+				}
 			}
 		};
 	}
@@ -450,38 +454,40 @@ var Cerulean = function () {
 			//shoot
 			if (this.refireTimer == 0) {
 				console.log("shoot");
+				if (player) {
 
-				if (this.type == 0) {
-					//the seeking shot
-					var angle = this.pos.angleTo(player.pos);
-					var shot = new Shot(this.getCenter(), room, angle);
-					room.shots.push(shot);
-					this.refireTimer = 15;
-				} else if (this.type == 1) {
-					//the spinner shot
-					this.fireAngle += 25;
-					if (this.fireAngle > 360) this.fireAngle -= 360;
-					var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
-					room.shots.push(shot2);
-					this.refireTimer = 7;
-				} else if (this.type == 2) {
-					var angle = this.pos.angleTo(player.pos);
-					for (var i = -2; i <= 2; i++) {
-						room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
+					if (this.type == 0) {
+						//the seeking shot
+						var angle = this.pos.angleTo(player.pos);
+						var shot = new Shot(this.getCenter(), room, angle);
+						room.shots.push(shot);
+						this.refireTimer = 15;
+					} else if (this.type == 1) {
+						//the spinner shot
+						this.fireAngle += 25;
+						if (this.fireAngle > 360) this.fireAngle -= 360;
+						var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
+						room.shots.push(shot2);
+						this.refireTimer = 7;
+					} else if (this.type == 2) {
+						var angle = this.pos.angleTo(player.pos);
+						for (var i = -2; i <= 2; i++) {
+							room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
+						}
+						this.refireTimer = 15;
+					} else if (this.type == 3) {
+						var angle = this.pos.angleTo(player.pos);
+						for (var i = -1; i <= 1; i+= 2) {
+							room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
+						}
+						this.refireTimer = 8;
+					} else {
+						var angle = 0;
+						for (var i = 0; i < 360; i+= 30) {
+							room.shots.push(new Shot(this.getCenter(), room, angle + i));
+						}
+						this.refireTimer = 30;
 					}
-					this.refireTimer = 15;
-				} else if (this.type == 3) {
-					var angle = this.pos.angleTo(player.pos);
-					for (var i = -1; i <= 1; i+= 2) {
-						room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
-					}
-					this.refireTimer = 8;
-				} else {
-					var angle = 0;
-					for (var i = 0; i < 360; i+= 30) {
-						room.shots.push(new Shot(this.getCenter(), room, angle + i));
-					}
-					this.refireTimer = 30;
 				}
 
 			} else {
@@ -490,7 +496,7 @@ var Cerulean = function () {
 
 			//duplicate code from Shot
 			//update highlight status
-			if (player.attackPowerOn(this) > this.health) {
+			if (player && player.attackPowerOn(this) > this.health) {
 				this.targetted = true;
 			} else {
 				this.targetted = false;
@@ -540,6 +546,7 @@ var Cerulean = function () {
 		var update = function () {
 			player.room.update(player);
 			if (player.lastRoom) player.lastRoom.update(player);
+
 			player.update(keyboard, roomsExplored); //roomsExplored is just for analytics
 
 			if (!player.room.containsAllOf(player)) {
@@ -559,15 +566,27 @@ var Cerulean = function () {
 							}
 						}
 						if (door.otherRoom.containsCenterOf(player)) {
+							var oldRoom = player.lastRoom;
 							player.lastRoom = player.room;
 							player.room = door.otherRoom;
+							if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
+								oldRoom.cleanUp();
+							}
 						} else {
+							var oldRoom = player.lastRoom;
 							player.lastRoom = door.otherRoom;
+							if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
+								oldRoom.cleanUp();
+							}
 						}
 					}
 				});
 			} else {
-				player.lastRoom = null;
+				//we're fully inside one room now.
+				if (player.lastRoom) {
+					player.lastRoom.cleanUp();
+					player.lastRoom = null;
+				}
 			}
 
 			keyboard.update();

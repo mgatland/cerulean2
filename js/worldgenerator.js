@@ -50,6 +50,11 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			});
 		}
 
+		//called when the player leaves a room
+		this.cleanUp = function () {
+			this.shots = [];
+		}
+
 		this.addDoor = function (x, y, otherRoom, direction) {
 			this.doors.push(new Door(x,y, otherRoom, direction));
 		}
