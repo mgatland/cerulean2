@@ -482,11 +482,13 @@ var Cerulean = function () {
 						}
 						this.refireTimer = 8;
 					} else {
-						var angle = 0;
+						var angle = this.fireAngle;
 						for (var i = 0; i < 360; i+= 30) {
 							room.shots.push(new Shot(this.getCenter(), room, angle + i));
 						}
 						this.refireTimer = 30;
+						this.fireAngle += 5;
+						if (this.fireAngle > 360) this.fireAngle -= 360;
 					}
 				}
 
