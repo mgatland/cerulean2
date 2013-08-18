@@ -30,7 +30,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.shots = [];
 		this.items = [];
 
-		this.update = function (player) {
+		this.update = function (player, audioUtil) {
 			if (this.flashing) this.flashing--;
 
 			this.shots = this.shots.filter(function (s) {return s.live});
@@ -38,11 +38,11 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			this.items = this.items.filter(function (i) {return i.live});
 
 			this.enemies.forEach(function (enemy) {
-				enemy.update(player);
+				enemy.update(player, audioUtil);
 			});
 
 			this.shots.forEach(function (shot) {
-				shot.update(player);
+				shot.update(player, audioUtil);
 			});
 
 			this.items.forEach(function (item) {

@@ -148,7 +148,7 @@ var Cerulean = function () {
 
 		}
 
-		this.update = function (keyboard, roomsExplored) {
+		this.update = function (keyboard, audioUtil, roomsExplored) {
 			this._updateControls(keyboard);
 
 			if (this.health > 0) {
@@ -165,6 +165,8 @@ var Cerulean = function () {
 					this.attackCharge = 0;
 				}
 			}
+
+			audioUtil.setCharging(isChargingAttack);
 
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
@@ -192,6 +194,7 @@ var Cerulean = function () {
 			if (this.health > 0) {
 				this.invlunerableTime = 2;
 			} else {
+				isChargingAttack = false;
 				this.attackCharge = 0;
 				this.invlunerableTime = 60; //we won't respawn until this wears off
 			}
@@ -210,7 +213,7 @@ var Cerulean = function () {
 		this.live = true;
 		this.targetted = false;
 		this.health = 1;
-		this.update = function (player) {
+		this.update = function (player, audioUtil) {
 			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
 			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
 			this.pos.x += xSpeed;
@@ -220,6 +223,7 @@ var Cerulean = function () {
 			}
 			if (player && player.isCollidingWith(this)) {
 				player.hit();
+				audioUtil.shotHitPlayer();
 				this.live = false;
 			}
 
@@ -307,7 +311,7 @@ var Cerulean = function () {
 			return new Pos(x, y);
 		}
 
-		this.update = function (player) {
+		this.update = function (player, audioUtil) {
 			//move
 			if (!this.dest) {
 				this.dest = room.getRandomPointInside();
@@ -361,6 +365,9 @@ var Cerulean = function () {
 						this.fireAngle += 5;
 						if (this.fireAngle > 360) this.fireAngle -= 360;
 					}
+
+				audioUtil.enemyAttack();
+
 				}
 
 			} else {
@@ -393,14 +400,15 @@ var Cerulean = function () {
 
 	this.load = function () {
 
+		var audioUtil = new AudioUtil();
 		loadFiles(['shaders/fragment.glsl', 'shaders/vertex.glsl'], function (shaders) {
-			start(shaders);
+			start(shaders, audioUtil);
 		}, function (url) {
 		    alert('Failed to download "' + url + '"');
 		});
 	}
 
-	var start = function (shaders) {
+	var start = function (shaders, audioUtil) {
 		var gameWindow = new GameWindow();
 		var renderer = new Renderer(gameWindow, GameConsts, shaders);
 		var keyboard = new Keyboard();
@@ -426,10 +434,10 @@ var Cerulean = function () {
 		roomsExplored++;
 
 		var update = function () {
-			player.room.update(player);
-			if (player.lastRoom) player.lastRoom.update(player);
+			player.room.update(player, audioUtil);
+			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
 
-			player.update(keyboard, roomsExplored); //roomsExplored is just for analytics
+			player.update(keyboard, audioUtil, roomsExplored); //roomsExplored is just for analytics
 
 			if (!player.room.containsAllOf(player)) {
 				player.attackCharge = 0; //discharge attack when between rooms
@@ -472,6 +480,7 @@ var Cerulean = function () {
 			}
 
 			keyboard.update();
+			audioUtil.update();
 		}
 
 		//cross browser hacks

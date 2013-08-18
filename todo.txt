@@ -12,8 +12,9 @@ to do:
 
 Presentation:
 [ ] add synth sounds
-[ ] switch to WebGL graphics
 [ ] add a fancy glow\blur effect
+[ ] draw everything in vector lines instead of blocks of color
+[ ] make rooms look like faces?
 
 Story?
 
@@ -25,8 +26,16 @@ Who:
 	attacks nearby projectiles with her projectile-destroyer
 	or maybe she can freeze enemies, or shots, while they're under her cursor.
 
+2013-08-19
+
+[x] switch to WebGL graphics
+	fun! I copy-pasted a lot of code I don't understand... but it's working, 100% like it did before.
+	Everything is in webGL except the text, which is on a overlaid on a transparent canvas.
+	I replaced the canvas noise effect with a noise shader effect. *Learning about shaders*
 
 2013-08-18
 
 [X] clean shots in a room when the player leaves that room
-	I don't like the feel of this (arbitrarily resetting world state), but it prevents players getting a room into an unwinnable state. And it's the easiest solution.
+	I don't like the feel of this (arbitrarily resetting world state), but it was an easy way to
+	prevent players getting a room into an unwinnable state. Better would be to keep updating shots
+	after the player leaves the room -- enemies stop firing so the shots will all explode after a few seconds. But currently I can't update rooms that the player isn't in.
