@@ -147,7 +147,7 @@ var Cerulean = function () {
 			var player = this;
 			roomToAttack.flashing = Math.floor(Math.max(3, 25 * player.attackCharge / player.maxAttackCharge));
 
-			var liveEnemiesBefore = roomToAttack.enemies.filter(function (e) {return e.live}).length;
+			var liveEnemiesBefore = roomToAttack.countEnemies();
 
 			roomToAttack.enemies.forEach(function (enemy) {
 				enemy.shocked(player.attackPowerOn(enemy));
@@ -156,7 +156,7 @@ var Cerulean = function () {
 				shot.shocked(player.attackPowerOn(shot));
 			});
 
-			var liveEnemiesAfter = roomToAttack.enemies.filter(function (e) {return e.live}).length;
+			var liveEnemiesAfter = roomToAttack.countEnemies();
 
 			var duration = player.attackCharge / player.maxAttackCharge;
 			var gotKill = (liveEnemiesAfter < liveEnemiesBefore);

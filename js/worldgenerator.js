@@ -175,6 +175,10 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			var y = rand(this.pos.y + 1, this.pos.y + this.size.y - 1);
 			return new Pos(x * gameConsts.tileSize, y * gameConsts.tileSize);
 		}
+
+		this.countEnemies = function () {
+			return this.enemies.filter(function (e) {return e.live}).length;
+		}
 	}
 
 	var addDoorsBetween = function (room, newRoom, direction) {
