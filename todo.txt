@@ -1,0 +1,32 @@
+to do:
+
+[ ] spawn build areas in some rooms
+[ ] let the player build stuff on 'build areas' (empty green boxes)
+[ ] late game, let the player create their own build areas anywhere
+	stuff like: teleporters, temporary powerups, currency gatherers
+[ ] some enemies move between rooms, chasing the player from up to 5 rooms away.
+[ ] rooms with only one door are special (boss rooms? treasure rooms?)
+[ ] some rooms are randomly just treasure rooms
+[ ] The world has 9 regions. Each has different enemies and room sizes.
+[ ] much more enemy diversity
+
+Presentation:
+[ ] add synth sounds
+[ ] switch to WebGL graphics
+[ ] add a fancy glow\blur effect
+
+Story?
+
+Add the companion?
+Who:
+	avoids shots as well as she can
+	stays close to the player
+	follows if she's in another room
+	attacks nearby projectiles with her projectile-destroyer
+	or maybe she can freeze enemies, or shots, while they're under her cursor.
+
+
+2013-08-18
+
+[X] clean shots in a room when the player leaves that room
+	I don't like the feel of this (arbitrarily resetting world state), but it prevents players getting a room into an unwinnable state. And it's the easiest solution.
