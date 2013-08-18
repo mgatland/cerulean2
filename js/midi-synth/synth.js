@@ -718,27 +718,19 @@ function AudioUtil() {
 	}
 
 	//player damage:
-	var shotHitPlayerTimer = 0;
-	var hitPlayerNote1 = 72;
-	var hitPlayerNote2 = 74;
-	this.shotHitPlayer = function () {
-		if (shotHitPlayerTimer == 0) {
-			shotHitPlayerTimer = 10;
-			noteOn(hitPlayerNote1, 1.0);
-			noteOn(hitPlayerNote2, 1.0);
-		}
+	this.shotHitPlayer = function (healthLeft) {
+			var now = audioContext.currentTime;
+			var lowNotes = [97, 98, 100, 101, 103];
+			scheduleNote(lowNotes[healthLeft], now, 0.25);
+			scheduleNote(105, now, 0.25);
 	}
 	this.playerDied = function () {
-		if (shotHitPlayerTimer == 0) {
-			noteOn(hitPlayerNote1, 1.0);
-			noteOn(hitPlayerNote2, 1.0);
-		}
-		//and, whether it was already playing or not:
-		shotHitPlayerTimer = 70;
+		var now = audioContext.currentTime;
+		scheduleNote(97, now, 1.1);
+		scheduleNote(105, now, 1.1);
 	}
 
 	var bitCollectionTimer = 0;
-	//var bitCollectionNote = 69; //now overlaps with playerAttackTimer
 	this.playerCollectedBit = function () {
 		if (bitCollectionTimer == 0 && playerAttackTimer == 0) {
 			bitCollectionTimer = 1;
@@ -750,11 +742,15 @@ function AudioUtil() {
 	var playerAttackTimer = 0;
 	var playerAttackNote1 = 62;
 	var playerAttackNote2 = 69;
-	this.playerAttack = function (damagePercent) {
+	var playerAttackNote3 = 74;
+	this.playerAttack = function (damagePercent, gotKills) {
 		if (playerAttackTimer == 0) {
 			playerAttackTimer = Math.floor(10 + damagePercent*50);
 			noteOn(playerAttackNote1, 1.0);
 			noteOn(playerAttackNote2, 1.0);
+			if (gotKills) {
+				noteOn(74, 1.0);
+			}
 		}
 	}
 
@@ -790,19 +786,12 @@ function AudioUtil() {
 			noteOff(playerAttackNote2);
 		}
 
-		if (shotHitPlayerTimer > 0) {
-			shotHitPlayerTimer--;
-			if (shotHitPlayerTimer == 0) {
-				noteOff(hitPlayerNote1);
-				noteOff(hitPlayerNote2);
-			}
-		}
-
 		if (playerAttackTimer > 0) {
 			playerAttackTimer--;
 			if (playerAttackTimer == 0) {
 				noteOff(playerAttackNote1);
 				noteOff(playerAttackNote2);
+				noteOff(playerAttackNote3);
 			}
 		}
 	}

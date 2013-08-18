@@ -158,12 +158,12 @@ var Cerulean = function () {
 
 			var liveEnemiesAfter = roomToAttack.enemies.filter(function (e) {return e.live}).length;
 
-			if (liveEnemiesAfter == 0 && liveEnemiesBefore > 0) {
-				//Victory sound
-				audioUtil.playerAttack(0.5 + player.attackCharge / player.maxAttackCharge);
-			} else {
-				audioUtil.playerAttack(player.attackCharge / player.maxAttackCharge);
-			}
+			var duration = player.attackCharge / player.maxAttackCharge;
+			var gotKill = (liveEnemiesAfter < liveEnemiesBefore);
+
+			//longer if we cleared a room
+			if (liveEnemiesAfter == 0 && liveEnemiesBefore > 0) duration += 0.5;
+			audioUtil.playerAttack(duration, gotKill);
 
 		}
 
@@ -211,7 +211,7 @@ var Cerulean = function () {
 			this.shieldRechange = 0;
 			console.log('hit!');
 			if (this.health > 0) {
-				audioUtil.shotHitPlayer();
+				audioUtil.shotHitPlayer(this.health);
 				this.invlunerableTime = 2;
 			} else {
 				audioUtil.playerDied();
@@ -404,7 +404,7 @@ var Cerulean = function () {
 			}
 		}
 
-		//duplicate code from Shot
+		//duplicate code from Shot (Except the audio)
 		this.shocked = function (damage) {
 			if (!this.live) return;
 			if (damage > this.health) {
