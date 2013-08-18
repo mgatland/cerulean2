@@ -14,17 +14,40 @@ icon: "cerulean/cerulean-icon.png"
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="css/cerulean.css">
 	<script src="js/util.js"></script>
+	<script src="js/sylvester.js"></script>
 	<script src="js/renderer.js"></script>
 	<script src="js/cerulean.js"></script>
 	<script src="js/keyboard.js"></script>
 	<script src="js/worldgenerator.js"></script>
 	<script src="js/overlay.js"></script>
+	<script id="shader-fs" type="x-shader/x-fragment">
+    	varying lowp vec4 vColor;
+    	
+      void main(void) {
+        gl_FragColor = vColor;
+      }
+    </script>
+	<script id="shader-vs" type="x-shader/x-vertex">
+	      attribute vec3 aVertexPosition;
+	      attribute vec4 aVertexColor;
+	    
+	      uniform mat4 uMVMatrix;
+	      uniform mat4 uPMatrix;
+	      
+	      varying lowp vec4 vColor;
+	    
+	      void main(void) {
+	        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+	        vColor = aVertexColor;
+	      }
+    </script>
 	{% include analytics.html %}
 </head>
 <body>
 <div id="gamecontainer">
 	<canvas id="gamescreen"></canvas>
-	<canvas id="overlay"></canvas>
+	<canvas id="hudoverlay"></canvas>
+	<canvas id="effectoverlay"></canvas>
 </div>
 <div id="instructions">
 	<p>USE THE ARROW KEYS TO MOVE^MRELEASE SPACEBAR WHEN TARGET FLASHES^M</p>

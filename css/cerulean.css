@@ -13,6 +13,6 @@ a {
 	position: relative;
 }
 
-#gamescreen, #overlay {
+#gamecontainer canvas {
 	position: absolute;
 }
