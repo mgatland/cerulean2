@@ -600,7 +600,7 @@ function AudioUtil() {
 		var note = keys[ev.keyCode];
 		if (note)
 			noteOn( note + 12*(3-currentOctave), 0.75 );
-	//	console.log( "key down: " + ev.keyCode );
+		console.log( "played: " + (note + 12*(3-currentOctave)) );
 		return false;
 	}
 
@@ -684,35 +684,66 @@ function AudioUtil() {
 	//expose an interface to the game
 
 	var wasCharging = false;
+	var chargeNote = 45;
+
 	this.setCharging = function (isCharging) {
 		if (isCharging && !wasCharging) {
-			noteOn(60, 0.75);
+			noteOn(chargeNote, 0.75);
 		}
 
 		if (!isCharging && wasCharging) {
-			noteOff(60);
+			noteOff(chargeNote);
 		}
 
 		wasCharging = isCharging;
 	}
 
-
-	var enemyAttackTime = null;
+	var enemyAttackTimer = 0;
+	var enemyAttackNote = 61;
 	this.enemyAttack = function () {
-		if (enemyAttackTime == null) {
-			enemyAttackTime = audioContext.currentTime;
-			noteOn(61, 0.75);
+		if (enemyAttackTimer == 0) {
+			enemyAttackTimer = 1;
+			noteOn(enemyAttackNote, 0.75);
 		}
 	}
 
+	var shotHitPlayerTimer = 0;
+	var hitPlayerNote1 = 72;
+	var hitPlayerNote2 = 74;
 	this.shotHitPlayer = function () {
+		if (shotHitPlayerTimer == 0) {
+			shotHitPlayerTimer = 10;
+			noteOn(hitPlayerNote1, 1.0);
+			noteOn(hitPlayerNote2, 1.0);
+		}
+	}
 
+	this.playerDied = function () {
+		if (shotHitPlayerTimer == 0) {
+			noteOn(hitPlayerNote1, 1.0);
+			noteOn(hitPlayerNote2, 1.0);
+		}
+		//and, whether it was already playing or not:
+		shotHitPlayerTimer = 70;
+	}
+
+	this.playerResetCharge = function () {
+		this.setCharging(false);
+		this.setCharging(true);
 	}
 
 	this.update = function () {
-		if (audioContext.currentTime > enemyAttackTime + 0.01) {
-			noteOff(61);
-			enemyAttackTime = null;
+		if (enemyAttackTimer > 0) {
+			enemyAttackTimer--;
+			if (enemyAttackTimer == 0) noteOff(enemyAttackNote);
+		}
+		if (shotHitPlayerTimer > 0) {
+			shotHitPlayerTimer--;
+			if (shotHitPlayerTimer == 0) {
+				noteOff(hitPlayerNote1);
+				noteOff(hitPlayerNote2);
+			}
+
 		}
 	}
 

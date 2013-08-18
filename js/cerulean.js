@@ -48,6 +48,13 @@ var Cerulean = function () {
 			this.lastRoom = null;
 		}
 
+		this.resetCharge = function (audioUtil) {
+			if (this.attackCharge > 3) {
+				audioUtil.playerResetCharge();
+			}
+			this.attackCharge = 0;
+		}
+
 		//duplicate code with Enemy.getCenter
 		this.getCenter = function () {
 			var x = Math.floor(this.pos.x + this.size.x / 2);
@@ -186,14 +193,16 @@ var Cerulean = function () {
 			}
 		}
 
-		this.hit = function () {
+		this.hit = function (audioUtil) {
 			if (this.invlunerableTime > 0 || this.health <= 0) return;
 			this.health--;
 			this.shieldRechange = 0;
 			console.log('hit!');
 			if (this.health > 0) {
+				audioUtil.shotHitPlayer();
 				this.invlunerableTime = 2;
 			} else {
+				audioUtil.playerDied();
 				isChargingAttack = false;
 				this.attackCharge = 0;
 				this.invlunerableTime = 60; //we won't respawn until this wears off
@@ -222,8 +231,7 @@ var Cerulean = function () {
 				this.live = false;
 			}
 			if (player && player.isCollidingWith(this)) {
-				player.hit();
-				audioUtil.shotHitPlayer();
+				player.hit(audioUtil);
 				this.live = false;
 			}
 
@@ -434,13 +442,16 @@ var Cerulean = function () {
 		roomsExplored++;
 
 		var update = function () {
+
+			audioUtil.update();
+
 			player.room.update(player, audioUtil);
 			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
 
 			player.update(keyboard, audioUtil, roomsExplored); //roomsExplored is just for analytics
 
 			if (!player.room.containsAllOf(player)) {
-				player.attackCharge = 0; //discharge attack when between rooms
+				player.resetCharge(audioUtil);
 				player.room.doors.forEach(function (door) {
 					if (door.otherRoom.containsSomeOf(player)) {
 						if (!door.otherRoom.explored) {
@@ -480,7 +491,6 @@ var Cerulean = function () {
 			}
 
 			keyboard.update();
-			audioUtil.update();
 		}
 
 		//cross browser hacks
