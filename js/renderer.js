@@ -23,13 +23,13 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	var squareVerticesColorBuffer;
 	var vertexColorAttribute;
 	var vertexCount = 0;
+	var frameValueLocation; //used to give the shader the frame counter
 
 	initShaders(shaders);
 	//initBuffers(); now called every frame
 
 	ctx = canvas.getContext("2d");
 
-	var effectOverlay = new EffectOverlay("effectoverlay", gameWindow);
 	var hudOverlay = new HudOverlay("hudoverlay", gameWindow);
 
 	this.fillRect = function (x, y, width, height, camera) {
@@ -147,6 +147,8 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	  gl.useProgram(shaderProgram);
 
+	  frameValueLocation = gl.getUniformLocation(shaderProgram, "frameValue");
+
 	  vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
 	  gl.enableVertexAttribArray(vertexPositionAttribute);
 	  vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
@@ -219,19 +221,26 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	  }
 	}
 
+	var frameValue = 0;
+
 	this.draw = function (player, rooms, camera, roomsExplored, fps) {
-		effectOverlay.drawEffect();
 		hudOverlay.drawHud(player.items, roomsExplored, rooms.length, fps);
 
 		flickerCounter ++;
 		if (flickerCounter == 4) flickerCounter = 0;
 		flicker = (flickerCounter <= 1);
 
+		frameValue++;
+		if (frameValue > 100) frameValue = 0;
+
 		squareVerticesBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
 		var vertices = [];
 		var colors = [];
+
+		//Draw a big black rectangle over the background, so that the noise shader is applied
+		addRect(vertices, colors, 0, 0, gameWindow.width, gameWindow.height, black);
 
 		//Red lines in background
 		for (var y = 0; y < gameWindow.height + gameConsts.tileSize*2; y+= gameConsts.tileSize*2) {
@@ -326,6 +335,8 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
 		vertexCount = vertices.length / 3;
+
+		gl.uniform1f(frameValueLocation, frameValue);
 
 		//end of 'initbuffers'
 
