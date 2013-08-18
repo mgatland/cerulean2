@@ -143,15 +143,27 @@ var Cerulean = function () {
 
 		}
 
-		this.attack = function (roomToAttack) {
+		this.attack = function (roomToAttack, audioUtil) {
 			var player = this;
 			roomToAttack.flashing = Math.floor(Math.max(3, 25 * player.attackCharge / player.maxAttackCharge));
+
+			var liveEnemiesBefore = roomToAttack.enemies.filter(function (e) {return e.live}).length;
+
 			roomToAttack.enemies.forEach(function (enemy) {
 				enemy.shocked(player.attackPowerOn(enemy));
 			});
 			roomToAttack.shots.forEach(function (shot) {
 				shot.shocked(player.attackPowerOn(shot));
 			});
+
+			var liveEnemiesAfter = roomToAttack.enemies.filter(function (e) {return e.live}).length;
+
+			if (liveEnemiesAfter == 0 && liveEnemiesBefore > 0) {
+				//Victory sound
+				audioUtil.playerAttack(0.5 + player.attackCharge / player.maxAttackCharge);
+			} else {
+				audioUtil.playerAttack(player.attackCharge / player.maxAttackCharge);
+			}
 
 		}
 
@@ -166,8 +178,8 @@ var Cerulean = function () {
 					}
 				} else {
 					if (this.attackCharge > 0) {
-						this.attack(this.room);
-						if (this.lastRoom) this.attack(this.lastRoom);
+						this.attack(this.room, audioUtil);
+						if (this.lastRoom) this.attack(this.lastRoom, audioUtil);
 					}
 					this.attackCharge = 0;
 				}
@@ -261,7 +273,7 @@ var Cerulean = function () {
 		this.live = true;
 		this.pos = pos;
 
-		this.update = function (player) {
+		this.update = function (player, audioUtil) {
 			if (player) {
 				var distance = this.pos.distanceTo(player.getCenter());
 				if (distance < 128) {
@@ -275,6 +287,7 @@ var Cerulean = function () {
 				if (distance < player.size.x / 2 || distance < player.size.y / 2) {
 					this.live = false;
 					player.items++;
+					audioUtil.playerCollectedBit();
 				}
 			}
 		};

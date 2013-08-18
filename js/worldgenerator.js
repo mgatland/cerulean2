@@ -46,7 +46,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			});
 
 			this.items.forEach(function (item) {
-				item.update(player);
+				item.update(player, audioUtil);
 			});
 		}
 
