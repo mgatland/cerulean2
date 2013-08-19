@@ -224,7 +224,10 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	var frameValue = 0;
 
 	this.draw = function (player, rooms, camera, roomsExplored, fps) {
-		hudOverlay.drawHud(player.items, roomsExplored, rooms.length, fps);
+
+		if(player.story.mode != "intro") {
+			hudOverlay.drawHud(player.items, roomsExplored, rooms.length, fps);
+		}
 
 		flickerCounter ++;
 		if (flickerCounter == 4) flickerCounter = 0;
@@ -243,11 +246,14 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		addRect(vertices, colors, 0, 0, gameWindow.width, gameWindow.height, black);
 
 		//Red lines in background
+		var lineColor = (player.story.mode=="intro") ? green : red;
 		for (var y = 0; y < gameWindow.height + gameConsts.tileSize*2; y+= gameConsts.tileSize*2) {
-			addRect(vertices, colors, 0, y - camera.pos.y % (gameConsts.tileSize*2), gameWindow.width, 1, red);
+			var y2 = (player.story.shaking==true) ? y + Math.random() * gameConsts.tileSize*2 : y;
+			addRect(vertices, colors, 0, y2 - camera.pos.y % (gameConsts.tileSize*2), gameWindow.width, 1, lineColor);
 		}
 
 		rooms.forEach(function (room) {
+
 			if (!room.explored) return;
 			if ((room.pos.x + room.size.x) * gameConsts.tileSize < camera.pos.x) return;
 			if ((room.pos.y + room.size.y) * gameConsts.tileSize < camera.pos.y) return;
@@ -279,7 +285,13 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 			if (room != player.room && room != player.lastRoom) return;
 
 			room.items.forEach(function (item) {
-				addRectWithCamera(vertices, colors, item.pos.x-2, item.pos.y-2, 4, 4, green, camera);
+				if (item.special) {
+					addRectWithCamera(vertices, colors, item.pos.x-16, item.pos.y-16, 32, 32, red, camera);
+					addRectWithCamera(vertices, colors, item.pos.x-15, item.pos.y-15, 30, 30, green, camera);
+					addRectWithCamera(vertices, colors, item.pos.x-14, item.pos.y-14, 28, 28, black, camera);
+				} else {
+					addRectWithCamera(vertices, colors, item.pos.x-2, item.pos.y-2, 4, 4, green, camera);
+				}
 			});
 
 			room.enemies.forEach(function (enemy) {

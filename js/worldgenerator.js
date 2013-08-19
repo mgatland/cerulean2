@@ -153,6 +153,10 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		//Is this thing colliding with the walls of the room?
 		this.isCollidingWith = function (thing, blockDoorways) {
 
+			if (thing.story) {
+				if (thing.story.mode == "intro") blockDoorways = true;
+			}
+
 			if (thing.size) {
 				var minTileX = Math.floor(thing.pos.x / gameConsts.tileSize);
 				var maxTileX = Math.floor((thing.pos.x + thing.size.x) / gameConsts.tileSize);

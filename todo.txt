@@ -1,13 +1,25 @@
 to do:
 
+
+[ ] The world has 9 regions. Each has different enemies and room sizes.
+[ ] the North, South, East and West regions are unlocked until the player does something
+[ ] the 4 corner regions are each individually locked.
+
+So our player story is: unlock the NSEW, then unlock each of the 4 corners.
+
+Intro movie:
+
 [ ] spawn build areas in some rooms
+
 [ ] let the player build stuff on 'build areas' (empty green boxes)
-[ ] late game, let the player create their own build areas anywhere
 	stuff like: teleporters, temporary powerups, currency gatherers
+	powerups to expand into the other 8 regions.
+
+[ ] late game, let the player create their own build areas anywhere
+
 [ ] some enemies move between rooms, chasing the player from up to 5 rooms away.
 [ ] rooms with only one door are special (boss rooms? treasure rooms?)
 [ ] some rooms are randomly just treasure rooms
-[ ] The world has 9 regions. Each has different enemies and room sizes.
 [ ] much more enemy diversity
 
 Sounds:
@@ -16,7 +28,7 @@ Sounds:
 [ ] gem is collected?
 
 Presentation:
-[] ] add a fancy glow\blur effect
+[ ] add a fancy glow\blur effect
 [ ] draw everything in vector lines instead of blocks of color
 [ ] make rooms look like faces?
 
@@ -37,7 +49,16 @@ Who:
 	Everything is in webGL except the text, which is on a overlaid on a transparent canvas.
 	I replaced the canvas noise effect with a noise shader effect. *Learning about shaders*
 
-[x] add synth sounds
+[x] add synth sounds. Lots of work on the sounds.
+
+[x] sleep...
+
+[ ] Add the intro sequence
+	[x] message system to display your chat with Jessica
+	[ ] collectable artefact
+	[ ] your attack only works when you have the attack artefact
+	[ ] the artefact triggers part 2 of the story:
+		- screen shakes, world blurs. Maybe the red lines appear. You can now go through doorways.
 
 2013-08-18
 

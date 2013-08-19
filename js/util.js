@@ -36,6 +36,10 @@ var Pos = function (x, y) {
 		return new Pos(this.x, this.y);
 	}
 
+	this.multiply = function (value) {
+		return new Pos(this.x*value, this.y*value);
+	}
+
 	this.angleTo = function (other) {
 		var angle = (Math.atan2(other.y - this.y, other.x - this.x) * 180 / Math.PI);
 		angle += 90;

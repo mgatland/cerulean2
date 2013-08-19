@@ -16,6 +16,73 @@ var Cerulean = function () {
 		this.pos = new Pos();
 	}
 
+	var Messages = function () {
+		var element = document.getElementById("messages");
+
+		var messages = [];
+		var messageDisplayTime = 60 * 8;
+
+		this.addMessage = function (msg) {
+			var newMessage = document.createElement('div');
+			newMessage.classList.add("message");
+			newMessage.innerHTML = msg;
+			element.insertBefore(newMessage, null);
+			messages.push({element: newMessage, timer: messageDisplayTime});
+		}
+
+		this.update = function () {
+			messages.forEach(function (message) {
+				message.timer--;
+				if (message.timer == 0) {
+					element.removeChild(message.element);
+				}
+			});
+			messages = messages.filter(function (message) {return message.timer > 0});
+		}
+	}
+
+	var Story = function () {
+		this.mode = "intro"; //cannot pass through doorways, do not show HUD.
+		this.shaking = false;
+
+		var sec = 60; //just a constant
+
+		var storyFrame = 0;
+		this.update = function (messages) {
+
+			if (this.mode == "intro") {
+				storyFrame++;
+				if (storyFrame == 0.5*sec) messages.addMessage("Use the ARROW KEYS to move.");
+				if (storyFrame == 1*sec) messages.addMessage("Justan: I found something!");
+				if (storyFrame == 5*sec) messages.addMessage("Jessica: Is it small? Pick it up and I'll teleport you out.");
+				if (storyFrame == 10*sec) messages.addMessage("Justan: Getting it now.");
+				if (storyFrame == 15*sec) messages.addMessage("Justan: It's a Timberial artifact.");
+				if (storyFrame == 18*sec) messages.addMessage("Jessica: Good work. We need a lucky break.");
+				if (storyFrame == 21*sec) messages.addMessage("Jessica: It's been empty rooms all week.");
+				if (storyFrame == 25*sec) messages.addMessage("Justan: Well, you're going to love this.");
+				if (storyFrame == 27*sec) messages.addMessage("Justan: I think it's still working!");
+				if (storyFrame == 29*sec) messages.addMessage("Justan: It's glowing, I think it's even vibrating.");
+				if (storyFrame == 32*sec) messages.addMessage("Jessica: Quick, pick it up! I'm so excited :D");
+				if (storyFrame == 35*sec) messages.addMessage("Jessica: This could be our biggest find so far.");
+			} else {
+				storyFrame++;
+				if (storyFrame == 1*sec) messages.addMessage("Justan: Uh oh. Jessica?");
+				if (storyFrame == 3*sec) messages.addMessage("Justan: Jessica, can you hear me?");
+				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artefact.");
+				if (storyFrame == 5*sec) this.shaking = false;
+			}
+		}
+
+		this.gotFirstAttackItem = function (player, audioUtil) {
+			if (this.mode == "intro") {
+				this.mode = "game";
+				storyFrame = 0;
+				this.shaking = true;
+				audioUtil.playIntro();
+			}
+		}
+	}
+
 	var Player = function () {
 		this.maxHealth = 5;
 		this.health = 0;
@@ -26,6 +93,9 @@ var Cerulean = function () {
 
 		this.attackCharge = 0;
 		this.maxAttackCharge = 5 * 60;
+
+		this.story = new Story();
+
 		var isChargingAttack = false;
 
 		this.isCollidingWith = function (point) {
@@ -112,7 +182,7 @@ var Cerulean = function () {
 		this._updateControls = function (keyboard) {
 			if (this.health <= 0) return;
 
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_SPACE)) {
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_SPACE) && this.story.mode != "intro") {
 				isChargingAttack = true;
 			} else {
 				isChargingAttack = false;
@@ -138,8 +208,10 @@ var Cerulean = function () {
 			}
 
 			//If we're running into a wall, make an automove.
-			if (oldPos.x == this.pos.x && (left || right)) this._autoMove("vertical");
-			if (oldPos.y == this.pos.y && (up || down)) this._autoMove("horizontal");
+			if (this.story.mode != "intro") {
+				if (oldPos.x == this.pos.x && (left || right)) this._autoMove("vertical");
+				if (oldPos.y == this.pos.y && (up || down)) this._autoMove("horizontal");
+			}
 
 		}
 
@@ -269,14 +341,16 @@ var Cerulean = function () {
 		}
 	}
 
-	var Item = function (pos) {
+	var Item = function (pos, special) {
 		this.live = true;
 		this.pos = pos;
+		this.special = special ? true : false;
+		this.onCollected = null;
 
 		this.update = function (player, audioUtil) {
 			if (player) {
 				var distance = this.pos.distanceTo(player.getCenter());
-				if (distance < 128) {
+				if (distance < 128 && !special) { //normal items are sucked up
 					var angle = this.pos.angleTo(player.getCenter());
 					var speed = 6 * (128 - distance) / 128;
 					var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
@@ -286,8 +360,12 @@ var Cerulean = function () {
 				}
 				if (distance < player.size.x / 2 || distance < player.size.y / 2) {
 					this.live = false;
-					player.items++;
-					audioUtil.playerCollectedBit();
+					if (special) {
+						if (this.onCollected) this.onCollected(player);
+					} else {
+						player.items++;
+						audioUtil.playerCollectedBit();
+					}
 				}
 			}
 		};
@@ -422,7 +500,7 @@ var Cerulean = function () {
 	this.load = function () {
 
 		var audioUtil = new AudioUtil();
-		audioUtil.playIntro();
+		//audioUtil.playIntro();
 		loadFiles(['shaders/fragment.glsl', 'shaders/vertex.glsl'], function (shaders) {
 			start(shaders, audioUtil);
 		}, function (url) {
@@ -436,6 +514,7 @@ var Cerulean = function () {
 		var keyboard = new Keyboard();
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
+		var messages = new Messages();
 
 		var desiredFps = 60;
 
@@ -449,15 +528,28 @@ var Cerulean = function () {
 
 		var player = new Player();
 		player.size = new Pos(20, 20);
-		player.setHome(rooms[0]);
-		player.respawn();
 
-		rooms[0].explored = true;
+		var firstRoom = rooms[0];
+		player.setHome(firstRoom);
+		player.respawn();
+		player.pos.y -= Math.floor((firstRoom.size.y - 3) * GameConsts.tileSize / 2);
+		player.pos.x -= Math.floor((firstRoom.size.x - 3) * GameConsts.tileSize / 2);
+		var attackItem = new Item(firstRoom.getCenter().multiply(GameConsts.tileSize), true);
+		attackItem.pos.x += 16;
+		attackItem.pos.y += 16;
+		attackItem.onCollected = function (player) {
+			player.story.gotFirstAttackItem(player, audioUtil);
+		}
+		firstRoom.items.push(attackItem);
+
+		firstRoom.explored = true;
 		roomsExplored++;
 
 		var update = function () {
 
 			audioUtil.update();
+			messages.update();
+			player.story.update(messages);
 
 			player.room.update(player, audioUtil);
 			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
