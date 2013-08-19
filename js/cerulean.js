@@ -74,6 +74,12 @@ var Cerulean = function () {
 			}
 		}
 
+		this.roomsExplored = function (amount, messages) {
+			console.log("Rooms " + amount);
+			if (amount == 3) messages.addMessage("Justan: This whole place was empty just a moment ago.");
+			if (amount == 4) messages.addMessage("Justan: Maybe we activated a defence system.");
+		}
+
 		this.gotFirstAttackItem = function (player, audioUtil) {
 			if (this.mode == "intro") {
 				this.mode = "game";
@@ -569,6 +575,7 @@ var Cerulean = function () {
 						if (!door.otherRoom.explored) {
 							door.otherRoom.explored = true;
 							roomsExplored++;
+							player.story.roomsExplored(roomsExplored, messages);
 							if (roomsExplored % 10 == 0) {
 								track("explored", ""+roomsExplored);
 							}
