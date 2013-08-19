@@ -68,7 +68,7 @@ var Cerulean = function () {
 				storyFrame++;
 				if (storyFrame == 1*sec) messages.addMessage("Justan: Uh oh. Jessica?");
 				if (storyFrame == 3*sec) messages.addMessage("Justan: Jessica, can you hear me?");
-				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artefact.");
+				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artifact.");
 				if (storyFrame == 5*sec) this.shaking = false;
 			}
 		}

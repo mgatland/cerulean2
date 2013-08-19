@@ -1,6 +1,5 @@
 to do:
 
-
 [ ] The world has 9 regions. Each has different enemies and room sizes.
 [ ] the North, South, East and West regions are unlocked until the player does something
 [ ] the 4 corner regions are each individually locked.
@@ -53,12 +52,12 @@ Who:
 
 [x] sleep...
 
-[ ] Add the intro sequence
+[x] Add the intro sequence
 	[x] message system to display your chat with Jessica
-	[ ] collectable artefact
-	[ ] your attack only works when you have the attack artefact
-	[ ] the artefact triggers part 2 of the story:
-		- screen shakes, world blurs. Maybe the red lines appear. You can now go through doorways.
+	[x] collectable artefact
+	[x] your attack only works when you have the attack artefact
+	[x] the artefact triggers part 2 of the story:
+		- screen shakes, the red lines appear. You can now go through doorways.
 
 2013-08-18
 
