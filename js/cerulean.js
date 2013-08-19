@@ -16,7 +16,7 @@ var Cerulean = function () {
 		this.pos = new Pos();
 	}
 
-	var Messages = function () {
+	var Messages = function (audioUtil) {
 		var element = document.getElementById("messages");
 
 		var messages = [];
@@ -28,6 +28,7 @@ var Cerulean = function () {
 			newMessage.innerHTML = msg;
 			element.insertBefore(newMessage, null);
 			messages.push({element: newMessage, timer: messageDisplayTime});
+			audioUtil.playAddMessage();
 		}
 
 		this.update = function () {
@@ -69,7 +70,7 @@ var Cerulean = function () {
 				if (storyFrame == 1*sec) messages.addMessage("Justan: Uh oh. Jessica?");
 				if (storyFrame == 3*sec) messages.addMessage("Justan: Jessica, can you hear me?");
 				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artifact.");
-				if (storyFrame == 5*sec) this.shaking = false;
+				if (storyFrame == 7*sec) this.shaking = false;
 			}
 		}
 
@@ -345,6 +346,11 @@ var Cerulean = function () {
 		this.live = true;
 		this.pos = pos;
 		this.special = special ? true : false;
+		if (this.special) {
+			this.size = new Pos(32, 32);
+		} else {
+			this.size = new Pos(2, 2);
+		}
 		this.onCollected = null;
 
 		this.update = function (player, audioUtil) {
@@ -358,7 +364,7 @@ var Cerulean = function () {
 					this.pos.x += xSpeed;
 					this.pos.y += ySpeed;
 				}
-				if (distance < player.size.x / 2 || distance < player.size.y / 2) {
+				if (distance < player.size.x / 2 + this.size.x / 2 || distance < player.size.y / 2 + this.size.y / 2) {
 					this.live = false;
 					if (special) {
 						if (this.onCollected) this.onCollected(player);
@@ -514,7 +520,7 @@ var Cerulean = function () {
 		var keyboard = new Keyboard();
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
-		var messages = new Messages();
+		var messages = new Messages(audioUtil);
 
 		var desiredFps = 60;
 

@@ -780,6 +780,14 @@ function AudioUtil() {
 		scheduleNote(71, now+beat*3, beat*5 + extra);
 	}
 
+	this.playAddMessage = function () {
+		var beat = 0.11;
+		var extra = beat / 10;
+		var now = audioContext.currentTime;
+		scheduleNote(53, now, beat, 0.75, 0.5);
+		scheduleNote(53, now+beat*1.1, beat,  0.75, 0.5);
+	}
+
 	this.update = function () {
 		if (enemyAttackTimer > 0) {
 			enemyAttackTimer--;
