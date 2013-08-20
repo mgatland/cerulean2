@@ -54,21 +54,23 @@ var Cerulean = function () {
 			if (this.mode == "intro") {
 				storyFrame++;
 				if (storyFrame == 0.5*sec) messages.addMessage("Use the ARROW KEYS to move.");
-				if (storyFrame == 1*sec) messages.addMessage("Justan: I found something!");
-				if (storyFrame == 5*sec) messages.addMessage("Jessica: Is it small? Pick it up and I'll teleport you out.");
-				if (storyFrame == 10*sec) messages.addMessage("Justan: Getting it now.");
-				if (storyFrame == 15*sec) messages.addMessage("Justan: It's a Timberial artifact.");
+				if (storyFrame == 1*sec) messages.addMessage("Justin: I found something!");
+				if (storyFrame == 3*sec) messages.addMessage("Jessica: Great! Pick it up and I'll teleport you out.");
+				if (storyFrame == 10*sec) messages.addMessage("Justin: Getting it now.");
+				if (storyFrame == 15*sec) messages.addMessage("Justin: It's a Pharos artifact.");
 				if (storyFrame == 18*sec) messages.addMessage("Jessica: Good work. We need a lucky break.");
 				if (storyFrame == 21*sec) messages.addMessage("Jessica: It's been empty rooms all week.");
-				if (storyFrame == 25*sec) messages.addMessage("Justan: Well, you're going to love this.");
-				if (storyFrame == 27*sec) messages.addMessage("Justan: I think it's still working!");
-				if (storyFrame == 29*sec) messages.addMessage("Justan: It's glowing, I think it's even vibrating.");
+				if (storyFrame == 25*sec) messages.addMessage("Justin: Well, you're going to love this.");
+				if (storyFrame == 27*sec) messages.addMessage("Justin: I think it's still working!");
+				if (storyFrame == 29*sec) messages.addMessage("Justin: I can see lights blinking off and on.");
 				if (storyFrame == 32*sec) messages.addMessage("Jessica: Quick, pick it up! I'm so excited :D");
 				if (storyFrame == 35*sec) messages.addMessage("Jessica: This could be our biggest find so far.");
+				if (storyFrame == 38*sec) messages.addMessage("Jessica: Pick up the artifact and I'll teleport you back to base.");
 			} else {
 				storyFrame++;
-				if (storyFrame == 1*sec) messages.addMessage("Justan: Uh oh. Jessica?");
-				if (storyFrame == 3*sec) messages.addMessage("Justan: Jessica, can you hear me?");
+				if (storyFrame == 1*sec) messages.addMessage("Justin: Uh oh.");
+				if (storyFrame == 2*sec) messages.addMessage("Justin: Jessica, can you hear me?");
+				if (storyFrame == 4*sec) messages.addMessage("Justin: No signal.");
 				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artifact.");
 				if (storyFrame == 7*sec) this.shaking = false;
 			}
@@ -76,8 +78,9 @@ var Cerulean = function () {
 
 		this.roomsExplored = function (amount, messages) {
 			console.log("Rooms " + amount);
-			if (amount == 3) messages.addMessage("Justan: This whole place was empty just a moment ago.");
-			if (amount == 4) messages.addMessage("Justan: Maybe we activated a defence system.");
+			if (amount == 3) messages.addMessage("Justin: What are these things?");
+			if (amount == 4) messages.addMessage("Justin: The rooms were all empty before.");
+			if (amount == 5) messages.addMessage("Justin: Maybe I activated a defence system.");
 		}
 
 		this.gotFirstAttackItem = function (player, audioUtil) {
