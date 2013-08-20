@@ -252,7 +252,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 	}
 
 	var addRoom = function (startRoom, direction, openRooms, closedRooms, worldWidth, worldHeight) {
-		if (closedRooms.length > 2000) {
+		if (closedRooms.length > 5000) {
 			console.log("Too many rooms!");
 			return; //abort
 		}

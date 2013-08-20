@@ -7,8 +7,8 @@ var Cerulean = function () {
 
 	var GameConsts = {
 		tileSize: 32,
-		worldWidth: 280,
-		worldHeight: 230,
+		worldWidth: 460,
+		worldHeight: 460,
 		wallWidth: 8
 	};
 
