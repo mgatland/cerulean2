@@ -78,9 +78,8 @@ var Cerulean = function () {
 
 		this.roomsExplored = function (amount, messages) {
 			console.log("Rooms " + amount);
-			if (amount == 3) messages.addMessage("Justin: What are these things?");
-			if (amount == 4) messages.addMessage("Justin: The rooms were all empty before.");
-			if (amount == 5) messages.addMessage("Justin: Maybe I activated a defence system.");
+			if (amount == 3) messages.addMessage("Justin: The rooms were all empty before.");
+			if (amount == 4) messages.addMessage("Justin: I must have woken up the defence system.");
 		}
 
 		this.gotFirstAttackItem = function (player, audioUtil) {
