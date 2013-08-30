@@ -204,7 +204,7 @@ var Cerulean = function () {
 			}
 		}
 
-		this._updateControls = function (keyboard) {
+		this._updateMovement = function (keyboard) {
 			if (this.health <= 0) return;
 
 			if (keyboard.isKeyDown(KeyEvent.DOM_VK_SPACE) && this.story.mode != "intro") {
@@ -302,7 +302,7 @@ var Cerulean = function () {
 		}
 
 		this.update = function (keyboard, audioUtil, roomsExplored) {
-			this._updateControls(keyboard);
+			this._updateMovement(keyboard);
 			this._updateAttackCharge(keyboard, audioUtil);
 			this._updateHealthAndShield(roomsExplored);
 		}
