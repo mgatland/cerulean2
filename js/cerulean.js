@@ -96,19 +96,59 @@ var Cerulean = function () {
 		health: 0,
 		maxHealth: 5,
 		invulnerableTime: 0,
+		size: new Pos(20, 20),
 		isCollidingWith: function (point) {
 			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
 				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
+		},
+		_moveTowards: function (destination, moveType) {
+			var center = this.getCenter();
+			if (moveType == "horizontal") {
+				var distance = Math.abs(destination.x - center.x);
+				if (distance == 0) return;
+				if (destination.x < center.x) {
+					this._moveInDir(Dir.LEFT, distance);
+				} else {
+					this._moveInDir(Dir.RIGHT, distance);
+				}
+			} else if (moveType == "vertical") {
+				var distance = Math.abs(destination.y - center.y);
+				if (distance == 0) return;
+				if (destination.y < center.y) {
+					this._moveInDir(Dir.UP, distance);
+				} else {
+					this._moveInDir(Dir.DOWN, distance);
+				}
+			}
+		},
+
+		getCenter: function () {
+			var x = Math.floor(this.pos.x + this.size.x / 2);
+			var y = Math.floor(this.pos.y + this.size.y / 2);
+			return new Pos(x, y);
+		},
+
+		_moveInDir: function (dir, maxSpeed) {
+			var speed = maxSpeed ? Math.min(maxSpeed, 4) : 4;
+			this.pos.moveInDir(dir, speed);
+			while (this.room.isCollidingWith(this)) {
+				this.pos.moveInDir(dir, -1);
+			}
 		}
 	}
 
 	var Companion = function (room) {
 		extend(this, humanMixin);
 		this.home = room;
+		this.room = room;
 		this.health = this.maxHealth;
 		this.pos = this.home.getCenter();
 		this.pos.x *= GameConsts.tileSize;
 		this.pos.y *= GameConsts.tileSize;
+		this.update = function (player) {
+			this._moveTowards(player.pos, "horizontal");
+			this._moveTowards(player.pos, "vertical");
+		};
 	}
 
 	var Player = function () {
@@ -145,43 +185,6 @@ var Cerulean = function () {
 				audioUtil.playerResetCharge();
 			}
 			this.attackCharge = 0;
-		}
-
-		//duplicate code with Enemy.getCenter
-		this.getCenter = function () {
-			var x = Math.floor(this.pos.x + this.size.x / 2);
-			var y = Math.floor(this.pos.y + this.size.y / 2);
-			return new Pos(x, y);
-		}
-
-		this._moveInDir = function (dir, maxSpeed) {
-			var speed = maxSpeed ? Math.min(maxSpeed, 4) : 4;
-			this.pos.moveInDir(dir, speed);
-			while (this.room.isCollidingWith(this)) {
-				this.pos.moveInDir(dir, -1);
-			}
-		}
-
-		//horizontal or vertical
-		this._moveTowards = function (destination, moveType) {
-			var center = this.getCenter();
-			if (moveType == "horizontal") {
-				var distance = Math.abs(destination.x - center.x);
-				if (distance == 0) return;
-				if (destination.x < center.x) {
-					this._moveInDir(Dir.LEFT, distance);
-				} else {
-					this._moveInDir(Dir.RIGHT, distance);
-				}
-			} else if (moveType == "vertical") {
-				var distance = Math.abs(destination.y - center.y);
-				if (distance == 0) return;
-				if (destination.y < center.y) {
-					this._moveInDir(Dir.UP, distance);
-				} else {
-					this._moveInDir(Dir.DOWN, distance);
-				}
-			}
 		}
 
 		this._autoMove = function (moveType) {
@@ -554,7 +557,6 @@ var Cerulean = function () {
 		var rooms = worldGenerator.generate();
 
 		var player = new Player();
-		player.size = new Pos(20, 20);
 
 		var firstRoom = rooms[0];
 		player.setHome(firstRoom);
@@ -584,6 +586,7 @@ var Cerulean = function () {
 			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
 
 			player.update(keyboard, audioUtil, roomsExplored); //roomsExplored is just for analytics
+			companion.update(player);
 
 			if (!player.room.containsAllOf(player)) {
 				player.resetCharge(audioUtil);
@@ -641,7 +644,7 @@ var Cerulean = function () {
 			camera.pos.y = player.pos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
 
 			requestAnimationFrame(function() {
-				renderer.draw(player, rooms, camera, roomsExplored, currentFps);
+				renderer.draw(player, companion, rooms, camera, roomsExplored, currentFps);
 				var newSecond = Math.floor(Date.now() / 1000);
 				if (newSecond != thisSecond) {
 					thisSecond = newSecond;

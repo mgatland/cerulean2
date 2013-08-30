@@ -223,7 +223,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	var frameValue = 0;
 
-	this.draw = function (player, rooms, camera, roomsExplored, fps) {
+	this.draw = function (player, companion, rooms, camera, roomsExplored, fps) {
 
 		if(player.story.mode != "intro") {
 			hudOverlay.drawHud(player.items, roomsExplored, rooms.length, fps);
@@ -325,6 +325,16 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 			playerColor = green;
 		}
 		addRectWithCamera(vertices, colors, player.pos.x, player.pos.y, player.size.x, player.size.y, playerColor, camera);
+
+		if (companion) {
+			var playerColor = null;
+			if (companion.invlunerableTime > 0 && flicker) {
+				playerColor = black;
+			} else {
+				playerColor = green;
+			}
+			addRectWithCamera(vertices, colors, companion.pos.x, companion.pos.y, companion.size.x, companion.size.y, playerColor, camera);
+		}
 
 		var insetX = player.pos.x + 2;
 		var insetY = player.pos.y + 2;
