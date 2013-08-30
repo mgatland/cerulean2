@@ -92,9 +92,27 @@ var Cerulean = function () {
 		}
 	}
 
+	var humanMixin = {
+		health: 0,
+		maxHealth: 5,
+		invulnerableTime: 0,
+		isCollidingWith: function (point) {
+			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
+				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
+		}
+	}
+
+	var Companion = function (room) {
+		extend(this, humanMixin);
+		this.home = room;
+		this.health = this.maxHealth;
+		this.pos = this.home.getCenter();
+		this.pos.x *= GameConsts.tileSize;
+		this.pos.y *= GameConsts.tileSize;
+	}
+
 	var Player = function () {
-		this.maxHealth = 5;
-		this.health = 0;
+		extend(this, humanMixin);
 		this.invlunerableTime = 0;
 		this.shieldRechange = 0;
 		this.home = null;
@@ -106,11 +124,6 @@ var Cerulean = function () {
 		this.story = new Story();
 
 		var isChargingAttack = false;
-
-		this.isCollidingWith = function (point) {
-			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
-				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
-		}
 
 		this.setHome = function (room) {
 			this.home = room;
@@ -558,6 +571,8 @@ var Cerulean = function () {
 
 		firstRoom.explored = true;
 		roomsExplored++;
+
+		var companion = new Companion(player.home);
 
 		var update = function () {
 

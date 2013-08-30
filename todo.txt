@@ -21,11 +21,6 @@ Intro movie:
 [ ] some rooms are randomly just treasure rooms
 [ ] much more enemy diversity
 
-Sounds:
-[ ] enemy dies
-[ ] enemy is targetted
-[ ] gem is collected?
-
 Presentation:
 [ ] add a fancy glow\blur effect
 [ ] draw everything in vector lines instead of blocks of color
@@ -40,6 +35,18 @@ Who:
 	follows if she's in another room
 	attacks nearby projectiles with her projectile-destroyer
 	or maybe she can freeze enemies, or shots, while they're under her cursor.
+
+
+2013-08-31
+
+Welcome back.
+
+What's most important?
+
+The companion
+
+[ ]	There is a companion who follows the player
+
 
 2013-08-19
 
