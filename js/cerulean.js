@@ -264,9 +264,7 @@ var Cerulean = function () {
 
 		}
 
-		this.update = function (keyboard, audioUtil, roomsExplored) {
-			this._updateControls(keyboard);
-
+		this._updateAttackCharge = function (keyboard, audioUtil) {
 			if (this.health > 0) {
 				if (isChargingAttack) {
 					this.attackCharge++;
@@ -281,9 +279,10 @@ var Cerulean = function () {
 					this.attackCharge = 0;
 				}
 			}
-
 			audioUtil.setCharging(isChargingAttack);
+		}
 
+		this._updateHealthAndShield = function (roomsExplored) {
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
 			} else {
@@ -300,6 +299,12 @@ var Cerulean = function () {
 					}
 				}
 			}
+		}
+
+		this.update = function (keyboard, audioUtil, roomsExplored) {
+			this._updateControls(keyboard);
+			this._updateAttackCharge(keyboard, audioUtil);
+			this._updateHealthAndShield(roomsExplored);
 		}
 
 		this.hit = function (audioUtil) {
