@@ -303,8 +303,16 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 				} else {
 					color = red;
 				}
-				addRect(vertices, colors, enemy.pos.x-camera.pos.x, enemy.pos.y-camera.pos.y,
-					enemy.size.x, enemy.size.y, color);
+
+				if (enemy.stunnedTimer > 0) {
+					addRectWithCamera(vertices, colors, enemy.pos.x-4, enemy.pos.y-4,
+					enemy.size.x+8, enemy.size.y+8, green, camera);
+					addRectWithCamera(vertices, colors, enemy.pos.x-3, enemy.pos.y-3,
+					enemy.size.x+6, enemy.size.y+6, black, camera);
+				}
+
+				addRectWithCamera(vertices, colors, enemy.pos.x, enemy.pos.y,
+					enemy.size.x, enemy.size.y, color, camera);
 			});
 
 			room.shots.forEach(function (shot) {
@@ -338,7 +346,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 			addRectWithCamera(vertices, colors, companion.pos.x, companion.pos.y, companion.size.x, companion.size.y, playerColor, camera);
 
 			if (companion.debugPoint) {
-				addRectWithCamera(vertices, colors, companion.debugPoint.x-7, companion.debugPoint.y-7, 7, 7, blue, camera);	
+				addRectWithCamera(vertices, colors, companion.debugPoint.x-7, companion.debugPoint.y-7, 7, 7, blue, camera);
 			}
 		}
 

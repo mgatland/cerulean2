@@ -192,12 +192,29 @@ var Cerulean = function () {
 		var oldPathEnd = null;
 		var oldPathStart = null;
 
+		this.stunAttackEffectDuration = 110;
+		this.maxAttackTimer = 120;
+		this.attackTimer = this.maxAttackTimer;
+
 		this._pathIsDirty = function (end) {
 			return (this.room != oldPathStart || end != oldPathEnd);
 		}
 
 		var safeTimer = 0;
 		this.update = function (player) {
+			if (this.attackTimer < this.maxAttackTimer) {
+				this.attackTimer++;
+			} else {
+				//fully charged. Shall we attack?
+				if (this.room.enemies.length > 0) {
+					var worstEnemy = this.room.enemies.reduce(function (p, v) {
+						return (p.type > v.type ? p : v);
+					});
+					worstEnemy.stunnedTimer += this.stunAttackEffectDuration;
+					this.attackTimer = 0;
+				}
+			}
+
 
 			if (player.room.enemies.length == 0) {
 				safeTimer++;
@@ -541,6 +558,7 @@ var Cerulean = function () {
 		this.angle = 0;
 		this.fireAngle = Math.floor(Math.random() * 360);
 		this.type = type;
+		this.stunnedTimer = 0;
 
 		if (this.type == 0) { //fires at player square
 			this.size = new Pos(25, 25);
@@ -571,66 +589,72 @@ var Cerulean = function () {
 		}
 
 		this.update = function (player, audioUtil) {
+
 			//move
 			if (!this.dest) {
 				this.dest = room.getRandomPointInside();
 				this.angle = this.pos.angleTo(this.dest);
 			}
 
-			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
-			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
-			this.pos.x += xSpeed;
-			this.pos.y += ySpeed;
+			if (this.stunnedTimer == 0) {
+				var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
+				var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
+				this.pos.x += xSpeed;
+				this.pos.y += ySpeed;
 
-			if (this.pos.distanceTo(this.dest) < 16) {
-				this.dest = null;
-			}
-			//shoot
-			if (this.refireTimer == 0) {
-				console.log("shoot");
-				if (player) {
+				if (this.pos.distanceTo(this.dest) < 16) {
+					this.dest = null;
+				}
 
-					if (this.type == 0) {
-						//the seeking shot
-						var angle = this.pos.angleTo(player.pos);
-						var shot = new Shot(this.getCenter(), room, angle);
-						room.shots.push(shot);
-						this.refireTimer = 15;
-					} else if (this.type == 1) {
-						//the spinner shot
-						this.fireAngle += 25;
-						if (this.fireAngle > 360) this.fireAngle -= 360;
-						var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
-						room.shots.push(shot2);
-						this.refireTimer = 7;
-					} else if (this.type == 2) {
-						var angle = this.pos.angleTo(player.pos);
-						for (var i = -2; i <= 2; i++) {
-							room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
+				if (this.refireTimer == 0) {
+					console.log("shoot");
+					if (player) {
+
+						if (this.type == 0) {
+							//the seeking shot
+							var angle = this.pos.angleTo(player.pos);
+							var shot = new Shot(this.getCenter(), room, angle);
+							room.shots.push(shot);
+							this.refireTimer = 15;
+						} else if (this.type == 1) {
+							//the spinner shot
+							this.fireAngle += 25;
+							if (this.fireAngle > 360) this.fireAngle -= 360;
+							var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
+							room.shots.push(shot2);
+							this.refireTimer = 7;
+						} else if (this.type == 2) {
+							var angle = this.pos.angleTo(player.pos);
+							for (var i = -2; i <= 2; i++) {
+								room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
+							}
+							this.refireTimer = 15;
+						} else if (this.type == 3) {
+							var angle = this.pos.angleTo(player.pos);
+							for (var i = -1; i <= 1; i+= 2) {
+								room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
+							}
+							this.refireTimer = 8;
+						} else {
+							var angle = this.fireAngle;
+							for (var i = 0; i < 360; i+= 30) {
+								room.shots.push(new Shot(this.getCenter(), room, angle + i));
+							}
+							this.refireTimer = 30;
+							this.fireAngle += 5;
+							if (this.fireAngle > 360) this.fireAngle -= 360;
 						}
-						this.refireTimer = 15;
-					} else if (this.type == 3) {
-						var angle = this.pos.angleTo(player.pos);
-						for (var i = -1; i <= 1; i+= 2) {
-							room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
-						}
-						this.refireTimer = 8;
-					} else {
-						var angle = this.fireAngle;
-						for (var i = 0; i < 360; i+= 30) {
-							room.shots.push(new Shot(this.getCenter(), room, angle + i));
-						}
-						this.refireTimer = 30;
-						this.fireAngle += 5;
-						if (this.fireAngle > 360) this.fireAngle -= 360;
+
+					audioUtil.enemyAttack();
+
 					}
 
-				audioUtil.enemyAttack();
-
+				} else {
+					this.refireTimer--;
 				}
 
 			} else {
-				this.refireTimer--;
+				this.stunnedTimer--;
 			}
 
 			//duplicate code from Shot

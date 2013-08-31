@@ -47,12 +47,7 @@ The companion
 [x]	There is a companion who follows the player
 	[x] companion can move between rooms
 	[x] ...intelligently
-
-Algorithm:
-	Am I in the same room? sweet.
-	No? Search neighbouring rooms:
-		Is this the right room? No? add its neighbours
-
+	[x] Can freeze one enemy temporarily
 
 2013-08-19
 
