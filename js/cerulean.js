@@ -99,27 +99,31 @@ var Cerulean = function () {
 		maxHealth: 5,
 		invulnerableTime: 0,
 		size: new Pos(20, 20),
+		speed: 4,
 		isCollidingWith: function (point) {
 			return (point.pos.x >= this.pos.x && point.pos.y >= this.pos.y
 				&& point.pos.x < this.pos.x + this.size.x && point.pos.y < this.pos.y + this.size.y);
 		},
-		_moveTowards: function (destination, moveType) {
+		_moveTowards: function (destination, moveType, maxSpeed) {
 			var center = this.getCenter();
+			if (!maxSpeed) maxSpeed = this.speed;
 			if (moveType == "horizontal") {
 				var distance = Math.abs(destination.x - center.x);
+				maxSpeed = Math.min(maxSpeed, distance);
 				if (distance == 0) return;
 				if (destination.x < center.x) {
-					this._moveInDir(Dir.LEFT, distance);
+					this._moveInDir(Dir.LEFT, maxSpeed);
 				} else {
-					this._moveInDir(Dir.RIGHT, distance);
+					this._moveInDir(Dir.RIGHT, maxSpeed);
 				}
 			} else if (moveType == "vertical") {
 				var distance = Math.abs(destination.y - center.y);
+				maxSpeed = Math.min(maxSpeed, distance);
 				if (distance == 0) return;
 				if (destination.y < center.y) {
-					this._moveInDir(Dir.UP, distance);
+					this._moveInDir(Dir.UP, maxSpeed);
 				} else {
-					this._moveInDir(Dir.DOWN, distance);
+					this._moveInDir(Dir.DOWN, maxSpeed);
 				}
 			}
 		},
@@ -131,7 +135,7 @@ var Cerulean = function () {
 		},
 
 		_moveInDir: function (dir, maxSpeed) {
-			var speed = maxSpeed ? Math.min(maxSpeed, 4) : 4;
+			var speed = maxSpeed ? Math.min(maxSpeed, this.speed) : this.speed;
 			this.pos.moveInDir(dir, speed);
 			while (this.room.isCollidingWith(this)) {
 				this.pos.moveInDir(dir, -1);
@@ -192,10 +196,23 @@ var Cerulean = function () {
 			return (this.room != oldPathStart || end != oldPathEnd);
 		}
 
+		var safeTimer = 0;
 		this.update = function (player) {
+
+			if (player.room.enemies.length == 0) {
+				safeTimer++;
+			} else {
+				safeTimer = 0;
+			}
+
 			if (this.room == player.room) {
-				//this._moveTowards(player.pos, "horizontal");
-				//this._moveTowards(player.pos, "vertical");
+				if (this.room.enemies.length == 0) {
+					var distToPlayer = this.pos.distanceTo(player.pos);
+					if (distToPlayer > 50 && safeTimer > 45) {
+						this._moveTowards(player.pos, "horizontal", 2);
+						this._moveTowards(player.pos, "vertical", 2);
+					}
+				}
 			} else {
 				var path = this._pathIsDirty(player.room) ? this.room.getPathTo(player.room) : oldPath;
 				oldPath = path;
