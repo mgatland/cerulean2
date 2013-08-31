@@ -46,7 +46,7 @@ What's most important?
 The companion
 
 [ ]	There is a companion who follows the player
-
+	[ ] companion can move between rooms
 
 2013-08-19
 

@@ -93,6 +93,8 @@ var Cerulean = function () {
 	}
 
 	var humanMixin = {
+		room: null,
+		lastRoom: null,
 		health: 0,
 		maxHealth: 5,
 		invulnerableTime: 0,
@@ -304,37 +306,47 @@ var Cerulean = function () {
 			}
 		}
 
+		this._enteredRoom = function (room, messages) {
+			if (!room.explored) {
+				room.explored = true;
+				this.roomsExplored++;
+				this.story.roomsExplored(this.roomsExplored, messages);
+				if (this.roomsExplored % 10 == 0) {
+					track("explored", ""+this.roomsExplored);
+				}
+
+				//Hack to hide instructions
+				if (this.roomsExplored == 10) {
+					document.getElementById('instructions').style.display = "none";
+				}
+			}
+		}
+
+		this._leftRoom = function (room) {
+			room.cleanUp();
+		}
+
 		this._updateCurrentRoom = function (audioUtil, messages) {
 			var player = this;
 			if (!player.room.containsAllOf(player)) {
 				player.resetCharge(audioUtil);
 				player.room.doors.forEach(function (door) {
 				if (door.otherRoom.containsSomeOf(player)) {
-					if (!door.otherRoom.explored) {
-						door.otherRoom.explored = true;
-						player.roomsExplored++;
-						player.story.roomsExplored(player.roomsExplored, messages);
-						if (player.roomsExplored % 10 == 0) {
-							track("explored", ""+player.roomsExplored);
-						}
 
-						//Hack to hide instructions
-						if (player.roomsExplored == 10) {
-							document.getElementById('instructions').style.display = "none";
-						}
-					}
+					player._enteredRoom(door.otherRoom, messages);
+
 					if (door.otherRoom.containsCenterOf(player)) {
 						var oldRoom = player.lastRoom;
 						player.lastRoom = player.room;
 						player.room = door.otherRoom;
 						if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
-							oldRoom.cleanUp();
+							player._leftRoom(oldRoom);
 						}
 					} else {
 						var oldRoom = player.lastRoom;
 						player.lastRoom = door.otherRoom;
 						if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
-							oldRoom.cleanUp();
+							player._leftRoom(oldRoom);
 						}
 					}
 				}
@@ -342,7 +354,7 @@ var Cerulean = function () {
 		} else {
 			//we're fully inside one room now.
 			if (player.lastRoom) {
-				player.lastRoom.cleanUp();
+				player._leftRoom(player.lastRoom);
 				player.lastRoom = null;
 			}
 		}
@@ -352,7 +364,12 @@ var Cerulean = function () {
 			this._updateMovement(keyboard);
 			this._updateAttackCharge(keyboard, audioUtil);
 			this._updateHealthAndShield();
+
+			var roomsPreviouslyExplored = this.roomsExplored;
 			this._updateCurrentRoom(audioUtil, messages);
+			if (this.roomsExplored > roomsPreviouslyExplored) {
+
+			}
 		}
 
 		this.hit = function (audioUtil) {
