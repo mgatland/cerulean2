@@ -223,10 +223,10 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	var frameValue = 0;
 
-	this.draw = function (player, companion, rooms, camera, roomsExplored, fps) {
+	this.draw = function (player, companion, rooms, camera, fps) {
 
 		if(player.story.mode != "intro") {
-			hudOverlay.drawHud(player.items, roomsExplored, rooms.length, fps);
+			hudOverlay.drawHud(player.items, player.roomsExplored, rooms.length, fps);
 		}
 
 		flickerCounter ++;

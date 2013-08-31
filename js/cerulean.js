@@ -153,6 +153,9 @@ var Cerulean = function () {
 
 	var Player = function () {
 		extend(this, humanMixin);
+
+		this.roomsExplored = 0;
+
 		this.invlunerableTime = 0;
 		this.shieldRechange = 0;
 		this.home = null;
@@ -282,12 +285,12 @@ var Cerulean = function () {
 			audioUtil.setCharging(isChargingAttack);
 		}
 
-		this._updateHealthAndShield = function (roomsExplored) {
+		this._updateHealthAndShield = function () {
 			if (this.invlunerableTime > 0) {
 				this.invlunerableTime--;
 			} else {
 				if (this.health <= 0) {
-					track("respawned", ""+roomsExplored);
+					track("respawned", ""+this.roomsExplored);
 					this.respawn();
 				}
 
@@ -301,10 +304,55 @@ var Cerulean = function () {
 			}
 		}
 
-		this.update = function (keyboard, audioUtil, roomsExplored) {
+		this._updateCurrentRoom = function (audioUtil, messages) {
+			var player = this;
+			if (!player.room.containsAllOf(player)) {
+				player.resetCharge(audioUtil);
+				player.room.doors.forEach(function (door) {
+				if (door.otherRoom.containsSomeOf(player)) {
+					if (!door.otherRoom.explored) {
+						door.otherRoom.explored = true;
+						player.roomsExplored++;
+						player.story.roomsExplored(player.roomsExplored, messages);
+						if (player.roomsExplored % 10 == 0) {
+							track("explored", ""+player.roomsExplored);
+						}
+
+						//Hack to hide instructions
+						if (player.roomsExplored == 10) {
+							document.getElementById('instructions').style.display = "none";
+						}
+					}
+					if (door.otherRoom.containsCenterOf(player)) {
+						var oldRoom = player.lastRoom;
+						player.lastRoom = player.room;
+						player.room = door.otherRoom;
+						if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
+							oldRoom.cleanUp();
+						}
+					} else {
+						var oldRoom = player.lastRoom;
+						player.lastRoom = door.otherRoom;
+						if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
+							oldRoom.cleanUp();
+						}
+					}
+				}
+			});
+		} else {
+			//we're fully inside one room now.
+			if (player.lastRoom) {
+				player.lastRoom.cleanUp();
+				player.lastRoom = null;
+			}
+		}
+		}
+
+		this.update = function (keyboard, audioUtil, messages) {
 			this._updateMovement(keyboard);
 			this._updateAttackCharge(keyboard, audioUtil);
-			this._updateHealthAndShield(roomsExplored);
+			this._updateHealthAndShield();
+			this._updateCurrentRoom(audioUtil, messages);
 		}
 
 		this.hit = function (audioUtil) {
@@ -558,7 +606,6 @@ var Cerulean = function () {
 		var framesThisSecond = 0;
 		var thisSecond = 0;
 
-		var roomsExplored = 0;
 		var rooms = worldGenerator.generate();
 
 		var player = new Player();
@@ -577,7 +624,7 @@ var Cerulean = function () {
 		firstRoom.items.push(attackItem);
 
 		firstRoom.explored = true;
-		roomsExplored++;
+		player.roomsExplored++;
 
 		var companion = new Companion(player.home);
 
@@ -590,49 +637,8 @@ var Cerulean = function () {
 			player.room.update(player, audioUtil);
 			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
 
-			player.update(keyboard, audioUtil, roomsExplored); //roomsExplored is just for analytics
+			player.update(keyboard, audioUtil, messages);
 			companion.update(player);
-
-			if (!player.room.containsAllOf(player)) {
-				player.resetCharge(audioUtil);
-				player.room.doors.forEach(function (door) {
-					if (door.otherRoom.containsSomeOf(player)) {
-						if (!door.otherRoom.explored) {
-							door.otherRoom.explored = true;
-							roomsExplored++;
-							player.story.roomsExplored(roomsExplored, messages);
-							if (roomsExplored % 10 == 0) {
-								track("explored", ""+roomsExplored);
-							}
-
-							//Hack to hide instructions
-							if (roomsExplored == 10) {
-								document.getElementById('instructions').style.display = "none";
-							}
-						}
-						if (door.otherRoom.containsCenterOf(player)) {
-							var oldRoom = player.lastRoom;
-							player.lastRoom = player.room;
-							player.room = door.otherRoom;
-							if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
-								oldRoom.cleanUp();
-							}
-						} else {
-							var oldRoom = player.lastRoom;
-							player.lastRoom = door.otherRoom;
-							if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
-								oldRoom.cleanUp();
-							}
-						}
-					}
-				});
-			} else {
-				//we're fully inside one room now.
-				if (player.lastRoom) {
-					player.lastRoom.cleanUp();
-					player.lastRoom = null;
-				}
-			}
 
 			keyboard.update();
 		}
@@ -649,7 +655,7 @@ var Cerulean = function () {
 			camera.pos.y = player.pos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
 
 			requestAnimationFrame(function() {
-				renderer.draw(player, companion, rooms, camera, roomsExplored, currentFps);
+				renderer.draw(player, companion, rooms, camera, currentFps);
 				var newSecond = Math.floor(Date.now() / 1000);
 				if (newSecond != thisSecond) {
 					thisSecond = newSecond;
