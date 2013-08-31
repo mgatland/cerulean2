@@ -20,6 +20,13 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			return new Pos(x, y);
 		}
 
+		this.getNearSidePos = function () {
+			return this.getCenter().moveInDir(this.direction.reverse, 12);
+		}
+
+		this.getFarSidePos = function () {
+			return this.getCenter().moveInDir(this.direction, 32);
+		}
 	}
 
 	var Room = function (x, y, width, height) {
@@ -55,6 +62,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			this.shots = [];
 		}
 
+		//generation time only
 		this.addDoor = function (x, y, otherRoom, direction) {
 			this.doors.push(new Door(x,y, otherRoom, direction));
 		}
@@ -182,6 +190,84 @@ var WorldGenerator = function (gameConsts, Enemy) {
 
 		this.countEnemies = function () {
 			return this.enemies.filter(function (e) {return e.live}).length;
+		}
+
+		this.getNeighbours = function () {
+			var neighbours = [];
+			this.doors.forEach(function (door) {
+				neighbours.push(door.otherRoom);
+			});
+			return neighbours;
+		}
+
+		this.getPathTo = function (destRoom) {
+			var maxSteps = 9000;
+			var steps = 0;
+
+			//fitness function for pathfinding
+			var fitnessFunc = function (node, destination) {
+				var distScore = node.room.pos.distanceTo(destRoom.pos);
+				var exploredScore = node.room.explored ? 0 : 10;
+				return distScore + exploredScore; //lower is better
+			};
+
+			if (this === destRoom) return destRoom;
+			var openList = [];
+			var closedList = [];
+			openList.push({room: this, prev: null});
+
+			while (openList.length > 0) {
+
+				steps++;
+				if (steps == maxSteps) {
+					console.log("Error in pathfinding");
+					return destRoom;
+				}
+				if (steps % 500 == 0) { //logging if somethig has gone wrong
+					console.log("Pathfinding has taken " + steps + " steps...");
+					console.log("Open rooms: " + openList.length);
+					console.log("Closed rooms: " + closedList.length);
+				}
+
+				// Grab the best node to process next
+				var lowInd = 0;
+				var lowVal = fitnessFunc(openList[0], destRoom);
+				for(var i=0; i<openList.length; i++) {
+					var fitness = fitnessFunc(openList[i], destRoom);
+					if(fitness < lowVal) {
+						lowInd = i;
+						lowVal = fitness
+					}
+				}
+				var currentNode = openList[lowInd];
+				openList.splice(lowInd, 1);
+
+				// success
+				if(currentNode.room === destRoom) {
+					var curr = currentNode;
+					var ret = [];
+					while(curr.prev) {
+						ret.push(curr.room);
+						curr = curr.prev;
+					}
+					return ret.reverse();
+				}
+
+	 			closedList.push(currentNode);
+	 			
+				var neighbours = currentNode.room.getNeighbours();
+
+				neighbours.forEach(function (room) {
+					//Add the room, if it is not already on any list
+					if (openList.some(function (node) {return node.room === room})) {
+						return;
+					}
+					if (closedList.some(function (node) {return node.room === room})) {
+						return;
+					}
+					openList.push({room: room, prev: currentNode});
+				});
+			}
 		}
 	}
 

@@ -36,7 +36,6 @@ Who:
 	attacks nearby projectiles with her projectile-destroyer
 	or maybe she can freeze enemies, or shots, while they're under her cursor.
 
-
 2013-08-31
 
 Welcome back.
@@ -45,8 +44,15 @@ What's most important?
 
 The companion
 
-[ ]	There is a companion who follows the player
-	[ ] companion can move between rooms
+[x]	There is a companion who follows the player
+	[x] companion can move between rooms
+	[x] ...intelligently
+
+Algorithm:
+	Am I in the same room? sweet.
+	No? Search neighbouring rooms:
+		Is this the right room? No? add its neighbours
+
 
 2013-08-19
 

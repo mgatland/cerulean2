@@ -24,6 +24,7 @@ var Pos = function (x, y) {
 			case Dir.LEFT: this.x -= distance; break;
 			case Dir.RIGHT: this.x += distance; break;
 		}
+        return this; //For chaining - this method does NOT clone
 	}
 
 	this.distanceTo = function (other) {

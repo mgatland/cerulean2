@@ -183,9 +183,42 @@ var Cerulean = function () {
 		this.pos = this.home.getCenter();
 		this.pos.x *= GameConsts.tileSize;
 		this.pos.y *= GameConsts.tileSize;
+
+		var oldPath = null;
+		var oldPathEnd = null;
+		var oldPathStart = null;
+
+		this._pathIsDirty = function (end) {
+			return (this.room != oldPathStart || end != oldPathEnd);
+		}
+
 		this.update = function (player) {
-			this._moveTowards(player.pos, "horizontal");
-			this._moveTowards(player.pos, "vertical");
+			if (this.room == player.room) {
+				//this._moveTowards(player.pos, "horizontal");
+				//this._moveTowards(player.pos, "vertical");
+			} else {
+				var path = this._pathIsDirty(player.room) ? this.room.getPathTo(player.room) : oldPath;
+				oldPath = path;
+				oldPathEnd = player.room;
+				oldPathStart = this.room;
+
+				var doorToUse = this.room.doors.filter(function (door) {
+					return door.otherRoom === path[0];
+				}).pop();
+				var moveDest = doorToUse.getCenter();
+
+				var moveDest;
+				if (doorToUse.overlaps(this)) {
+					moveDest = doorToUse.getFarSidePos();
+					this.invulnerableTime = 7;
+				} else {
+					moveDest = doorToUse.getNearSidePos();
+					this.invulnerableTime = 0;
+				}
+				this.debugPoint = moveDest;
+				this._moveTowards(moveDest, "horizontal");
+				this._moveTowards(moveDest, "vertical");
+			}
 			this._updateCurrentRoom();
 		};
 		this._inDoorway = noop;
@@ -653,7 +686,7 @@ var Cerulean = function () {
 		firstRoom.explored = true;
 		player.roomsExplored++;
 
-		var companion = new Companion(player.home);
+		var companion = new Companion(rooms[100]);
 
 		var update = function () {
 
