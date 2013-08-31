@@ -606,9 +606,10 @@ function AudioUtil() {
 		}
 
 		var note = keys[ev.keyCode];
-		if (note)
+		if (note) {
 			noteOn( note + 12*(3-currentOctave), 0.75 );
-		console.log( "played: " + (note + 12*(3-currentOctave)) );
+			console.log( "played: " + (note + 12*(3-currentOctave)) );
+		}
 		return false;
 	}
 
