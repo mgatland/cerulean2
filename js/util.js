@@ -80,6 +80,8 @@ function loadFile(url, data, callback, errorCallback) {
 }
 
 function loadFiles(urls, callback, errorCallback) {
+    var startTime = Date.now();
+    console.log("Loading files...");
     var numUrls = urls.length;
     var numComplete = 0;
     var result = [];
@@ -91,6 +93,7 @@ function loadFiles(urls, callback, errorCallback) {
 
         // When all files have downloaded
         if (numComplete == numUrls) {
+            console.log(numUrls + " files loaded in " + (Date.now() - startTime) + " ms.");
             callback(result);
         }
     }
@@ -106,5 +109,5 @@ function extend(destination, source) {
       destination[k] = source[k];
     }
   }
-  return destination; 
+  return destination;
 }

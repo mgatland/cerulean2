@@ -683,7 +683,6 @@ var Cerulean = function () {
 	}
 
 	this.load = function () {
-
 		var audioUtil = new AudioUtil();
 		//audioUtil.playIntro();
 		loadFiles(['shaders/fragment.glsl', 'shaders/vertex.glsl'], function (shaders) {

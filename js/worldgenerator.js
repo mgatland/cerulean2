@@ -545,6 +545,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 	}
 
 	this.generate = function () {
+		console.log("Generating level...");
 		var startTime = Date.now();
 		var worldWidth = gameConsts.worldWidth;
 		var worldHeight = gameConsts.worldHeight;
@@ -569,8 +570,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			addRoom(room, Dir.DOWN, openRooms, filledCells, worldWidth, worldHeight);
 			addRoom(room, Dir.RIGHT, openRooms, filledCells, worldWidth, worldHeight);
 		}
-		console.log("Room count: " + closedRooms.length);
-		console.log("Generation took " + (Date.now() - startTime) + " ms");
+		console.log("Generated " + closedRooms.length + " rooms in " + (Date.now() - startTime) + " ms");
 		return closedRooms;
 	}
 }
