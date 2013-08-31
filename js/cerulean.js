@@ -136,8 +136,44 @@ var Cerulean = function () {
 			while (this.room.isCollidingWith(this)) {
 				this.pos.moveInDir(dir, -1);
 			}
+		},
+
+		_updateCurrentRoom: function (audioUtil, messages) {
+			var player = this;
+			if (!player.room.containsAllOf(player)) {
+				player._inDoorway(audioUtil);
+				player.room.doors.forEach(function (door) {
+					if (door.otherRoom.containsSomeOf(player)) {
+
+						player._enteredRoom(door.otherRoom, messages);
+
+						if (door.otherRoom.containsCenterOf(player)) {
+							var oldRoom = player.lastRoom;
+							player.lastRoom = player.room;
+							player.room = door.otherRoom;
+							if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
+								player._leftRoom(oldRoom);
+							}
+						} else {
+							var oldRoom = player.lastRoom;
+							player.lastRoom = door.otherRoom;
+							if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
+								player._leftRoom(oldRoom);
+							}
+						}
+					}
+				});
+			} else {
+				//we're fully inside one room now.
+				if (player.lastRoom) {
+					player._leftRoom(player.lastRoom);
+					player.lastRoom = null;
+				}
+			}
 		}
 	}
+
+	var noop = function () {};
 
 	var Companion = function (room) {
 		extend(this, humanMixin);
@@ -150,7 +186,11 @@ var Cerulean = function () {
 		this.update = function (player) {
 			this._moveTowards(player.pos, "horizontal");
 			this._moveTowards(player.pos, "vertical");
+			this._updateCurrentRoom();
 		};
+		this._inDoorway = noop;
+		this._leftRoom = noop;
+		this._enteredRoom = noop;
 	}
 
 	var Player = function () {
@@ -326,38 +366,8 @@ var Cerulean = function () {
 			room.cleanUp();
 		}
 
-		this._updateCurrentRoom = function (audioUtil, messages) {
-			var player = this;
-			if (!player.room.containsAllOf(player)) {
-				player.resetCharge(audioUtil);
-				player.room.doors.forEach(function (door) {
-				if (door.otherRoom.containsSomeOf(player)) {
-
-					player._enteredRoom(door.otherRoom, messages);
-
-					if (door.otherRoom.containsCenterOf(player)) {
-						var oldRoom = player.lastRoom;
-						player.lastRoom = player.room;
-						player.room = door.otherRoom;
-						if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
-							player._leftRoom(oldRoom);
-						}
-					} else {
-						var oldRoom = player.lastRoom;
-						player.lastRoom = door.otherRoom;
-						if (oldRoom && oldRoom != player.lastRoom && oldRoom != player.room) {
-							player._leftRoom(oldRoom);
-						}
-					}
-				}
-			});
-		} else {
-			//we're fully inside one room now.
-			if (player.lastRoom) {
-				player._leftRoom(player.lastRoom);
-				player.lastRoom = null;
-			}
-		}
+		this._inDoorway = function (audioUtil) {
+			this.resetCharge(audioUtil);
 		}
 
 		this.update = function (keyboard, audioUtil, messages) {
