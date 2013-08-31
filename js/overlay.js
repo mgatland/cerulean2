@@ -6,7 +6,7 @@ var HudOverlay = function(overlayId, gameWindow) {
 
 	this.drawHud = function(bitscore, roomsExplored, roomsInTotal, fps) {
 
-		ctx2.clearRect(0, gameWindow.height - 64 - 64, gameWindow.width, 64);
+		ctx2.clearRect(0, gameWindow.height - 128, gameWindow.width, 128);
 
 		ctx2.fillStyle = "#5DE100";
 		ctx2.font = '32px "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
