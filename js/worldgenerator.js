@@ -29,7 +29,10 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		}
 	}
 
+	var nextRoomId = 0;
 	var Room = function (x, y, width, height) {
+		this.id = nextRoomId;
+		nextRoomId++;
 		this.pos = new Pos(x, y);
 		this.size = new Pos(width, height);
 		this.doors = [];
@@ -254,7 +257,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 				}
 
 	 			closedList.push(currentNode);
-	 			
+
 				var neighbours = currentNode.room.getNeighbours();
 
 				neighbours.forEach(function (room) {
@@ -337,12 +340,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		return Math.floor(Math.random() * (max-min) + min);
 	}
 
-	var addRoom = function (startRoom, direction, openRooms, closedRooms, worldWidth, worldHeight) {
-		if (closedRooms.length > 5000) {
-			console.log("Too many rooms!");
-			return; //abort
-		}
-
+	var addRoom = function (startRoom, direction, openRooms, filledCells, worldWidth, worldHeight) {
 		var width;
 		var height;
 		var maxExpansions;
@@ -387,13 +385,9 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		}
 		if (x < 0 || y < 0 || x > worldWidth || y > worldHeight) return;
 
-		var nearbyClosedRooms = closedRooms.filter(function (room) {
-			return roomCollidesWith(room, x-maxExpansions-1, y-maxExpansions-1, width+maxExpansions*2+2, height+maxExpansions*2+2);
-		});
-		var nearbyOpenRooms = openRooms.filter(function (room) {
-			return roomCollidesWith(room, x-maxExpansions-1, y-maxExpansions-1, width+maxExpansions*2+2, height+maxExpansions*2+2);
-		});
-		var nearbyRooms = nearbyOpenRooms.concat(nearbyClosedRooms);
+		//Find nearby closed rooms
+
+		var nearbyRooms = findExistingRoomsInArea(filledCells, x-maxExpansions-1, y-maxExpansions-1, width+maxExpansions*2+2, height+maxExpansions*2+2);
 
 		//Are we already colliding? If so, abort, this room will never fit.
 		if (nearbyRooms.some(function (room) {
@@ -493,6 +487,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		});
 
 		openRooms.push(newRoom);
+		addFilledCells(filledCells, newRoom);
 
 		//set up enemies in room
 		var area = width * height;
@@ -521,23 +516,61 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		}
 	}
 
+	var addFilledCells = function(filledCells, room) {
+		for (var x = room.pos.x; x < room.size.x+room.pos.x; x++) {
+			for (var y = room.pos.y; y < room.size.y+room.pos.y; y++) {
+				filledCells[makeKey(x, y)] = room;
+			}
+		}
+	}
+
+	var makeKey = function (x, y) {
+		return x + y * gameConsts.worldWidth;
+	}
+
+	var findExistingRoomsInArea = function(filledCells, areaX, areaY, width, height) {
+		var existingRooms = [];
+		var hashSet = []; //an efficient way to avoid adding duplicates to this list.
+		for (var x = areaX; x < areaX + width; x++) {
+			for (var y = areaY; y < areaY + height; y++) {
+				var key = makeKey(x, y);
+				var value = filledCells[key];
+				if (value && !hashSet[value.id]) {
+					existingRooms.push(value);
+					hashSet[value.id] = true;
+				}
+			}
+		}
+		return existingRooms;
+	}
+
 	this.generate = function () {
+		var startTime = Date.now();
 		var worldWidth = gameConsts.worldWidth;
 		var worldHeight = gameConsts.worldHeight;
 		var openRooms = [];
 		var closedRooms = [];
+		var filledCells = {};
 		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 11, 11);
 		openRooms.push(firstRoom);
+		addFilledCells(filledCells, firstRoom);
 
 		while (openRooms.length > 0) {
+
+			if (closedRooms.length > 5000) {
+				console.log("Too many rooms!");
+				return closedRooms; //abort
+			}
+
 			var room = (Math.random() > 0.5) ? openRooms.shift() : openRooms.pop();
 			closedRooms.push(room);
-			addRoom(room, Dir.UP, openRooms, closedRooms, worldWidth, worldHeight);
-			addRoom(room, Dir.LEFT, openRooms, closedRooms, worldWidth, worldHeight);
-			addRoom(room, Dir.DOWN, openRooms, closedRooms, worldWidth, worldHeight);
-			addRoom(room, Dir.RIGHT, openRooms, closedRooms, worldWidth, worldHeight);
+			addRoom(room, Dir.UP, openRooms, filledCells, worldWidth, worldHeight);
+			addRoom(room, Dir.LEFT, openRooms, filledCells, worldWidth, worldHeight);
+			addRoom(room, Dir.DOWN, openRooms, filledCells, worldWidth, worldHeight);
+			addRoom(room, Dir.RIGHT, openRooms, filledCells, worldWidth, worldHeight);
 		}
 		console.log("Room count: " + closedRooms.length);
+		console.log("Generation took " + (Date.now() - startTime) + " ms");
 		return closedRooms;
 	}
 }

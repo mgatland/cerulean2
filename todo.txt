@@ -26,23 +26,16 @@ Presentation:
 [ ] draw everything in vector lines instead of blocks of color
 [ ] make rooms look like faces?
 
-Story?
+2013-09-01
 
-Add the companion?
-Who:
-	avoids shots as well as she can
-	stays close to the player
-	follows if she's in another room
-	attacks nearby projectiles with her projectile-destroyer
-	or maybe she can freeze enemies, or shots, while they're under her cursor.
+[x] speed up loading.
+
+I used a map instead of iterating over 3000 rooms, but it barely helped - until I used ints instead of strings as keys to the map. Then it really helped. 3000 ms down to 750 ms.
+
+[ ] stun gun visual effect - a beam of green bubbles
+[ ] stun gun sound effect
 
 2013-08-31
-
-Welcome back.
-
-What's most important?
-
-The companion
 
 [x]	There is a companion who follows the player
 	[x] companion can move between rooms
