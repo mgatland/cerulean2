@@ -467,7 +467,8 @@ var Cerulean = function () {
 
 		this.attackPowerOn = function (enemy) {
 			var dist = this.getCenter().distanceTo(enemy.getCenter());
-			return Math.floor(100 * this.attackCharge / this.maxAttackCharge - dist/10);
+			var multi = enemy.stunnedTimer > 0 ? 2 : 1;
+			return multi * Math.floor(100 * this.attackCharge / this.maxAttackCharge - dist/10);
 		}
 	}
 
