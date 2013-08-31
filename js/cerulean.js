@@ -683,16 +683,17 @@ var Cerulean = function () {
 	}
 
 	this.load = function () {
+		var startTime = Date.now();
 		var audioUtil = new AudioUtil();
 		//audioUtil.playIntro();
 		loadFiles(['shaders/fragment.glsl', 'shaders/vertex.glsl'], function (shaders) {
-			start(shaders, audioUtil);
+			start(shaders, audioUtil, startTime);
 		}, function (url) {
 		    alert('Failed to download "' + url + '"');
 		});
 	}
 
-	var start = function (shaders, audioUtil) {
+	var start = function (shaders, audioUtil, startTime) {
 		var gameWindow = new GameWindow();
 		var renderer = new Renderer(gameWindow, GameConsts, shaders);
 		var keyboard = new Keyboard();
@@ -766,6 +767,7 @@ var Cerulean = function () {
 				framesThisSecond++;
 			});
 		}, 1000/desiredFps);
+		console.log("Game started " + (Date.now() - startTime) + " ms after the window loaded.");
 	}
 
 }
