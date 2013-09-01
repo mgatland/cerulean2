@@ -89,7 +89,7 @@ var Cerulean = function () {
 				if (storyFrame == 2*sec) messages.addMessage("Justin: What are you doing here? It's not safe!");
 				if (storyFrame == 3*sec) messages.addMessage("Stranger: I noticed!");
 				if (storyFrame == 5*sec) messages.addMessage("Stranger: I'm Anna Harpin. I study Pharos artifacts.");
-				if (storyFrame == 7*sec) messages.addMessage("Stranger: Something teleported me in from my lab.");
+				if (storyFrame == 7*sec) messages.addMessage("Anna: Something teleported me in from my lab.");
 				if (storyFrame == 11*sec) messages.addMessage("Justin: Do you know how we can escape?");
 				if (storyFrame == 14*sec) messages.addMessage("Anna: Escape?");
 				if (storyFrame == 15*sec) messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.");
