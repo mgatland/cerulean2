@@ -59,6 +59,11 @@ var Pos = function (x, y) {
         this.y = Math.floor(this.y);
         return this; //For chaining - this does not clone!
     }
+
+    this.moveXY = function (x, y) {
+        this.x += x;
+        this.y += y;
+    }
 }
 
 var track = function (action, label, number) {

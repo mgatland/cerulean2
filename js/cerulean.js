@@ -714,6 +714,72 @@ var Cerulean = function () {
 		});
 	}
 
+	//Warning: copied from, and must match, code in worldgenerator.js
+	var makeKey = function (x, y) {
+		return x + y * GameConsts.worldWidth;
+	}
+
+	var findRoomNear = function (xPercent, yPercent, rooms, cells) {
+		var x = Math.floor(xPercent * GameConsts.worldWidth / 100);
+		var y = Math.floor(yPercent * GameConsts.worldHeight / 100);
+		//Find a room that is not already special.
+		var attempts = 0;
+		while (true) {
+			var key = makeKey(x, y);
+			var room = cells[key];
+			if (room && !room.special) return room;
+			x++;
+			attempts++;
+			if (attempts % 10 == 0) {
+				x -= 10;
+				y++;
+			}
+			if (attempts == 400) {
+				console.log("Fatal Error: Could not find a room at " + xPercent + ", " + yPercent);
+				return null;
+			}
+		}
+	}
+
+	var createSpecialItems = function (rooms, cells, audioUtil) {
+		var firstRoom = rooms[0];
+		firstRoom.special = true;
+		var attackItem = new Item(firstRoom.getCenter().multiply(GameConsts.tileSize), true);
+		attackItem.pos.x += 16;
+		attackItem.pos.y += 16;
+		attackItem.onCollected = function (player) {
+			player.story.gotFirstAttackItem(player, audioUtil);
+		}
+		firstRoom.items.push(attackItem);
+
+		//  0      33      67     100
+		//         |        |
+		//         |        |
+		// 33------+--------+---------
+		//         |        |
+		//         |    A   |
+		//         |       B|
+		// 67------+--------+---------
+		//         |        |
+		//         |        |
+		//100      |        |         
+
+		//A - firstRoom
+		//B - green collector
+
+
+		var itemCollectorRoom = findRoomNear(65, 65, rooms, cells);
+		itemCollectorRoom.special = true;
+		var collectorItem = new Item(itemCollectorRoom.getCenter().multiply(GameConsts.tileSize), true);
+		collectorItem.pos.moveXY(16, 16);
+		collectorItem.onCollected = function (player) {
+			console.log("Found the green item collector");
+			player.canCollectGreenDots = true;
+		}
+		itemCollectorRoom.enemies = [];
+		itemCollectorRoom.items.push(collectorItem);
+	}
+
 	var start = function (shaders, audioUtil, startTime) {
 		var gameWindow = new GameWindow();
 		var renderer = new Renderer(gameWindow, GameConsts, shaders);
@@ -729,7 +795,10 @@ var Cerulean = function () {
 		var framesThisSecond = 0;
 		var thisSecond = 0;
 
-		var rooms = worldGenerator.generate();
+		var roomData = worldGenerator.generate();
+		var rooms = roomData.rooms;
+		createSpecialItems(rooms, roomData.cells, audioUtil);
+		roomData = null; //Free up the memory?
 
 		var player = new Player();
 
@@ -738,19 +807,6 @@ var Cerulean = function () {
 		player.respawn();
 		player.pos.y -= Math.floor((firstRoom.size.y - 3) * GameConsts.tileSize / 2);
 		player.pos.x -= Math.floor((firstRoom.size.x - 3) * GameConsts.tileSize / 2);
-
-
-		//Create special rooms:
-
-		var attackItem = new Item(firstRoom.getCenter().multiply(GameConsts.tileSize), true);
-		attackItem.pos.x += 16;
-		attackItem.pos.y += 16;
-		attackItem.onCollected = function (player) {
-			player.story.gotFirstAttackItem(player, audioUtil);
-		}
-		firstRoom.items.push(attackItem);
-
-		// End of creating special rooms
 
 		firstRoom.explored = true;
 		player.roomsExplored++;

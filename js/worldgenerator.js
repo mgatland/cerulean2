@@ -571,6 +571,6 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			addRoom(room, Dir.RIGHT, openRooms, filledCells, worldWidth, worldHeight);
 		}
 		console.log("Generated " + closedRooms.length + " rooms in " + (Date.now() - startTime) + " ms");
-		return closedRooms;
+		return {rooms:closedRooms, cells: filledCells};
 	}
 }
