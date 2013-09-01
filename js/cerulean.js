@@ -103,9 +103,9 @@ var Cerulean = function () {
 		}
 
 		this.roomsExplored = function (amount, messages) {
-			console.log("Rooms " + amount);
-			if (amount == 3) messages.addMessage("Justin: The rooms were all empty before.");
-			if (amount == 4) messages.addMessage("Justin: I must have woken up the defence system.");
+			//console.log("Rooms " + amount);
+			//if (amount == 3) messages.addMessage("Justin: The rooms were all empty before.");
+			//if (amount == 4) messages.addMessage("Justin: I must have woken up the defence system.");
 		}
 
 		this.gotFirstAttackItem = function (player, audioUtil) {
@@ -552,6 +552,7 @@ var Cerulean = function () {
 			if (player) {
 				var distance = this.pos.distanceTo(player.getCenter());
 				if (distance < 128 && !special) { //normal items are sucked up
+					return;
 					var angle = this.pos.angleTo(player.getCenter());
 					var speed = 6 * (128 - distance) / 128;
 					var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
@@ -631,7 +632,6 @@ var Cerulean = function () {
 				}
 
 				if (this.refireTimer == 0) {
-					console.log("shoot");
 					if (player) {
 
 						if (this.type == 0) {
