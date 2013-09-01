@@ -355,7 +355,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 				//Draw wand
 				if (companion.wandTarget) {
 					var pos = companion.getCenter();
-					var end = companion.wandTarget;
+					var end = companion.wandTarget.pos;
 					var angle = pos.angleTo(end);
 					pos.moveAtAngle(angle, 27);
 					for (var i = 0; i < 3; i++) {

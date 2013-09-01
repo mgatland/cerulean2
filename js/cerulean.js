@@ -42,7 +42,7 @@ var Cerulean = function () {
 		}
 	}
 
-	var Story = function () {
+	var Story = function (specialItems) {
 
 		this.mode = "intro"; //cannot pass through doorways, do not show HUD.
 		this.shaking = false;
@@ -95,7 +95,7 @@ var Cerulean = function () {
 				if (storyFrame == 15*sec) messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.");
 				if (storyFrame == 17*sec) {
 					messages.addMessage("Anna: The Wand will point our way to other artifacts.");
-					companion.wandTarget = new Pos(7000, 7000);
+					companion.wandTarget = specialItems.collector;
 				}
 				if (storyFrame == 19*sec) messages.addMessage("Justin: And those artifacts will help us escape?");
 				if (storyFrame == 21*sec) messages.addMessage("Anna: Exactly. Let's go!");
@@ -114,6 +114,8 @@ var Cerulean = function () {
 				storyFrame = 0;
 				this.shaking = true;
 				audioUtil.playIntro();
+				player.canAttack = true;
+				player.canUseDoors = true;
 			}
 		}
 	}
@@ -227,6 +229,10 @@ var Cerulean = function () {
 		var safeTimer = 0;
 		this.update = function (player) {
 
+			if (this.wandTarget && !this.wandTarget.live) {
+				this.wandTarget = null;
+			}
+
 			//fully charged. Shall we attack?
 			var oldTarget = this.stunTarget;
 			var newTarget = null;
@@ -299,7 +305,10 @@ var Cerulean = function () {
 		this.attackCharge = 0;
 		this.maxAttackCharge = 5 * 60;
 
-		this.story = new Story();
+		this.canUseDoors = false;
+		this.canAttack = false;
+
+		this.story = null; //Set me externally! FIXME
 
 		var isChargingAttack = false;
 
@@ -345,7 +354,7 @@ var Cerulean = function () {
 		this._updateMovement = function (keyboard) {
 			if (this.health <= 0) return;
 
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_SPACE) && this.story.mode != "intro") {
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_SPACE) && this.canAttack) {
 				isChargingAttack = true;
 			} else {
 				isChargingAttack = false;
@@ -371,7 +380,7 @@ var Cerulean = function () {
 			}
 
 			//If we're running into a wall, make an automove.
-			if (this.story.mode != "intro") {
+			if (this.canUseDoors) {
 				if (oldPos.x == this.pos.x && (left || right)) this._autoMove("vertical");
 				if (oldPos.y == this.pos.y && (up || down)) this._autoMove("horizontal");
 			}
@@ -778,6 +787,7 @@ var Cerulean = function () {
 		}
 		itemCollectorRoom.enemies = [];
 		itemCollectorRoom.items.push(collectorItem);
+		return {collector: collectorItem};
 	}
 
 	var start = function (shaders, audioUtil, startTime) {
@@ -797,10 +807,11 @@ var Cerulean = function () {
 
 		var roomData = worldGenerator.generate();
 		var rooms = roomData.rooms;
-		createSpecialItems(rooms, roomData.cells, audioUtil);
+		var specialItems = createSpecialItems(rooms, roomData.cells, audioUtil);
 		roomData = null; //Free up the memory?
 
 		var player = new Player();
+		player.story = new Story(specialItems);
 
 		var firstRoom = rooms[0];
 		player.setHome(firstRoom);
