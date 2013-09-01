@@ -99,6 +99,13 @@ var Cerulean = function () {
 				}
 				if (storyFrame == 19*sec) messages.addMessage("Justin: And those artifacts will help us escape?");
 				if (storyFrame == 21*sec) messages.addMessage("Anna: Exactly. Let's go!");
+			} else if (this.mode === "game3") {
+				storyFrame++;
+				if (storyFrame == 0.5*sec) messages.addMessage("Justin: What is it?");
+				if (storyFrame == 2.5*sec) messages.addMessage("Anna: Some kind of collection device.");
+				if (storyFrame == 4.5*sec) messages.addMessage("Anna: I have one in my lab - but it didn't do anything.");
+				if (storyFrame == 6.5*sec) messages.addMessage("Anna: It should let you collect something.");
+				if (storyFrame == 8.5*sec) messages.addMessage("Justin: OK.");
 			}
 		}
 
@@ -116,6 +123,14 @@ var Cerulean = function () {
 				audioUtil.playIntro();
 				player.canAttack = true;
 				player.canUseDoors = true;
+			}
+		}
+
+		this.gotCollectorItem = function (player) {
+			if (this.mode === "game2") {
+				this.mode = "game3";
+				storyFrame = 0;
+				player.canCollectGreenDots = true;
 			}
 		}
 	}
@@ -767,7 +782,7 @@ var Cerulean = function () {
 		// 33------+--------+---------
 		//         |        |
 		//         |    A   |
-		//         |       B|
+		//         |      B |
 		// 67------+--------+---------
 		//         |        |
 		//         |        |
@@ -781,8 +796,7 @@ var Cerulean = function () {
 		var collectorItem = new Item(itemCollectorRoom.getCenter().multiply(GameConsts.tileSize), true);
 		collectorItem.pos.moveXY(16, 16);
 		collectorItem.onCollected = function (player) {
-			console.log("Found the green item collector");
-			player.canCollectGreenDots = true;
+			player.story.gotCollectorItem(player);
 		}
 		itemCollectorRoom.enemies = [];
 		itemCollectorRoom.items.push(collectorItem);

@@ -16,6 +16,8 @@ Intro movie:
 
 [ ] late game, let the player create their own build areas anywhere
 
+[ ] Handle player collecting items in unexpected order
+
 [ ] some enemies move between rooms, chasing the player from up to 5 rooms away.
 [ ] rooms with only one door are special (boss rooms? treasure rooms?)
 [ ] some rooms are randomly just treasure rooms
