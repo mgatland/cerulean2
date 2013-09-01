@@ -27,17 +27,13 @@ Presentation:
 [ ] make rooms look like faces?
 [ ] stun gun sound effect
 
-
-
-
-
 2013-09-01
 
-Story:
-	The companion comes after you've explored 10 rooms
-	Triggers a conversation
-	Activates the Artifact Finder
-	Then: Let's Go Artifact Finding!
+[x] companion arrives after you explore 7 rooms
+[ ] trigger conversation when you meet the companion, and there are no enemies in the current room
+[ ]	Activate the artifact finder at the end of that conversation.	
+[ ] Artifact - the green stuff collector.
+[ ] Artifact - the eyes of devotion.
 
 
 

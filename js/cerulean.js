@@ -49,30 +49,56 @@ var Cerulean = function () {
 		var sec = 60; //just a constant
 
 		var storyFrame = 0;
-		this.update = function (messages) {
+		this.update = function (messages, player, companion) {
+
+			var quietAndTogether = (companion && player.room === companion.room && player.room.enemies.length === 0);
+
 
 			if (this.mode == "intro") {
 				storyFrame++;
 				if (storyFrame == 0.5*sec) messages.addMessage("Use the ARROW KEYS to move.");
 				if (storyFrame == 1*sec) messages.addMessage("Justin: I found something!");
-				if (storyFrame == 3*sec) messages.addMessage("Jessica: Great! Pick it up and I'll teleport you out.");
+				if (storyFrame == 3*sec) messages.addMessage("HQ: Great! Pick it up and I'll teleport you out.");
 				if (storyFrame == 8*sec) messages.addMessage("Justin: It's a Pharos artifact.");
-				if (storyFrame == 11*sec) messages.addMessage("Jessica: Good work. We need a lucky break.");
+				if (storyFrame == 11*sec) messages.addMessage("HQ: Good work. We need a lucky break.");
 				if (storyFrame == 15*sec) messages.addMessage("Use the ARROW KEYS to move.");
-				if (storyFrame == 21*sec) messages.addMessage("Jessica: It's been empty rooms all week.");
+				if (storyFrame == 21*sec) messages.addMessage("HQ: It's been empty rooms all week.");
 				if (storyFrame == 25*sec) messages.addMessage("Justin: Well, you're going to love this.");
 				if (storyFrame == 27*sec) messages.addMessage("Justin: I think it's still working!");
 				if (storyFrame == 29*sec) messages.addMessage("Justin: I can see lights blinking off and on.");
-				if (storyFrame == 32*sec) messages.addMessage("Jessica: Quick, pick it up! I'm so excited :D");
-				if (storyFrame == 35*sec) messages.addMessage("Jessica: This could be our biggest find so far.");
-				if (storyFrame == 38*sec) messages.addMessage("Jessica: Pick up the artifact and I'll teleport you back to base.");
-			} else {
+				if (storyFrame == 32*sec) messages.addMessage("HQ: Quick, pick it up! I'm so excited :D");
+				if (storyFrame == 35*sec) messages.addMessage("HQ: This could be our biggest find so far.");
+				if (storyFrame == 38*sec) messages.addMessage("HQ: Pick up the artifact and I'll teleport you back to base.");
+
+			} else if (this.mode === "game1") {
 				storyFrame++;
 				if (storyFrame == 1*sec) messages.addMessage("Justin: Uh oh.");
-				if (storyFrame == 2*sec) messages.addMessage("Justin: Jessica, can you hear me?");
+				if (storyFrame == 2*sec) messages.addMessage("Justin: Is anyone there? Headquarters?");
 				if (storyFrame == 4*sec) messages.addMessage("Justin: No signal.");
 				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artifact.");
 				if (storyFrame == 7*sec) this.shaking = false;
+
+				if (quietAndTogether && this.shaking == false) {
+					this.mode = "game2";
+					storyFrame = 0;
+				}
+
+			} else if (this.mode === "game2") {
+				storyFrame++;
+				if (storyFrame == 1*sec) messages.addMessage("Stranger: Hello!");
+				if (storyFrame == 2*sec) messages.addMessage("Justin: What are you doing here? It's not safe!");
+				if (storyFrame == 3*sec) messages.addMessage("Stranger: I noticed!");
+				if (storyFrame == 5*sec) messages.addMessage("Stranger: I'm Anna Harpin. I study Pharos artifacts.");
+				if (storyFrame == 7*sec) messages.addMessage("Stranger: Something teleported me in from my lab.");
+				if (storyFrame == 11*sec) messages.addMessage("Justin: Do you know how we can escape?");
+				if (storyFrame == 14*sec) messages.addMessage("Anna: Escape?");
+				if (storyFrame == 15*sec) messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.");
+				if (storyFrame == 17*sec) {
+					messages.addMessage("Anna: The Wand will point our way to other artifacts.");
+					//companion.wand = true;
+				}
+				if (storyFrame == 19*sec) messages.addMessage("Justin: And those artifacts will help us escape?");
+				if (storyFrame == 21*sec) messages.addMessage("Anna: Exactly. Let's go!");
 			}
 		}
 
@@ -84,7 +110,7 @@ var Cerulean = function () {
 
 		this.gotFirstAttackItem = function (player, audioUtil) {
 			if (this.mode == "intro") {
-				this.mode = "game";
+				this.mode = "game1";
 				storyFrame = 0;
 				this.shaking = true;
 				audioUtil.playIntro();
@@ -729,7 +755,8 @@ var Cerulean = function () {
 
 			audioUtil.update();
 			messages.update();
-			player.story.update(messages);
+
+			player.story.update(messages, player, companion);
 
 			player.room.update(player, audioUtil);
 			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
