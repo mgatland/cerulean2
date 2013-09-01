@@ -776,8 +776,7 @@ var Cerulean = function () {
 		//A - firstRoom
 		//B - green collector
 
-
-		var itemCollectorRoom = findRoomNear(65, 65, rooms, cells);
+		var itemCollectorRoom = findRoomNear(58, 58, rooms, cells);
 		itemCollectorRoom.special = true;
 		var collectorItem = new Item(itemCollectorRoom.getCenter().multiply(GameConsts.tileSize), true);
 		collectorItem.pos.moveXY(16, 16);

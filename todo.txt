@@ -39,14 +39,11 @@ Presentation:
 [x] trigger conversation when you meet the companion, and there are no enemies in the current room
 [x]	Activate the artifact finder at the end of that conversation.	
 
-[ ] Artifact - the green stuff collector.
+[x] Artifact - the green stuff collector.
 [ ] Artifact - the eyes of devotion.
 
 [ ] conversation - on the Wand of Justice
 [ ] conversation - on the Amulet of Might
-
-
-
 
 [x] stun gun visual effect - a beam of green bubbles
 [x] speed up loading.
