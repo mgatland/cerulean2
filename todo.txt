@@ -1,3 +1,9 @@
+
+What if the conversation text
+appeared INSIDE the room
+and stayed there forever
+
+
 to do:
 
 [ ] The world has 9 regions. Each has different enemies and room sizes.
