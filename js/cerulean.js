@@ -551,8 +551,7 @@ var Cerulean = function () {
 		this.update = function (player, audioUtil) {
 			if (player) {
 				var distance = this.pos.distanceTo(player.getCenter());
-				if (distance < 128 && !special) { //normal items are sucked up
-					return;
+				if (distance < 128 && !special && player.canCollectGreenDots) { //normal items are sucked up
 					var angle = this.pos.angleTo(player.getCenter());
 					var speed = 6 * (128 - distance) / 128;
 					var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
@@ -561,10 +560,11 @@ var Cerulean = function () {
 					this.pos.y += ySpeed;
 				}
 				if (distance < player.size.x / 2 + this.size.x / 2 || distance < player.size.y / 2 + this.size.y / 2) {
-					this.live = false;
 					if (special) {
+						this.live = false;
 						if (this.onCollected) this.onCollected(player);
-					} else {
+					} else if (player.canCollectGreenDots) {
+						this.live = false;
 						player.items++;
 						audioUtil.playerCollectedBit();
 					}
@@ -738,6 +738,10 @@ var Cerulean = function () {
 		player.respawn();
 		player.pos.y -= Math.floor((firstRoom.size.y - 3) * GameConsts.tileSize / 2);
 		player.pos.x -= Math.floor((firstRoom.size.x - 3) * GameConsts.tileSize / 2);
+
+
+		//Create special rooms:
+
 		var attackItem = new Item(firstRoom.getCenter().multiply(GameConsts.tileSize), true);
 		attackItem.pos.x += 16;
 		attackItem.pos.y += 16;
@@ -745,6 +749,8 @@ var Cerulean = function () {
 			player.story.gotFirstAttackItem(player, audioUtil);
 		}
 		firstRoom.items.push(attackItem);
+
+		// End of creating special rooms
 
 		firstRoom.explored = true;
 		player.roomsExplored++;
