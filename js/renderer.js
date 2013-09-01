@@ -328,22 +328,12 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		});
 
 		//draw player
-		var playerColor = null;
-		if (player.invlunerableTime > 0 && flicker) {
-			playerColor = black;
-		} else {
-			playerColor = green;
-		}
+		var playerColor = (player.invlunerableTime > 0 && flicker) ? black : green;
 		addRectWithCamera(vertices, colors, player.pos.x, player.pos.y, player.size.x, player.size.y, playerColor, camera);
 
 		//Draw companion
 		if (companion) {
-			var playerColor = null;
-			if (companion.invlunerableTime > 0 && flicker) {
-				playerColor = black;
-			} else {
-				playerColor = green;
-			}
+			var playerColor = (companion.invlunerableTime > 0 && flicker) ? black : green;
 			addRectWithCamera(vertices, colors, companion.pos.x, companion.pos.y, companion.size.x, companion.size.y, playerColor, camera);
 
 			if (companion.debugPoint) {
@@ -360,6 +350,24 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 					addRectWithCamera(vertices, colors, pos.x-2, pos.y-2, 4, 4, green, camera);
 					addRectWithCamera(vertices, colors, pos.x-1, pos.y-1, 2, 2, black, camera);
 					pos.moveAtAngle(angle, stepDist);
+				}
+			} else {
+				//Draw wand
+				if (companion.wandTarget) {
+					var pos = companion.getCenter();
+					var end = companion.wandTarget;
+					var angle = pos.angleTo(end);
+					pos.moveAtAngle(angle, 27);
+					for (var i = 0; i < 3; i++) {
+						var drawPos = pos.clone().floor();
+						addRectWithCamera(vertices, colors, drawPos.x-2, drawPos.y-2, 4, 4, green, camera);
+						addRectWithCamera(vertices, colors, drawPos.x-1, drawPos.y-1, 2, 2, black, camera);
+						pos.moveAtAngle(angle, 7);
+					}
+					pos.floor();
+					//big rectangle at the end
+					addRectWithCamera(vertices, colors, pos.x-4, pos.y-4, 8, 8, green, camera);
+					addRectWithCamera(vertices, colors, pos.x-3, pos.y-3, 6, 6, black, camera);
 				}
 			}
 		}

@@ -43,6 +43,7 @@ var Cerulean = function () {
 	}
 
 	var Story = function () {
+
 		this.mode = "intro"; //cannot pass through doorways, do not show HUD.
 		this.shaking = false;
 
@@ -52,7 +53,6 @@ var Cerulean = function () {
 		this.update = function (messages, player, companion) {
 
 			var quietAndTogether = (companion && player.room === companion.room && player.room.enemies.length === 0);
-
 
 			if (this.mode == "intro") {
 				storyFrame++;
@@ -95,7 +95,7 @@ var Cerulean = function () {
 				if (storyFrame == 15*sec) messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.");
 				if (storyFrame == 17*sec) {
 					messages.addMessage("Anna: The Wand will point our way to other artifacts.");
-					//companion.wand = true;
+					companion.wandTarget = new Pos(7000, 7000);
 				}
 				if (storyFrame == 19*sec) messages.addMessage("Justin: And those artifacts will help us escape?");
 				if (storyFrame == 21*sec) messages.addMessage("Anna: Exactly. Let's go!");

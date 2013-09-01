@@ -53,6 +53,12 @@ var Pos = function (x, y) {
         this.x += xSpeed;
         this.y += ySpeed;
     }
+
+    this.floor = function () {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+        return this; //For chaining - this does not clone!
+    }
 }
 
 var track = function (action, label, number) {
