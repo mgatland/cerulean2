@@ -192,9 +192,7 @@ var Cerulean = function () {
 		var oldPathEnd = null;
 		var oldPathStart = null;
 
-		this.stunAttackEffectDuration = 110;
-		this.maxAttackTimer = 120;
-		this.attackTimer = this.maxAttackTimer;
+		this.stunTarget = null;
 
 		this._pathIsDirty = function (end) {
 			return (this.room != oldPathStart || end != oldPathEnd);
@@ -202,19 +200,21 @@ var Cerulean = function () {
 
 		var safeTimer = 0;
 		this.update = function (player) {
-			if (this.attackTimer < this.maxAttackTimer) {
-				this.attackTimer++;
-			} else {
-				//fully charged. Shall we attack?
-				if (this.room.enemies.length > 0) {
-					var worstEnemy = this.room.enemies.reduce(function (p, v) {
-						return (p.type > v.type ? p : v);
-					});
-					worstEnemy.stunnedTimer += this.stunAttackEffectDuration;
-					this.attackTimer = 0;
-				}
+
+			//fully charged. Shall we attack?
+			var oldTarget = this.stunTarget;
+			var newTarget = null;
+			if (this.room.enemies.length > 0) {
+				newTarget = this.room.enemies.reduce(function (p, v) {
+					return (p.type > v.type && p.live === true ? p : v);
+				});
 			}
 
+			if (newTarget != oldTarget) {
+				if (oldTarget) oldTarget.stunned = false;
+				if (newTarget) newTarget.stunned = true;
+				this.stunTarget = newTarget;
+			}
 
 			if (player.room.enemies.length == 0) {
 				safeTimer++;
@@ -467,7 +467,7 @@ var Cerulean = function () {
 
 		this.attackPowerOn = function (enemy) {
 			var dist = this.getCenter().distanceTo(enemy.getCenter());
-			var multi = enemy.stunnedTimer > 0 ? 2 : 1;
+			var multi = enemy.stunned ? 2 : 1;
 			return multi * Math.floor(100 * this.attackCharge / this.maxAttackCharge - dist/10);
 		}
 	}
@@ -480,10 +480,7 @@ var Cerulean = function () {
 		this.targetted = false;
 		this.health = 1;
 		this.update = function (player, audioUtil) {
-			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
-			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
-			this.pos.x += xSpeed;
-			this.pos.y += ySpeed;
+			this.pos.moveAtAngle(this.angle, this.speed);
 			if (room.isCollidingWith(this, true)) {
 				this.live = false;
 			}
@@ -559,7 +556,7 @@ var Cerulean = function () {
 		this.angle = 0;
 		this.fireAngle = Math.floor(Math.random() * 360);
 		this.type = type;
-		this.stunnedTimer = 0;
+		this.stunned = false;
 
 		if (this.type == 0) { //fires at player square
 			this.size = new Pos(25, 25);
@@ -597,7 +594,7 @@ var Cerulean = function () {
 				this.angle = this.pos.angleTo(this.dest);
 			}
 
-			if (this.stunnedTimer == 0) {
+			if (!this.stunned) {
 				var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
 				var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
 				this.pos.x += xSpeed;
@@ -654,8 +651,6 @@ var Cerulean = function () {
 					this.refireTimer--;
 				}
 
-			} else {
-				this.stunnedTimer--;
 			}
 
 			//duplicate code from Shot

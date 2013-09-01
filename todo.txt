@@ -28,12 +28,13 @@ Presentation:
 
 2013-09-01
 
-[x] speed up loading.
-
-I used a map instead of iterating over 3000 rooms, but it barely helped - until I used ints instead of strings as keys to the map. Then it really helped. 3000 ms down to 750 ms.
-
 [ ] stun gun visual effect - a beam of green bubbles
 [ ] stun gun sound effect
+
+Story:
+
+[x] speed up loading.
+I used a map instead of iterating over 3000 rooms, but it barely helped - until I used numbers instead of strings as keys to the map. Then it really helped. 3000 ms down to 750 ms.
 
 2013-08-31
 

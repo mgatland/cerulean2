@@ -46,6 +46,13 @@ var Pos = function (x, y) {
 		angle += 90;
 		return angle;
 	}
+
+    this.moveAtAngle = function (angle, speed) {
+        var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
+        var ySpeed = (speed * -Math.cos(3.14159 / 180 * angle));
+        this.x += xSpeed;
+        this.y += ySpeed;
+    }
 }
 
 var track = function (action, label, number) {

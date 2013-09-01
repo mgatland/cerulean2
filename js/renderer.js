@@ -304,7 +304,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 					color = red;
 				}
 
-				if (enemy.stunnedTimer > 0) {
+				if (enemy.stunned) {
 					addRectWithCamera(vertices, colors, enemy.pos.x-4, enemy.pos.y-4,
 					enemy.size.x+8, enemy.size.y+8, green, camera);
 					addRectWithCamera(vertices, colors, enemy.pos.x-3, enemy.pos.y-3,
@@ -336,6 +336,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		}
 		addRectWithCamera(vertices, colors, player.pos.x, player.pos.y, player.size.x, player.size.y, playerColor, camera);
 
+		//Draw companion
 		if (companion) {
 			var playerColor = null;
 			if (companion.invlunerableTime > 0 && flicker) {
@@ -347,6 +348,19 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 			if (companion.debugPoint) {
 				addRectWithCamera(vertices, colors, companion.debugPoint.x-7, companion.debugPoint.y-7, 7, 7, blue, camera);
+			}
+
+			//Draw attack beam
+			if (companion.stunTarget && companion.stunTarget.live) {
+				var pos = companion.getCenter();
+				var end = companion.stunTarget.getCenter();
+				var angle = pos.angleTo(end);
+				var stepDist = pos.distanceTo(end) / 10;
+				for (var i = 0; i < 10; i++) {
+					addRectWithCamera(vertices, colors, pos.x-2, pos.y-2, 4, 4, green, camera);
+					addRectWithCamera(vertices, colors, pos.x-1, pos.y-1, 2, 2, black, camera);
+					pos.moveAtAngle(angle, stepDist);
+				}
 			}
 		}
 
