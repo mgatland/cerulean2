@@ -723,7 +723,7 @@ var Cerulean = function () {
 		firstRoom.explored = true;
 		player.roomsExplored++;
 
-		var companion = new Companion(rooms[100]);
+		var companion = null;
 
 		var update = function () {
 
@@ -735,7 +735,12 @@ var Cerulean = function () {
 			if (player.lastRoom) player.lastRoom.update(player, audioUtil);
 
 			player.update(keyboard, audioUtil, messages);
-			companion.update(player);
+			if (companion) companion.update(player);
+
+			//HACK: replace with a listener once we support listeners
+			if (player.roomsExplored >= 7 && player.room != firstRoom && companion == null) {
+				companion = new Companion(firstRoom);
+			}
 
 			keyboard.update();
 		}
