@@ -8,8 +8,6 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	var red = {r: 1, b:0.06, g:0.06};
 	var green = {r:0.365, g:0.882, b:0};
 
-	var blue = {r:0, g:0, b:1};
-
 	container = document.getElementById('gamecontainer');
 	container.style.width = gameWindow.width;
 	container.style.height = gameWindow.height;
@@ -335,10 +333,6 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		if (companion) {
 			var playerColor = (companion.invlunerableTime > 0 && flicker) ? black : green;
 			addRectWithCamera(vertices, colors, companion.pos.x, companion.pos.y, companion.size.x, companion.size.y, playerColor, camera);
-
-			if (companion.debugPoint) {
-				addRectWithCamera(vertices, colors, companion.debugPoint.x-7, companion.debugPoint.y-7, 7, 7, blue, camera);
-			}
 
 			//Draw attack beam
 			if (companion.stunTarget && companion.stunTarget.live) {

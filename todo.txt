@@ -4,6 +4,11 @@ appeared INSIDE the room
 and stayed there forever
 
 
+
+[ ] Anna's weapons flicker green\black, not green\red (red is only for dangerous things)
+[ ] try putting text inside the rooms?
+[ ] story - explain your weapon and anna's weapon in the story.
+
 to do:
 
 [ ] The world has 9 regions. Each has different enemies and room sizes.

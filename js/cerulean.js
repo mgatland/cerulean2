@@ -296,7 +296,6 @@ var Cerulean = function () {
 					moveDest = doorToUse.getNearSidePos();
 					this.invulnerableTime = 0;
 				}
-				this.debugPoint = moveDest;
 				this._moveTowards(moveDest, "horizontal");
 				this._moveTowards(moveDest, "vertical");
 			}
@@ -786,7 +785,7 @@ var Cerulean = function () {
 		// 67------+--------+---------
 		//         |        |
 		//         |        |
-		//100      |        |         
+		//100      |        |
 
 		//A - firstRoom
 		//B - green collector
