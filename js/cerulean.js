@@ -62,10 +62,10 @@ var Cerulean = function () {
 				if (storyFrame == 8*sec) messages.addMessage("Justin: It's a Pharos artifact.");
 				if (storyFrame == 11*sec) messages.addMessage("HQ: Good work. We need a lucky break.");
 				if (storyFrame == 15*sec) messages.addMessage("Use the ARROW KEYS to move.");
-				if (storyFrame == 21*sec) messages.addMessage("HQ: It's been empty rooms all week.");
+				if (storyFrame == 21*sec) messages.addMessage("HQ: You're the first person who found anything.");
 				if (storyFrame == 25*sec) messages.addMessage("Justin: Well, you're going to love this.");
 				if (storyFrame == 27*sec) messages.addMessage("Justin: I think it's still working!");
-				if (storyFrame == 29*sec) messages.addMessage("Justin: I can see lights blinking off and on.");
+				if (storyFrame == 29*sec) messages.addMessage("Justin: It looks like it's powered up.");
 				if (storyFrame == 32*sec) messages.addMessage("HQ: Quick, pick it up! I'm so excited :D");
 				if (storyFrame == 35*sec) messages.addMessage("HQ: This could be our biggest find so far.");
 				if (storyFrame == 38*sec) messages.addMessage("HQ: Pick up the artifact and I'll teleport you back to base.");

@@ -43,6 +43,8 @@ Presentation:
 
 2013-09-01
 
+Make the first set of rooms very easy.
+
 [x] companion arrives after you explore 7 rooms
 [x] trigger conversation when you meet the companion, and there are no enemies in the current room
 [x]	Activate the artifact finder at the end of that conversation.	
