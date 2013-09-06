@@ -4,7 +4,7 @@ appeared INSIDE the room
 and stayed there forever
 
 
-
+[ ] don't draw those blue debug dots
 [ ] Anna's weapons flicker green\black, not green\red (red is only for dangerous things)
 [ ] try putting text inside the rooms?
 [ ] story - explain your weapon and anna's weapon in the story.
@@ -39,8 +39,6 @@ Presentation:
 [ ] draw everything in vector lines instead of blocks of color
 [ ] make rooms look like faces?
 [ ] stun gun sound effect
-
-
 
 
 

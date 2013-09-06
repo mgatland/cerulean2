@@ -223,6 +223,9 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	var frameValue = 0;
 
+	var wandCounter = 0;
+	var wandOffset = 0;
+
 	this.draw = function (player, companion, rooms, camera, fps) {
 
 		if(player.story.mode != "intro") {
@@ -294,6 +297,52 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 				}
 			});
 
+			//Draw companion attack effects in the correct room
+			if (companion && companion.room == room) {
+				var wandColor = green;
+				//Draw attack beam
+				if (companion.stunTarget && companion.stunTarget.live) {
+					var pos = companion.getCenter();
+					var end = companion.stunTarget.getCenter();
+					var angle = pos.angleTo(end);
+					var distanceToEnd = pos.distanceTo(end);
+					var stepDist = 7;
+
+					wandOffset++;
+					if (wandOffset == 7) wandOffset = 0;
+
+					pos.moveAtAngle(angle, wandOffset);
+					for (var i = 0; i < distanceToEnd; i+= stepDist) {
+						addRectWithCamera(vertices, colors, pos.x-2, pos.y-2, 4, 4, wandColor, camera);
+						addRectWithCamera(vertices, colors, pos.x-1, pos.y-1, 2, 2, black, camera);
+						pos.moveAtAngle(angle, stepDist);
+					}
+				} else {
+					//Draw wand
+					if (companion.wandTarget) {
+						var pos = companion.getCenter();
+						var end = companion.wandTarget.pos;
+						var angle = pos.angleTo(end);
+						wandCounter++;
+						if (wandCounter >= 2) {
+							wandCounter = 0;
+							wandOffset++;
+							if (wandOffset == 7) wandOffset = 0;
+						}
+						pos.moveAtAngle(angle, wandOffset);
+						for (var i = 0; i < 6; i++) {
+							addRectWithCamera(vertices, colors, Math.floor(pos.x), Math.floor(pos.y), 2, 2, wandColor, camera);
+							pos.moveAtAngle(angle, 7);
+						}
+						pos.moveAtAngle(angle, -2 - wandOffset);
+						pos.floor();
+						//big rectangle at the end
+						addRectWithCamera(vertices, colors, pos.x-2, pos.y-2, 5, 5, wandColor, camera);
+						addRectWithCamera(vertices, colors, pos.x-1, pos.y-1, 3, 3, black, camera);
+					}
+				}
+			}
+
 			room.enemies.forEach(function (enemy) {
 				var color = null;
 				if (enemy.targetted && flicker) {
@@ -333,40 +382,6 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		if (companion) {
 			var playerColor = (companion.invlunerableTime > 0 && flicker) ? black : green;
 			addRectWithCamera(vertices, colors, companion.pos.x, companion.pos.y, companion.size.x, companion.size.y, playerColor, camera);
-
-			//Draw attack beam
-			if (companion.stunTarget && companion.stunTarget.live) {
-				var wandColor = flicker ? red : green;
-				var pos = companion.getCenter();
-				var end = companion.stunTarget.getCenter();
-				var angle = pos.angleTo(end);
-				var distanceToEnd = pos.distanceTo(end);
-				var stepDist = 7;
-				for (var i = 0; i < distanceToEnd; i+= stepDist) {
-					addRectWithCamera(vertices, colors, pos.x-2, pos.y-2, 4, 4, wandColor, camera);
-					addRectWithCamera(vertices, colors, pos.x-1, pos.y-1, 2, 2, black, camera);
-					pos.moveAtAngle(angle, stepDist);
-				}
-			} else {
-				//Draw wand
-				if (companion.wandTarget) {
-					var pos = companion.getCenter();
-					var end = companion.wandTarget.pos;
-					var angle = pos.angleTo(end);
-					pos.moveAtAngle(angle, 27);
-					var wandColor = flicker ? red : green;
-					for (var i = 0; i < 3; i++) {
-						var drawPos = pos.clone().floor();
-						addRectWithCamera(vertices, colors, drawPos.x-2, drawPos.y-2, 4, 4, wandColor, camera);
-						addRectWithCamera(vertices, colors, drawPos.x-1, drawPos.y-1, 2, 2, black, camera);
-						pos.moveAtAngle(angle, 7);
-					}
-					pos.floor();
-					//big rectangle at the end
-					addRectWithCamera(vertices, colors, pos.x-4, pos.y-4, 8, 8, wandColor, camera);
-					addRectWithCamera(vertices, colors, pos.x-3, pos.y-3, 6, 6, black, camera);
-				}
-			}
 		}
 
 		var insetX = player.pos.x + 2;
