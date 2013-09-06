@@ -555,6 +555,7 @@ var Cerulean = function () {
 			if (damage > this.health) {
 				this.health = 0;
 				this.live = false;
+				this.pos.floor();
 				room.items.push(new Item(this.pos));
 			}
 		}
@@ -711,12 +712,12 @@ var Cerulean = function () {
 			}
 		}
 
-		//duplicate code from Shot (Except the audio)
 		this.shocked = function (damage) {
 			if (!this.live) return;
 			if (damage > this.health) {
 				this.health = 0;
 				this.live = false;
+				this.pos.floor();
 				for (var x = this.pos.x; x < this.pos.x + this.size.x; x += 5) {
 					for (var y = this.pos.y; y < this.pos.y + this.size.y; y += 5) {
 						this.room.items.push(new Item(new Pos(x, y)));
