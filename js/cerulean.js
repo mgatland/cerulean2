@@ -16,29 +16,28 @@ var Cerulean = function () {
 		this.pos = new Pos();
 	}
 
-	var Messages = function (audioUtil) {
-		var element = document.getElementById("messages");
-
-		var messages = [];
-		var messageDisplayTime = 60 * 8;
+	var Messages = function (player, audioUtil, msgRenderer) {
+		var messageQueue = [];
 
 		this.addMessage = function (msg) {
-			var newMessage = document.createElement('div');
-			newMessage.classList.add("message");
-			newMessage.innerHTML = msg;
-			element.insertBefore(newMessage, null);
-			messages.push({element: newMessage, timer: messageDisplayTime});
-			audioUtil.playAddMessage();
+			messageQueue.push(msg);
 		}
 
 		this.update = function () {
-			messages.forEach(function (message) {
-				message.timer--;
-				if (message.timer == 0) {
-					element.removeChild(message.element);
+			if (messageQueue.length > 0) {
+				var msg = messageQueue[0];
+				if (msgRenderer.canAddMessage(player.room, msg)) {
+					messageQueue.shift();
+					audioUtil.playAddMessage();
+					if (!player.room.messages) player.room.messages = [];
+					player.room.messages.push(msg);
+					player.messageWaiting = false;
+				} else {
+					player.messageWaiting = true;
 				}
-			});
-			messages = messages.filter(function (message) {return message.timer > 0});
+
+
+			}
 		}
 	}
 
@@ -809,7 +808,6 @@ var Cerulean = function () {
 		var keyboard = new Keyboard();
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
-		var messages = new Messages(audioUtil);
 
 		var desiredFps = 60;
 
@@ -836,6 +834,8 @@ var Cerulean = function () {
 		player.roomsExplored++;
 
 		var companion = null;
+
+		var messages = new Messages(player, audioUtil, renderer.overlay);
 
 		var update = function () {
 

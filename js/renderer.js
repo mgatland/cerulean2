@@ -1,6 +1,4 @@
 var Renderer = function (gameWindow, gameConsts, shaders) {
-	var canvas;
-	var ctx;
 	var flicker = false;
 	var flickerCounter = 0;
 
@@ -12,7 +10,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	container.style.width = gameWindow.width;
 	container.style.height = gameWindow.height;
 
-	canvas = document.getElementById('gamescreen');
+	var canvas = document.getElementById('gamescreen');
 	canvas.width = gameWindow.width;
 	canvas.height = gameWindow.height;
 	var gl = initWebGL(canvas);
@@ -28,13 +26,8 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	initShaders(shaders);
 	//initBuffers(); now called every frame
 
-	ctx = canvas.getContext("2d");
-
-	var hudOverlay = new HudOverlay("hudoverlay", gameWindow);
-
-	this.fillRect = function (x, y, width, height, camera) {
-		ctx.fillRect(x-camera.pos.x, y-camera.pos.y, width, height);
-	}
+	var hudOverlay = new HudOverlay("hudoverlay", gameWindow, gameConsts);
+	this.overlay = hudOverlay; //hack to expose this so it can be used by Message
 
 	function drawScene() {
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -228,6 +221,8 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	this.draw = function (player, companion, rooms, camera, fps) {
 
+		hudOverlay.clear();
+
 		if(player.story.mode != "intro") {
 			hudOverlay.drawHud(player.items, player.roomsExplored, rooms.length, fps);
 		}
@@ -262,6 +257,9 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 			if ((room.pos.y + room.size.y) * gameConsts.tileSize < camera.pos.y) return;
 			if (room.pos.x * gameConsts.tileSize > camera.pos.x + gameWindow.width) return;
 			if (room.pos.y * gameConsts.tileSize > camera.pos.y + gameWindow.height) return;
+
+			var messageWaiting = (room === player.room && player.messageWaiting);
+			hudOverlay.drawMessages(room, camera, messageWaiting);
 
 			var pX = (room.pos.x * gameConsts.tileSize - camera.pos.x);
 			var pY =  (room.pos.y * gameConsts.tileSize - camera.pos.y);
