@@ -18,20 +18,36 @@ var Cerulean = function () {
 
 	var Messages = function (player, audioUtil, msgRenderer) {
 		var messageQueue = [];
+		var nextMessageDelay = 0;
+		var fps = 60; //number of frames per second
 
-		this.addMessage = function (msg) {
-			messageQueue.push(msg);
+		this.addMessage = function (msg, delay, func) {
+			messageQueue.push({msg:msg, delay:delay, func:func});
+		}
+
+		this.clearMessages = function () {
+			//Execute any functions before clearing
+			messageQueue.forEach(function (msg) {
+				if (msg.func) msg.func();
+			});
+			messageQueue = [];
+			nextMessageDelay = 0;
 		}
 
 		this.update = function () {
-			if (messageQueue.length > 0) {
+			if (nextMessageDelay > 0) {
+				nextMessageDelay--; //frame rate
+			} else if (messageQueue.length > 0) {
 				var msg = messageQueue[0];
-				if (msgRenderer.canAddMessage(player.room, msg)) {
+				if (msgRenderer.canAddMessage(player.room, msg.msg)) {
 					messageQueue.shift();
 					audioUtil.playAddMessage();
 					if (!player.room.messages) player.room.messages = [];
-					player.room.messages.push(msg);
+					player.room.messages.push(msg.msg);
 					player.messageWaiting = false;
+
+					nextMessageDelay = msg.delay * fps;
+					if (msg.func) msg.func();
 				} else {
 					player.messageWaiting = true;
 				}
@@ -55,26 +71,33 @@ var Cerulean = function () {
 
 			if (this.mode == "intro") {
 				storyFrame++;
-				if (storyFrame == 0.5*sec) messages.addMessage("Use the ARROW KEYS to move.");
-				if (storyFrame == 1*sec) messages.addMessage("Justin: I found something!");
-				if (storyFrame == 3*sec) messages.addMessage("HQ: Great! Pick it up and I'll teleport you out.");
-				if (storyFrame == 8*sec) messages.addMessage("Justin: It's a Pharos artifact.");
-				if (storyFrame == 11*sec) messages.addMessage("HQ: Good work. We need a lucky break.");
-				if (storyFrame == 15*sec) messages.addMessage("Use the ARROW KEYS to move.");
-				if (storyFrame == 21*sec) messages.addMessage("HQ: You're the first person who found anything.");
-				if (storyFrame == 25*sec) messages.addMessage("Justin: Well, you're going to love this.");
-				if (storyFrame == 27*sec) messages.addMessage("Justin: I think it's still working!");
-				if (storyFrame == 29*sec) messages.addMessage("Justin: It looks like it's powered up.");
-				if (storyFrame == 32*sec) messages.addMessage("HQ: Quick, pick it up! I'm so excited :D");
-				if (storyFrame == 35*sec) messages.addMessage("HQ: This could be our biggest find so far.");
-				if (storyFrame == 38*sec) messages.addMessage("HQ: Pick up the artifact and I'll teleport you back to base.");
+				if (storyFrame == 0.5*sec) {
+					messages.addMessage("Use the ARROW KEYS to move.", 1);
+					messages.addMessage("Justin: I found something!", 2);
+					messages.addMessage("HQ: Great! Pick it up and I'll teleport you out.", 5);
+					messages.addMessage("Justin: It's a Pharos artifact.", 3);
+					messages.addMessage("HQ: Good work. We need a lucky break.", 4);
+					messages.addMessage("Use the ARROW KEYS to move.", 6);
+					messages.addMessage("HQ: You're the first person who found anything.", 4);
+					messages.addMessage("Justin: Well, you're going to love this.", 2);
+					messages.addMessage("Justin: I think it's still working!", 2);
+					messages.addMessage("Justin: It looks like it's powered up.", 3);
+					messages.addMessage("HQ: Quick, pick it up! I'm so excited :D", 3);
+					messages.addMessage("HQ: This could be our biggest find so far.", 3);
+					messages.addMessage("HQ: Pick up the artifact and I'll teleport you back to base.", 0);
+				}
 
 			} else if (this.mode === "game1") {
+
+				if (storyFrame == 0) messages.clearMessages(); //Cancel leftover chat from the intro sequence
+
 				storyFrame++;
-				if (storyFrame == 1*sec) messages.addMessage("Justin: Uh oh.");
-				if (storyFrame == 2*sec) messages.addMessage("Justin: Is anyone there? Headquarters?");
-				if (storyFrame == 4*sec) messages.addMessage("Justin: No signal.");
-				if (storyFrame == 6*sec) messages.addMessage("Hold SPACEBAR to use the artifact.");
+				if (storyFrame == 1*sec) {
+					messages.addMessage("Justin: Uh oh.", 1);
+					messages.addMessage("Justin: Is anyone there? Headquarters?", 2);
+					messages.addMessage("Justin: No signal.", 2);
+					messages.addMessage("Hold SPACEBAR to use the artifact.", 0);
+				}
 				if (storyFrame == 7*sec) this.shaking = false;
 
 				if (quietAndTogether && this.shaking == false) {
@@ -84,27 +107,32 @@ var Cerulean = function () {
 
 			} else if (this.mode === "game2") {
 				storyFrame++;
-				if (storyFrame == 1*sec) messages.addMessage("Stranger: Hello!");
-				if (storyFrame == 2*sec) messages.addMessage("Justin: What are you doing here? It's not safe!");
-				if (storyFrame == 3*sec) messages.addMessage("Stranger: I noticed!");
-				if (storyFrame == 5*sec) messages.addMessage("Stranger: I'm Anna Harpin. I study Pharos artifacts.");
-				if (storyFrame == 7*sec) messages.addMessage("Anna: Something teleported me in from my lab.");
-				if (storyFrame == 11*sec) messages.addMessage("Justin: Do you know how we can escape?");
-				if (storyFrame == 14*sec) messages.addMessage("Anna: Escape?");
-				if (storyFrame == 15*sec) messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.");
-				if (storyFrame == 17*sec) {
-					messages.addMessage("Anna: The Wand will point our way to other artifacts.");
-					companion.wandTarget = specialItems.collector;
+				if (storyFrame == 1*sec) {
+					messages.addMessage("Stranger: Hello!", 1);
+					messages.addMessage("Justin: What are you doing here? It's not safe!", 1);
+					messages.addMessage("Stranger: I noticed!", 2);
+					messages.addMessage("Stranger: I'm Anna Harpin. I study Pharos artifacts.", 2);
+					messages.addMessage("Anna: Something teleported me in from my lab.", 4);
+					messages.addMessage("Justin: Do you know how we can escape?", 3);
+					messages.addMessage("Anna: Escape?", 1);
+					messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.", 2);
+					//TODO: Don't allow the story to skip messages that call functions!
+					var revealWandFunc = function () {
+						companion.wandTarget = specialItems.collector;
+					}
+					messages.addMessage("Anna: The Wand will point our way to other artifacts.", 2, revealWandFunc);
+					messages.addMessage("Justin: And those artifacts will help us escape?", 2);
+					messages.addMessage("Anna: Exactly. Let's go!", 0);
 				}
-				if (storyFrame == 19*sec) messages.addMessage("Justin: And those artifacts will help us escape?");
-				if (storyFrame == 21*sec) messages.addMessage("Anna: Exactly. Let's go!");
 			} else if (this.mode === "game3") {
 				storyFrame++;
-				if (storyFrame == 0.5*sec) messages.addMessage("Justin: What is it?");
-				if (storyFrame == 2.5*sec) messages.addMessage("Anna: Some kind of collection device.");
-				if (storyFrame == 4.5*sec) messages.addMessage("Anna: I have one in my lab - but it didn't do anything.");
-				if (storyFrame == 6.5*sec) messages.addMessage("Anna: It should let you collect something.");
-				if (storyFrame == 8.5*sec) messages.addMessage("Justin: OK.");
+				if (storyFrame == 0.5*sec) {
+					messages.addMessage("Justin: What is it?", 2);
+					messages.addMessage("Anna: Some kind of collection device.", 2);
+					messages.addMessage("Anna: I have one in my lab - but it didn't do anything.", 2);
+					messages.addMessage("Anna: It should let you collect something.", 2);
+					messages.addMessage("Justin: OK.", 0);
+				}
 			}
 		}
 
