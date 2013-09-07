@@ -58,6 +58,18 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			this.items.forEach(function (item) {
 				item.update(player, audioUtil);
 			});
+
+			if (!player.canCollectGreenDots) {
+				if ((player.room === this || player.lastRoom === this) && this.items.length > 0) {
+					var room = this;
+					var liveItems = this.items.filter(function (item) {
+						if (item.special) return false;
+						if (item.live) return true;
+						return false;
+					});
+					if (liveItems.length > 0) liveItems[0].live = false;
+				}
+			}
 		}
 
 		//called when the player leaves a room
