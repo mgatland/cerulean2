@@ -50,7 +50,7 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 			ctx2.fillText(line, area.x, area.y+i*lineHeight);
 		});
 		if (messageWaiting) {
-			ctx2.fillText(". . .", area.x, area.y+lines.length*lineHeight);
+			ctx2.fillText("↓↓↓↓↓", area.x, area.y+lines.length*lineHeight);
 		}
 	}
 
