@@ -1,13 +1,7 @@
 
-What if the conversation text
-appeared INSIDE the room
-and stayed there forever
+[ ] story - explain your weapon and Anna's weapon in the story.
 
-
-[ ] don't draw those blue debug dots
-[ ] Anna's weapons flicker green\black, not green\red (red is only for dangerous things)
-[ ] try putting text inside the rooms?
-[ ] story - explain your weapon and anna's weapon in the story.
+[ ] Maybe go silent protagonist. Actually, I can't tell the story like that...
 
 to do:
 
@@ -40,23 +34,30 @@ Presentation:
 [ ] make rooms look like faces?
 [ ] stun gun sound effect
 
+Make the first set of rooms very easy.
 
+[ ] conversation - on the Wand of Justice
+[ ] conversation - on the Amulet of Might
+[ ] Artifact - the eyes of devotion.
+[ ] make pressing keyboard keys not make sounds any more!
 
+2013-09-07
+
+[x] don't draw those blue debug dots
+[x] Anna's weapons flicker green\black, not green\red (red is only for dangerous things)
+[x] try putting text inside the rooms? Yes. I am keeping this.
+[x] improve conversation engine
+
+Conversation should only appear in non-combat situations, when Anna and Justin are together (unless it's special solo conversation)
 
 
 2013-09-01
-
-Make the first set of rooms very easy.
 
 [x] companion arrives after you explore 7 rooms
 [x] trigger conversation when you meet the companion, and there are no enemies in the current room
 [x]	Activate the artifact finder at the end of that conversation.	
 
 [x] Artifact - the green stuff collector.
-[ ] Artifact - the eyes of devotion.
-
-[ ] conversation - on the Wand of Justice
-[ ] conversation - on the Amulet of Might
 
 [x] stun gun visual effect - a beam of green bubbles
 [x] speed up loading.

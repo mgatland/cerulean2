@@ -76,26 +76,20 @@ var Cerulean = function () {
 					messages.addMessage("Justin: I found something!", 2);
 					messages.addMessage("HQ: Great! Pick it up and I'll teleport you out.", 5);
 					messages.addMessage("Justin: It's a Pharos artifact.", 3);
-					messages.addMessage("HQ: Good work. We need a lucky break.", 4);
-					messages.addMessage("Use the ARROW KEYS to move.", 6);
-					messages.addMessage("HQ: You're the first person who found anything.", 4);
+					messages.addMessage("HQ: Good work. We need a lucky break.", 2);
+					messages.addMessage("HQ: No-one else found anything on their shifts.", 2);
 					messages.addMessage("Justin: Well, you're going to love this.", 2);
 					messages.addMessage("Justin: I think it's still working!", 2);
-					messages.addMessage("Justin: It looks like it's powered up.", 3);
-					messages.addMessage("HQ: Quick, pick it up! I'm so excited :D", 3);
-					messages.addMessage("HQ: This could be our biggest find so far.", 3);
-					messages.addMessage("HQ: Pick up the artifact and I'll teleport you back to base.", 0);
+					messages.addMessage("HQ: Quick, pick it up so I can beam you home!", 3);
+					messages.addMessage("HQ: This could be our biggest find so far.", 0);
 				}
 
 			} else if (this.mode === "game1") {
-
-				if (storyFrame == 0) messages.clearMessages(); //Cancel leftover chat from the intro sequence
-
+				if (storyFrame == 0) messages.clearMessages();
 				storyFrame++;
 				if (storyFrame == 1*sec) {
 					messages.addMessage("Justin: Uh oh.", 1);
-					messages.addMessage("Justin: Is anyone there? Headquarters?", 2);
-					messages.addMessage("Justin: No signal.", 2);
+					messages.addMessage("Justin: Is anyone there? Can you hear me?", 2);
 					messages.addMessage("Hold SPACEBAR to use the artifact.", 0);
 				}
 				if (storyFrame == 7*sec) this.shaking = false;
@@ -106,14 +100,15 @@ var Cerulean = function () {
 				}
 
 			} else if (this.mode === "game2") {
+				if (storyFrame == 0) messages.clearMessages();
 				storyFrame++;
 				if (storyFrame == 1*sec) {
 					messages.addMessage("Stranger: Hello!", 1);
 					messages.addMessage("Justin: What are you doing here? It's not safe!", 1);
 					messages.addMessage("Stranger: I noticed!", 2);
 					messages.addMessage("Stranger: I'm Anna Harpin. I study Pharos artifacts.", 2);
-					messages.addMessage("Anna: Something teleported me in from my lab.", 4);
-					messages.addMessage("Justin: Do you know how we can escape?", 3);
+					messages.addMessage("Anna: Something teleported me in from my lab.", 2);
+					messages.addMessage("Justin: Do you know how we can escape?", 2);
 					messages.addMessage("Anna: Escape?", 1);
 					messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.", 2);
 					//TODO: Don't allow the story to skip messages that call functions!
@@ -122,16 +117,62 @@ var Cerulean = function () {
 					}
 					messages.addMessage("Anna: The Wand will point our way to other artifacts.", 2, revealWandFunc);
 					messages.addMessage("Justin: And those artifacts will help us escape?", 2);
-					messages.addMessage("Anna: Exactly. Let's go!", 0);
+					messages.addMessage("Anna: Exactly. Let's go!", 8);
+
+					//Amulet of Might
+
+					messages.addMessage("Anna: I see you found the Amulet of Might.", 2);
+					messages.addMessage("Justin: This weapon I'm using?", 1);
+					messages.addMessage("Anna: It's more than a weapon!", 2);
+					messages.addMessage("Anna: If you're about to be killed, it will teleport you back to a safe place.", 2);
+					messages.addMessage("Anna: Nothing here can kill you while you hold it.", 2);
+					messages.addMessage("Justin: Wow.", 2);
+					messages.addMessage("Anna: It should protect me too, while I'm with you.", 2);
+					messages.addMessage("Anna: So I hope you don't mind me keeping close :)", 2);
 				}
 			} else if (this.mode === "game3") {
+				if (storyFrame == 0) messages.clearMessages();
 				storyFrame++;
 				if (storyFrame == 0.5*sec) {
-					messages.addMessage("Justin: What is it?", 2);
-					messages.addMessage("Anna: Some kind of collection device.", 2);
-					messages.addMessage("Anna: I have one in my lab - but it didn't do anything.", 2);
-					messages.addMessage("Anna: It should let you collect something.", 2);
-					messages.addMessage("Justin: OK.", 0);
+					messages.addMessage("Justin: Is this a shield? Or a dinner plate?", 2);
+					messages.addMessage("Anna: The markings say 'Outstretched Arms'.", 2);
+					messages.addMessage("Justin: Like a hug?", 2);
+					messages.addMessage("Anna: I don't think so.", 2);
+					messages.addMessage("Anna: No controls - you just hold it.", 2);
+					messages.addMessage("Justin: What does it do?", 2);
+					messages.addMessage("Anna: Takes something from something? I guess we'll find out.", 6);
+
+					//Wand of Justice
+					messages.addMessage("Justin: What is that wand you're using?", 2);
+					messages.addMessage("Anna: The Wand of Justice.", 2);
+					messages.addMessage("Anna: It was made for the King's so-called tax collectors.", 2);
+					messages.addMessage("Anna: People hid their valuables when the tax men came. This wand helped find them.", 2);
+					messages.addMessage("Justin: You're also using it to freeze these monsters.", 2);
+					messages.addMessage("Anna: Yes, it can disable automatons.", 2);
+					messages.addMessage("Anna: Also useful when invading people's homes to 'collect tax'.", 4);
+
+					messages.addMessage("Justin: So where are we going next?", 2);
+					messages.addMessage("Anna: The wand's still recalibrating, let's just explore.", 10);
+
+					//make sure players know to stop now.
+					messages.addMessage("Anna: Actually", 2);
+					messages.addMessage("Anna: This is the end of the game.", 2);
+					messages.addMessage("Justin: What?!", 2);
+					messages.addMessage("Anna: The game's not finished yet, and this is the end.", 2);
+					messages.addMessage("Anna: We can keep exploring, but we're not going to find any more artifacts.", 2);
+					messages.addMessage("Justin: You mean, we can't escape?", 2);
+					messages.addMessage("Anna: I'm afraid not.", 4);
+					messages.addMessage("Justin: So...", 2);
+					messages.addMessage("Anna: Yeah.", 4);
+					messages.addMessage("Justin: We could try to find the edge of the world.", 3);
+					messages.addMessage("Anna: That could be fun.", 2);
+					messages.addMessage("Anna: But nothing will happen when we get there.", 2);
+					messages.addMessage("Anna: I mean, I'm not even going to say anything.", 2);
+					messages.addMessage("Anna: This is the end of the talking.", 2);
+					messages.addMessage("Justin: OK.", 9);
+					messages.addMessage("Justin: So...", 1);
+					messages.addMessage("Anna: No more talking!", 10);
+					messages.addMessage("THE END", 1);
 				}
 			}
 		}
