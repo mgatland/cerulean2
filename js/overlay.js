@@ -8,6 +8,7 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 
 	var roomMargin = gameConsts.wallWidth + 4;
 	var lineHeight = 18;
+	var minimumWidthForText = 88;
 
 	this.clear = function () {
 		ctx2.clearRect(0, 0, gameWindow.width, gameWindow.height);
@@ -23,6 +24,7 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 	this.canAddMessage = function (room, message) {
 		this.setContextForMessages();
 		var area = this.getMessageDrawingArea(room, fakeCamera);
+		if (area.width < minimumWidthForText) return false;
 		var maxLines = Math.floor(area.height / lineHeight);
 		var lines = this.getMessageLines(room.messages, area);
 		var newLines = this.getMessageLines([message], area);
