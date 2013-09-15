@@ -698,102 +698,102 @@ var Cerulean = function () {
 			this.speed = 0.0;
 			this.health = 10;
 		}
+	}
+	Enemy.prototype.getCenter = function () {
+		var x = Math.floor(this.pos.x + this.size.x / 2);
+		var y = Math.floor(this.pos.y + this.size.y / 2);
+		return new Pos(x, y);
+	}
 
-		this.getCenter = function () {
-			var x = Math.floor(this.pos.x + this.size.x / 2);
-			var y = Math.floor(this.pos.y + this.size.y / 2);
-			return new Pos(x, y);
+	Enemy.prototype.update = function (player, audioUtil) {
+
+		//move
+		if (!this.dest) {
+			this.dest = this.room.getRandomPointInside();
+			this.angle = this.pos.angleTo(this.dest);
 		}
 
-		this.update = function (player, audioUtil) {
+		if (!this.stunned) {
+			var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
+			var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
+			this.pos.x += xSpeed;
+			this.pos.y += ySpeed;
 
-			//move
-			if (!this.dest) {
-				this.dest = room.getRandomPointInside();
-				this.angle = this.pos.angleTo(this.dest);
+			if (this.pos.distanceTo(this.dest) < 16) {
+				this.dest = null;
 			}
 
-			if (!this.stunned) {
-				var xSpeed = (this.speed * Math.sin(3.14159 / 180.0 * this.angle));
-				var ySpeed = (this.speed * -Math.cos(3.14159 / 180 * this.angle));
-				this.pos.x += xSpeed;
-				this.pos.y += ySpeed;
+			if (this.refireTimer == 0) {
+				if (player) {
 
-				if (this.pos.distanceTo(this.dest) < 16) {
-					this.dest = null;
-				}
-
-				if (this.refireTimer == 0) {
-					if (player) {
-
-						if (this.type == 0) {
-							//the seeking shot
-							var angle = this.pos.angleTo(player.pos);
-							var shot = new Shot(this.getCenter(), room, angle);
-							room.shots.push(shot);
-							this.refireTimer = 15;
-						} else if (this.type == 1) {
-							//the spinner shot
-							this.fireAngle += 25;
-							if (this.fireAngle > 360) this.fireAngle -= 360;
-							var shot2 = new Shot(this.getCenter(), room, this.fireAngle);
-							room.shots.push(shot2);
-							this.refireTimer = 7;
-						} else if (this.type == 2) {
-							var angle = this.pos.angleTo(player.pos);
-							for (var i = -2; i <= 2; i++) {
-								room.shots.push(new Shot(this.getCenter(), room, angle + 10*i));
-							}
-							this.refireTimer = 15;
-						} else if (this.type == 3) {
-							var angle = this.pos.angleTo(player.pos);
-							for (var i = -1; i <= 1; i+= 2) {
-								room.shots.push(new Shot(this.getCenter(), room, angle + 40*i));
-							}
-							this.refireTimer = 8;
-						} else {
-							var angle = this.fireAngle;
-							for (var i = 0; i < 360; i+= 30) {
-								room.shots.push(new Shot(this.getCenter(), room, angle + i));
-							}
-							this.refireTimer = 30;
-							this.fireAngle += 5;
-							if (this.fireAngle > 360) this.fireAngle -= 360;
+					if (this.type == 0) {
+						//the seeking shot
+						var angle = this.pos.angleTo(player.pos);
+						var shot = new Shot(this.getCenter(), this.room, angle);
+						this.room.shots.push(shot);
+						this.refireTimer = 15;
+					} else if (this.type == 1) {
+						//the spinner shot
+						this.fireAngle += 25;
+						if (this.fireAngle > 360) this.fireAngle -= 360;
+						var shot2 = new Shot(this.getCenter(), this.room, this.fireAngle);
+						this.room.shots.push(shot2);
+						this.refireTimer = 7;
+					} else if (this.type == 2) {
+						var angle = this.pos.angleTo(player.pos);
+						for (var i = -2; i <= 2; i++) {
+							this.room.shots.push(new Shot(this.getCenter(), this.room, angle + 10*i));
 						}
-
-					audioUtil.enemyAttack();
-
+						this.refireTimer = 15;
+					} else if (this.type == 3) {
+						var angle = this.pos.angleTo(player.pos);
+						for (var i = -1; i <= 1; i+= 2) {
+							this.room.shots.push(new Shot(this.getCenter(), this.room, angle + 40*i));
+						}
+						this.refireTimer = 8;
+					} else {
+						var angle = this.fireAngle;
+						for (var i = 0; i < 360; i+= 30) {
+							this.room.shots.push(new Shot(this.getCenter(), this.room, angle + i));
+						}
+						this.refireTimer = 30;
+						this.fireAngle += 5;
+						if (this.fireAngle > 360) this.fireAngle -= 360;
 					}
 
-				} else {
-					this.refireTimer--;
+				audioUtil.enemyAttack();
+
 				}
 
+			} else {
+				this.refireTimer--;
 			}
 
-			//duplicate code from Shot
-			//update highlight status
-			if (player && player.attackPowerOn(this) > this.health) {
-				this.targetted = true;
-			} else {
-				this.targetted = false;
-			}
 		}
 
-		this.shocked = function (damage) {
-			if (!this.live) return;
-			if (damage > this.health) {
-				this.health = 0;
-				this.live = false;
-				this.pos.floor();
-				for (var x = this.pos.x; x < this.pos.x + this.size.x; x += 5) {
-					for (var y = this.pos.y; y < this.pos.y + this.size.y; y += 5) {
-						this.room.items.push(new Item(new Pos(x, y)));
-					}
+		//duplicate code from Shot
+		//update highlight status
+		if (player && player.attackPowerOn(this) > this.health) {
+			this.targetted = true;
+		} else {
+			this.targetted = false;
+		}
+	}
+
+	Enemy.prototype.shocked = function (damage) {
+		if (!this.live) return;
+		if (damage > this.health) {
+			this.health = 0;
+			this.live = false;
+			this.pos.floor();
+			for (var x = this.pos.x; x < this.pos.x + this.size.x; x += 5) {
+				for (var y = this.pos.y; y < this.pos.y + this.size.y; y += 5) {
+					this.room.items.push(new Item(new Pos(x, y)));
 				}
 			}
 		}
 	}
+	//End of Enemy.Prototype
 
 	this.load = function () {
 		var startTime = Date.now();
