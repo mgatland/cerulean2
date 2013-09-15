@@ -12,59 +12,60 @@ Dir.RIGHT.reverse = Dir.LEFT;
 var Pos = function (x, y) {
 	this.x = x;
 	this.y = y;
-
-	this.toString = function () {
-		return "(" + this.x + "," + this.y + ")";
-	}
-
-	this.moveInDir = function (dir, distance) {
-		switch (dir) {
-			case Dir.UP: this.y -= distance; break;
-			case Dir.DOWN: this.y += distance; break;
-			case Dir.LEFT: this.x -= distance; break;
-			case Dir.RIGHT: this.x += distance; break;
-		}
-        return this; //For chaining - this method does NOT clone
-	}
-
-	this.distanceTo = function (other) {
-		var xDiff = this.x - other.x;
-		var yDiff = this.y - other.y;
-		return Math.floor(Math.sqrt(xDiff * xDiff + yDiff * yDiff));
-	}
-
-	this.clone = function () {
-		return new Pos(this.x, this.y);
-	}
-
-	this.multiply = function (value) {
-		return new Pos(this.x*value, this.y*value);
-	}
-
-	this.angleTo = function (other) {
-		var angle = (Math.atan2(other.y - this.y, other.x - this.x) * 180 / Math.PI);
-		angle += 90;
-		return angle;
-	}
-
-    this.moveAtAngle = function (angle, speed) {
-        var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
-        var ySpeed = (speed * -Math.cos(3.14159 / 180 * angle));
-        this.x += xSpeed;
-        this.y += ySpeed;
-    }
-
-    this.floor = function () {
-        this.x = Math.floor(this.x);
-        this.y = Math.floor(this.y);
-        return this; //For chaining - this does not clone!
-    }
-
-    this.moveXY = function (x, y) {
-        this.x += x;
-        this.y += y;
-    }
 }
+Pos.prototype.toString = function () {
+    return "(" + this.x + "," + this.y + ")";
+}
+
+Pos.prototype.moveInDir = function (dir, distance) {
+    switch (dir) {
+        case Dir.UP: this.y -= distance; break;
+        case Dir.DOWN: this.y += distance; break;
+        case Dir.LEFT: this.x -= distance; break;
+        case Dir.RIGHT: this.x += distance; break;
+    }
+    return this; //For chaining - this method does NOT clone
+}
+
+Pos.prototype.distanceTo = function (other) {
+    var xDiff = this.x - other.x;
+    var yDiff = this.y - other.y;
+    return Math.floor(Math.sqrt(xDiff * xDiff + yDiff * yDiff));
+}
+
+Pos.prototype.clone = function () {
+    return new Pos(this.x, this.y);
+}
+
+Pos.prototype.multiply = function (value) {
+    return new Pos(this.x*value, this.y*value);
+}
+
+Pos.prototype.angleTo = function (other) {
+    var angle = (Math.atan2(other.y - this.y, other.x - this.x) * 180 / Math.PI);
+    angle += 90;
+    return angle;
+}
+
+Pos.prototype.moveAtAngle = function (angle, speed) {
+    var xSpeed = (speed * Math.sin(3.14159 / 180.0 * angle));
+    var ySpeed = (speed * -Math.cos(3.14159 / 180 * angle));
+    this.x += xSpeed;
+    this.y += ySpeed;
+}
+
+Pos.prototype.floor = function () {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+    return this; //For chaining - this does not clone!
+}
+
+Pos.prototype.moveXY = function (x, y) {
+    this.x += x;
+    this.y += y;
+}
+//End of Pos.prototype
+
 
 var track = function (action, label, number) {
 	console.log("_trackEvent: " + action + ", " + label + ", " + number);

@@ -4,30 +4,30 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.pos = new Pos(x,y);
 		this.otherRoom = otherRoom;
 		this.direction = direction;
-
-		this.overlaps = function (rect) {
-			var x = this.pos.x * gameConsts.tileSize;
-			var y = this.pos.y * gameConsts.tileSize;
-			return (x < rect.pos.x + rect.size.x
-				&& x + gameConsts.tileSize > rect.pos.x
-				&& y < rect.pos.y + rect.size.y
-				&& y + gameConsts.tileSize > rect.pos.y);
-		}
-
-		this.getCenter = function () {
-			var x = Math.floor(this.pos.x * gameConsts.tileSize + gameConsts.tileSize / 2);
-			var y = Math.floor(this.pos.y * gameConsts.tileSize + gameConsts.tileSize / 2);
-			return new Pos(x, y);
-		}
-
-		this.getNearSidePos = function () {
-			return this.getCenter().moveInDir(this.direction.reverse, 12);
-		}
-
-		this.getFarSidePos = function () {
-			return this.getCenter().moveInDir(this.direction, 32);
-		}
 	}
+	Door.prototype.overlaps = function (rect) {
+		var x = this.pos.x * gameConsts.tileSize;
+		var y = this.pos.y * gameConsts.tileSize;
+		return (x < rect.pos.x + rect.size.x
+			&& x + gameConsts.tileSize > rect.pos.x
+			&& y < rect.pos.y + rect.size.y
+			&& y + gameConsts.tileSize > rect.pos.y);
+	}
+
+	Door.prototype.getCenter = function () {
+		var x = Math.floor(this.pos.x * gameConsts.tileSize + gameConsts.tileSize / 2);
+		var y = Math.floor(this.pos.y * gameConsts.tileSize + gameConsts.tileSize / 2);
+		return new Pos(x, y);
+	}
+
+	Door.prototype.getNearSidePos = function () {
+		return this.getCenter().moveInDir(this.direction.reverse, 12);
+	}
+
+	Door.prototype.getFarSidePos = function () {
+		return this.getCenter().moveInDir(this.direction, 32);
+	}
+	//end of Door.prototype
 
 	var nextRoomId = 0;
 	var Room = function (x, y, width, height) {
@@ -39,250 +39,252 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		this.enemies = [];
 		this.shots = [];
 		this.items = [];
+	}
 
-		this.update = function (player, audioUtil) {
-			if (this.flashing) this.flashing--;
+	Room.prototype.update = function (player, audioUtil) {
+		if (this.flashing) this.flashing--;
 
-			this.shots = this.shots.filter(function (s) {return s.live});
-			this.enemies = this.enemies.filter(function (e) {return e.live});
-			this.items = this.items.filter(function (i) {return i.live});
+		this.shots = this.shots.filter(function (s) {return s.live});
+		this.enemies = this.enemies.filter(function (e) {return e.live});
+		this.items = this.items.filter(function (i) {return i.live});
 
-			this.enemies.forEach(function (enemy) {
-				enemy.update(player, audioUtil);
-			});
+		this.enemies.forEach(function (enemy) {
+			enemy.update(player, audioUtil);
+		});
 
-			this.shots.forEach(function (shot) {
-				shot.update(player, audioUtil);
-			});
+		this.shots.forEach(function (shot) {
+			shot.update(player, audioUtil);
+		});
 
-			this.items.forEach(function (item) {
-				item.update(player, audioUtil);
-			});
+		this.items.forEach(function (item) {
+			item.update(player, audioUtil);
+		});
 
-			if (!player.canCollectGreenDots) {
-				if ((player.room === this || player.lastRoom === this) && this.items.length > 0) {
-					var room = this;
-					var liveItems = this.items.filter(function (item) {
-						if (item.special) return false;
-						if (item.live) return true;
-						return false;
-					});
-					if (liveItems.length > 0) liveItems[0].live = false;
-				}
-			}
-		}
-
-		//called when the player leaves a room
-		this.cleanUp = function () {
-			this.shots = [];
-		}
-
-		//generation time only
-		this.addDoor = function (x, y, otherRoom, direction) {
-			this.doors.push(new Door(x,y, otherRoom, direction));
-		}
-
-		this.getCenter = function () {
-			var x = this.pos.x + this.size.x / 2;
-			var y = this.pos.y + this.size.y / 2;
-			return new Pos(Math.floor(x), Math.floor(y));
-		}
-
-		this.toString = function () {
-			return "Room " + this.pos + "|" + this.size;
-		};
-
-		this._isCollidingWithPoint = function (x, y, blockDoorways) {
-			if (!this._containsPos(x, y)) return false;
-			var gridX = x / gameConsts.tileSize;
-			var gridY = y / gameConsts.tileSize;
-			var wallWidth = gameConsts.wallWidth / gameConsts.tileSize;
-			var leftWall = (gridX < this.pos.x + wallWidth);
-			var rightWall = (gridX >= this.pos.x + this.size.x - wallWidth);
-			var upWall = (gridY < this.pos.y + wallWidth);
-			var downWall = (gridY >= this.pos.y + this.size.y - wallWidth);
-			if (leftWall || rightWall || upWall || downWall) {
-
-				//it's wall unless it's a door.
-				if (blockDoorways) return true;
-				var gridXfloored = Math.floor(gridX);
-				var gridYfloored = Math.floor(gridY);
-				return !(this.doors.some(function (door) {
-					return (gridXfloored == door.pos.x && gridYfloored == door.pos.y);
-				}));
-			}
-			return false;
-		}
-
-		this._containsPos = function (x, y) {
-			var gridX = Math.floor(x / gameConsts.tileSize);
-			var gridY = Math.floor(y / gameConsts.tileSize);
-			return (this.pos.x <= gridX && this.pos.x + this.size.x > gridX
-				&& this.pos.y <= gridY && this.pos.y + this.size.y > gridY);
-		}
-
-		this.containsCenterOf = function (player) {
-			return (this._containsPos(player.pos.x+player.size.x/2, player.pos.y+player.size.y/2));
-		}
-
-		this.containsAllOf = function (player) {
-			if (!this._containsPos(player.pos.x, player.pos.y)) return false;
-			if (!this._containsPos(player.pos.x+player.size.x, player.pos.y)) return false;
-			if (!this._containsPos(player.pos.x+player.size.x, player.pos.y+player.size.y)) return false;
-			if (!this._containsPos(player.pos.x, player.pos.y+player.size.y)) return false;
-			return true;
-		}
-
-		this.containsSomeOf = function (player) {
-			if (this._containsPos(player.pos.x, player.pos.y)) return true;
-			if (this._containsPos(player.pos.x+player.size.x, player.pos.y)) return true;
-			if (this._containsPos(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;
-			if (this._containsPos(player.pos.x, player.pos.y+player.size.y)) return true;
-			return false;
-		}
-
-		this._isTileCollidingWith = function (x, y, thing, blockDoorways) {
-			var typeType;
-			var left = (x == this.pos.x);
-			var right = (x == this.pos.x + this.size.x - 1);
-			var up = (y == this.pos.y);
-			var down = (y == this.pos.y + this.size.y - 1);
-
-			if (!left && !right && !up && !down) return false; //floor never collides
-
-			if (!blockDoorways) {
-				var doorway = this.doors.some(function (d) {
-					return d.pos.x == x && d.pos.y == y;
+		if (!player.canCollectGreenDots) {
+			if ((player.room === this || player.lastRoom === this) && this.items.length > 0) {
+				var room = this;
+				var liveItems = this.items.filter(function (item) {
+					if (item.special) return false;
+					if (item.live) return true;
+					return false;
 				});
-				if (doorway) return false;
-			}
-
-			var hitWall = false;
-			if (left) {
-				hitWall = hitWall || (thing.pos.x < x * gameConsts.tileSize + gameConsts.wallWidth);
-			}
-			if (right) {
-				hitWall = hitWall || (thing.pos.x + thing.size.x > (x+1) * gameConsts.tileSize - gameConsts.wallWidth);
-			}
-			if (up) {
-				hitWall = hitWall || (thing.pos.y < y * gameConsts.tileSize + gameConsts.wallWidth);
-			}
-			if (down) {
-				hitWall = hitWall || (thing.pos.y + thing.size.y > (y+1) * gameConsts.tileSize - gameConsts.wallWidth);
-			}
-			return hitWall;
-		};
-
-		//Is this thing colliding with the walls of the room?
-		this.isCollidingWith = function (thing, blockDoorways) {
-
-			if (thing.canUseDoors === false) blockDoorways = true;
-
-			if (thing.size) {
-				var minTileX = Math.floor(thing.pos.x / gameConsts.tileSize);
-				var maxTileX = Math.floor((thing.pos.x + thing.size.x) / gameConsts.tileSize);
-				var minTileY = Math.floor(thing.pos.y / gameConsts.tileSize);
-				var maxTileY = Math.floor((thing.pos.y + thing.size.y) / gameConsts.tileSize);
-				for (var x = minTileX; x <= maxTileX; x++) {
-					for (var y = minTileY; y <= maxTileY; y++) {
-						if (this._isTileCollidingWith(x, y, thing, blockDoorways)) return true;
-					}
-				}
-				return false;
-			} else {
-				if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y, blockDoorways)) return true;
-			}
-			return false;
-		};
-
-		this.getRandomPointInside = function () {
-			var x = rand(this.pos.x + 1, this.pos.x + this.size.x - 1);
-			var y = rand(this.pos.y + 1, this.pos.y + this.size.y - 1);
-			return new Pos(x * gameConsts.tileSize, y * gameConsts.tileSize);
-		}
-
-		this.countEnemies = function () {
-			return this.enemies.filter(function (e) {return e.live}).length;
-		}
-
-		this.getNeighbours = function () {
-			var neighbours = [];
-			this.doors.forEach(function (door) {
-				neighbours.push(door.otherRoom);
-			});
-			return neighbours;
-		}
-
-		this.getPathTo = function (destRoom) {
-			var maxSteps = 9000;
-			var steps = 0;
-
-			//fitness function for pathfinding
-			var fitnessFunc = function (node, destination) {
-				var distScore = node.room.pos.distanceTo(destRoom.pos);
-				var exploredScore = node.room.explored ? 0 : 10;
-				return distScore + exploredScore; //lower is better
-			};
-
-			if (this === destRoom) return destRoom;
-			var openList = [];
-			var closedList = [];
-			openList.push({room: this, prev: null});
-
-			while (openList.length > 0) {
-
-				steps++;
-				if (steps == maxSteps) {
-					console.log("Error in pathfinding");
-					return destRoom;
-				}
-				if (steps % 500 == 0) { //logging if somethig has gone wrong
-					console.log("Pathfinding has taken " + steps + " steps...");
-					console.log("Open rooms: " + openList.length);
-					console.log("Closed rooms: " + closedList.length);
-				}
-
-				// Grab the best node to process next
-				var lowInd = 0;
-				var lowVal = fitnessFunc(openList[0], destRoom);
-				for(var i=0; i<openList.length; i++) {
-					var fitness = fitnessFunc(openList[i], destRoom);
-					if(fitness < lowVal) {
-						lowInd = i;
-						lowVal = fitness
-					}
-				}
-				var currentNode = openList[lowInd];
-				openList.splice(lowInd, 1);
-
-				// success
-				if(currentNode.room === destRoom) {
-					var curr = currentNode;
-					var ret = [];
-					while(curr.prev) {
-						ret.push(curr.room);
-						curr = curr.prev;
-					}
-					return ret.reverse();
-				}
-
-	 			closedList.push(currentNode);
-
-				var neighbours = currentNode.room.getNeighbours();
-
-				neighbours.forEach(function (room) {
-					//Add the room, if it is not already on any list
-					if (openList.some(function (node) {return node.room === room})) {
-						return;
-					}
-					if (closedList.some(function (node) {return node.room === room})) {
-						return;
-					}
-					openList.push({room: room, prev: currentNode});
-				});
+				if (liveItems.length > 0) liveItems[0].live = false;
 			}
 		}
 	}
+
+	//called when the player leaves a room
+	Room.prototype.cleanUp = function () {
+		this.shots = [];
+	}
+
+	//generation time only
+	Room.prototype.addDoor = function (x, y, otherRoom, direction) {
+		this.doors.push(new Door(x,y, otherRoom, direction));
+	}
+
+	Room.prototype.getCenter = function () {
+		var x = this.pos.x + this.size.x / 2;
+		var y = this.pos.y + this.size.y / 2;
+		return new Pos(Math.floor(x), Math.floor(y));
+	}
+
+	Room.prototype.toString = function () {
+		return "Room " + this.pos + "|" + this.size;
+	};
+
+	Room.prototype._isCollidingWithPoint = function (x, y, blockDoorways) {
+		if (!this._containsPos(x, y)) return false;
+		var gridX = x / gameConsts.tileSize;
+		var gridY = y / gameConsts.tileSize;
+		var wallWidth = gameConsts.wallWidth / gameConsts.tileSize;
+		var leftWall = (gridX < this.pos.x + wallWidth);
+		var rightWall = (gridX >= this.pos.x + this.size.x - wallWidth);
+		var upWall = (gridY < this.pos.y + wallWidth);
+		var downWall = (gridY >= this.pos.y + this.size.y - wallWidth);
+		if (leftWall || rightWall || upWall || downWall) {
+
+			//it's wall unless it's a door.
+			if (blockDoorways) return true;
+			var gridXfloored = Math.floor(gridX);
+			var gridYfloored = Math.floor(gridY);
+			return !(this.doors.some(function (door) {
+				return (gridXfloored == door.pos.x && gridYfloored == door.pos.y);
+			}));
+		}
+		return false;
+	}
+
+	Room.prototype._containsPos = function (x, y) {
+		var gridX = Math.floor(x / gameConsts.tileSize);
+		var gridY = Math.floor(y / gameConsts.tileSize);
+		return (this.pos.x <= gridX && this.pos.x + this.size.x > gridX
+			&& this.pos.y <= gridY && this.pos.y + this.size.y > gridY);
+	}
+
+	Room.prototype.containsCenterOf = function (player) {
+		return (this._containsPos(player.pos.x+player.size.x/2, player.pos.y+player.size.y/2));
+	}
+
+	Room.prototype.containsAllOf = function (player) {
+		if (!this._containsPos(player.pos.x, player.pos.y)) return false;
+		if (!this._containsPos(player.pos.x+player.size.x, player.pos.y)) return false;
+		if (!this._containsPos(player.pos.x+player.size.x, player.pos.y+player.size.y)) return false;
+		if (!this._containsPos(player.pos.x, player.pos.y+player.size.y)) return false;
+		return true;
+	}
+
+	Room.prototype.containsSomeOf = function (player) {
+		if (this._containsPos(player.pos.x, player.pos.y)) return true;
+		if (this._containsPos(player.pos.x+player.size.x, player.pos.y)) return true;
+		if (this._containsPos(player.pos.x+player.size.x, player.pos.y+player.size.y)) return true;
+		if (this._containsPos(player.pos.x, player.pos.y+player.size.y)) return true;
+		return false;
+	}
+
+	Room.prototype._isTileCollidingWith = function (x, y, thing, blockDoorways) {
+		var typeType;
+		var left = (x == this.pos.x);
+		var right = (x == this.pos.x + this.size.x - 1);
+		var up = (y == this.pos.y);
+		var down = (y == this.pos.y + this.size.y - 1);
+
+		if (!left && !right && !up && !down) return false; //floor never collides
+
+		if (!blockDoorways) {
+			var doorway = this.doors.some(function (d) {
+				return d.pos.x == x && d.pos.y == y;
+			});
+			if (doorway) return false;
+		}
+
+		var hitWall = false;
+		if (left) {
+			hitWall = hitWall || (thing.pos.x < x * gameConsts.tileSize + gameConsts.wallWidth);
+		}
+		if (right) {
+			hitWall = hitWall || (thing.pos.x + thing.size.x > (x+1) * gameConsts.tileSize - gameConsts.wallWidth);
+		}
+		if (up) {
+			hitWall = hitWall || (thing.pos.y < y * gameConsts.tileSize + gameConsts.wallWidth);
+		}
+		if (down) {
+			hitWall = hitWall || (thing.pos.y + thing.size.y > (y+1) * gameConsts.tileSize - gameConsts.wallWidth);
+		}
+		return hitWall;
+	};
+
+	//Is this thing colliding with the walls of the room?
+	Room.prototype.isCollidingWith = function (thing, blockDoorways) {
+
+		if (thing.canUseDoors === false) blockDoorways = true;
+
+		if (thing.size) {
+			var minTileX = Math.floor(thing.pos.x / gameConsts.tileSize);
+			var maxTileX = Math.floor((thing.pos.x + thing.size.x) / gameConsts.tileSize);
+			var minTileY = Math.floor(thing.pos.y / gameConsts.tileSize);
+			var maxTileY = Math.floor((thing.pos.y + thing.size.y) / gameConsts.tileSize);
+			for (var x = minTileX; x <= maxTileX; x++) {
+				for (var y = minTileY; y <= maxTileY; y++) {
+					if (this._isTileCollidingWith(x, y, thing, blockDoorways)) return true;
+				}
+			}
+			return false;
+		} else {
+			if (this._isCollidingWithPoint(thing.pos.x, thing.pos.y, blockDoorways)) return true;
+		}
+		return false;
+	};
+
+	Room.prototype.getRandomPointInside = function () {
+		var x = rand(this.pos.x + 1, this.pos.x + this.size.x - 1);
+		var y = rand(this.pos.y + 1, this.pos.y + this.size.y - 1);
+		return new Pos(x * gameConsts.tileSize, y * gameConsts.tileSize);
+	}
+
+	Room.prototype.countEnemies = function () {
+		return this.enemies.filter(function (e) {return e.live}).length;
+	}
+
+	Room.prototype.getNeighbours = function () {
+		var neighbours = [];
+		this.doors.forEach(function (door) {
+			neighbours.push(door.otherRoom);
+		});
+		return neighbours;
+	}
+
+	Room.prototype.getPathTo = function (destRoom) {
+		var maxSteps = 9000;
+		var steps = 0;
+
+		//fitness function for pathfinding
+		var fitnessFunc = function (node, destination) {
+			var distScore = node.room.pos.distanceTo(destRoom.pos);
+			var exploredScore = node.room.explored ? 0 : 10;
+			return distScore + exploredScore; //lower is better
+		};
+
+		if (this === destRoom) return destRoom;
+		var openList = [];
+		var closedList = [];
+		openList.push({room: this, prev: null});
+
+		while (openList.length > 0) {
+
+			steps++;
+			if (steps == maxSteps) {
+				console.log("Error in pathfinding");
+				return destRoom;
+			}
+			if (steps % 500 == 0) { //logging if somethig has gone wrong
+				console.log("Pathfinding has taken " + steps + " steps...");
+				console.log("Open rooms: " + openList.length);
+				console.log("Closed rooms: " + closedList.length);
+			}
+
+			// Grab the best node to process next
+			var lowInd = 0;
+			var lowVal = fitnessFunc(openList[0], destRoom);
+			for(var i=0; i<openList.length; i++) {
+				var fitness = fitnessFunc(openList[i], destRoom);
+				if(fitness < lowVal) {
+					lowInd = i;
+					lowVal = fitness
+				}
+			}
+			var currentNode = openList[lowInd];
+			openList.splice(lowInd, 1);
+
+			// success
+			if(currentNode.room === destRoom) {
+				var curr = currentNode;
+				var ret = [];
+				while(curr.prev) {
+					ret.push(curr.room);
+					curr = curr.prev;
+				}
+				return ret.reverse();
+			}
+
+ 			closedList.push(currentNode);
+
+			var neighbours = currentNode.room.getNeighbours();
+
+			neighbours.forEach(function (room) {
+				//Add the room, if it is not already on any list
+				if (openList.some(function (node) {return node.room === room})) {
+					return;
+				}
+				if (closedList.some(function (node) {return node.room === room})) {
+					return;
+				}
+				openList.push({room: room, prev: currentNode});
+			});
+		}
+	}
+
+	//end of Room prototype methods
 
 	var addDoorsBetween = function (room, newRoom, direction) {
 		var minX;
