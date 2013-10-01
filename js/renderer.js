@@ -33,7 +33,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	  gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
-	  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+	  gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 	  gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesColorBuffer);
   	  gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
@@ -139,14 +139,14 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	  //top triangle
 	  vertices.push(
-	  	x+width, y+height, 0,
-	  	x, y+height, 0,
-	  	x+width, y, 0);
+	  	x+width, y+height,
+	  	x, y+height,
+	  	x+width, y);
 	  //bottom triangle
 	  vertices.push(
-	  	x+width, y, 0,
-	  	x, y+height, 0,
-	  	x, y, 0);
+	  	x+width, y,
+	  	x, y+height,
+	  	x, y);
 
 	  for (var i = 0; i < 6; i++) {
 	  	colors.push(color.r, color.g, color.b, 1);
@@ -341,7 +341,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesColorBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
-		vertexCount = vertices.length / 3;
+		vertexCount = vertices.length / 2;
 
 		gl.uniform1f(frameValueLocation, frameValue);
 
