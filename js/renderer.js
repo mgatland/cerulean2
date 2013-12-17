@@ -113,44 +113,51 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	  return shader;
 	}
 
+	function addParticles() {
+
+	}
+
 	//p means 'in pixels'
 	function addRectWithCamera(vertices, colors, pX, pY, pWidth, pHeight, color, camera) {
 		addRect(vertices, colors, pX-camera.pos.x, pY-camera.pos.y, pWidth, pHeight, color);
 	}
 
-	//p means 'in pixels'
-	function addRect(vertices, colors, pX, pY, pWidth, pHeight, color) {
-
+	function addQuad(vertices, colors, pX, pY, pX2, pY2, color) {
 	  // Draw rectangles as two triangles:
 	  // 2--1       5\ (repeat of 2)
 	  //  \ |       | \
 	  //   \3       6--4 (repeat of 3)
 
-	  var glScreenWidth = 2;
-	  var glScreenHeight = 2;
+	  //invert Y
+	  pY = gameWindow.height - pY;
+	  pY2 = gameWindow.height - pY2; 
 
-	  var x = pX / gameWindow.width * glScreenWidth - glScreenWidth/2;
-	  var y = pY / gameWindow.height * glScreenHeight - glScreenHeight/2;
-	  var width = pWidth / gameWindow.width * glScreenWidth;
-	  var height = pHeight / gameWindow.height * glScreenHeight;
+	  //convert to screen coords
+	  var x = pX / gameWindow.width * 2 - 1;
+	  var y = pY / gameWindow.height * 2 - 1;
 
-	  //invert y
-	  y = -y - height;
+	  var x2 = pX2 / gameWindow.width * 2 - 1;
+	  var y2 = pY2 / gameWindow.height * 2 - 1;
 
 	  //top triangle
 	  vertices.push(
-	  	x+width, y+height,
-	  	x, y+height,
-	  	x+width, y);
+	  	x2, y2,
+	  	x, y2,
+	  	x2, y);
 	  //bottom triangle
 	  vertices.push(
-	  	x+width, y,
-	  	x, y+height,
+	  	x2, y,
+	  	x, y2,
 	  	x, y);
 
 	  for (var i = 0; i < 6; i++) {
 	  	colors.push(color.r, color.g, color.b, 1);
 	  }
+	}
+
+	//p means 'in pixels'
+	function addRect(vertices, colors, pX, pY, pWidth, pHeight, color) {
+		addQuad(vertices, colors, pX, pY, pX+pWidth, pY+pHeight, color);
 	}
 
 	var frameValue = 0;
@@ -330,7 +337,10 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		if (player.health < 3) addRectWithCamera(vertices, colors, insetX+insetSizeX/2, insetY, insetSizeX/2, insetSizeY/2, black, camera);
 		if (player.health < 2) addRectWithCamera(vertices, colors, insetX, insetY+insetSizeY/2, insetSizeX/2, insetSizeY/2, black, camera);
 
-		//attack charge:
+		//attack charge particles
+		addParticles(vertices, colors);
+
+		//attack charge bar:
 		var width = Math.floor(gameWindow.width * player.attackCharge / player.maxAttackCharge);
 		addRect(vertices, colors, 0, gameWindow.height - 32, width, 32, green);
 
