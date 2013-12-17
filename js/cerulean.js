@@ -111,39 +111,38 @@ var Cerulean = function () {
 					messages.addMessage("Stranger: I noticed!", 2);
 					messages.addMessage("Stranger: I'm Anna Harpin. I study Pharos artifacts.", 2);
 					messages.addMessage("Anna: Something teleported me in from my lab.", 2);
-					messages.addMessage("Justin: Do you know how we can escape?", 2);
-					messages.addMessage("Anna: Escape?", 1);
-					messages.addMessage("Anna: Right. Yes. I found this Wand of Justice.", 2);
+					messages.addMessage("Justin: I'm Justin.", 1);
+					messages.addMessage("Justin: I'm an artifact retrieval specialist.", 2);
+					messages.addMessage("Justin: I've lost contact with HQ. Do you know a way out?", 2);
+					messages.addMessage("Anna: Not exactly. But I can help - this is a Wand of Justice.", 2);
 					//TODO: Don't allow the story to skip messages that call functions!
 					var revealWandFunc = function () {
 						companion.wandTarget = specialItems.collector;
 					}
-					messages.addMessage("Anna: The Wand will point our way to other artifacts.", 2, revealWandFunc);
-					messages.addMessage("Justin: And those artifacts will help us escape?", 2);
-					messages.addMessage("Anna: Exactly. Let's go!", 8);
+					messages.addMessage("Anna: The Wand points towards powerful artifacts.", 2, revealWandFunc);
+					messages.addMessage("Anna: It can lead us to Pharos devices that will help us.", 2);
+					messages.addMessage("Justin: Nice! OK, let's see what we can find.", 8);
 
 					//Amulet of Might
 
-					messages.addMessage("Anna: I see you found the Amulet of Might.", 2);
-					messages.addMessage("Justin: This weapon I'm using?", 1);
-					messages.addMessage("Anna: It's more than a weapon!", 2);
-					messages.addMessage("Anna: If you're about to be killed, it will teleport you back to a safe place.", 2);
-					messages.addMessage("Anna: Nothing here can kill you while you hold it.", 2);
+					messages.addMessage("Anna: I see you already found the Amulet of Might.", 2);
+					messages.addMessage("Justin: Is that what this weapon is called?", 1);
+					messages.addMessage("Anna: It's far more than a weapon!", 2);
+					messages.addMessage("Anna: If you're about to be killed, it will teleport you back to where you found it.", 2);
+					messages.addMessage("Anna: Nothing can ever kill you while you hold it.", 2);
 					messages.addMessage("Justin: Wow.", 2);
 					messages.addMessage("Anna: It should protect me too, while I'm with you.", 2);
-					messages.addMessage("Anna: So I hope you don't mind me keeping close :)", 2);
+					messages.addMessage("Anna: So I hope you don't mind me keeping close :)", 8);
+
 				}
 			} else if (this.mode === "game3") {
 				if (storyFrame == 0) messages.clearMessages();
 				storyFrame++;
 				if (storyFrame == 0.5*sec) {
-					messages.addMessage("Justin: Is this a shield? Or a dinner plate?", 2);
-					messages.addMessage("Anna: The markings say 'Outstretched Arms'.", 2);
-					messages.addMessage("Justin: Like a hug?", 2);
-					messages.addMessage("Anna: I don't think so.", 2);
-					messages.addMessage("Anna: No controls - you just hold it.", 2);
-					messages.addMessage("Justin: What does it do?", 2);
-					messages.addMessage("Anna: Takes something from something? I guess we'll find out.", 6);
+					messages.addMessage("Justin: Looks like a bracelet.", 2);
+					messages.addMessage("Anna: It will let you draw energy out of the automatons, as you destroy them.", 4);
+					messages.addMessage("Justin: What can I do with that energy?", 2);
+					messages.addMessage("Anna: I don't know. I guess we'll find out.", 6);
 
 					//Wand of Justice
 					messages.addMessage("Justin: What is that wand you're using?", 2);
