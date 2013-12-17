@@ -1,12 +1,17 @@
 
-[ ] Only talk when not in combat.
+
+
+Conversation:
+[ ] Only talk when not in combat OR when in full health
 [ ] only talk when Anna and Justin are together
 [ ] put break-lines between disjointed chats when they're in the same room
 [ ] make recent chats flash? it's hard to follow conversations sometimes.
+
+
+
 [ ] Sound effect upon getting the green collector item
 
 to do:
-
 [ ] The world has 9 regions. Each has different enemies and room sizes.
 [ ] the North, South, East and West regions are unlocked until the player does something
 [ ] the 4 corner regions are each individually locked.
@@ -15,7 +20,7 @@ So our player story is: unlock the NSEW, then unlock each of the 4 corners.
 
 * * * 
 
-Intro movie:
+Intro movie
 
 [ ] spawn build areas in some rooms
 

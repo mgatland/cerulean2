@@ -85,9 +85,12 @@ var Cerulean = function () {
 				}
 
 			} else if (this.mode === "game1") {
-				if (storyFrame == 0) messages.clearMessages();
+				if (storyFrame == 0) {
+					messages.clearMessages();
+					player.room.messages.length = 0; //HACK: delete the intro text
+				}
 				storyFrame++;
-				if (storyFrame == 1*sec) {
+				if (storyFrame == 1*sec) {					
 					messages.addMessage("Justin: Uh oh.", 1);
 					messages.addMessage("Justin: Is anyone there? Can you hear me?", 2);
 					messages.addMessage("Hold SPACEBAR to use the artifact.", 0);
