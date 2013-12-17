@@ -140,21 +140,27 @@ var Cerulean = function () {
 				storyFrame++;
 				if (storyFrame == 0.5*sec) {
 					messages.addMessage("Justin: Looks like a bracelet.", 2);
-					messages.addMessage("Anna: It will let you draw energy out of the automatons, as you destroy them.", 4);
+					messages.addMessage("Anna: The Calling Circle. It draws energy out of the automatons, as you destroy them.", 4);
 					messages.addMessage("Justin: What can I do with that energy?", 2);
 					messages.addMessage("Anna: I don't know. I guess we'll find out.", 6);
 
 					//Wand of Justice
 					messages.addMessage("Justin: What is that wand you're using?", 2);
 					messages.addMessage("Anna: The Wand of Justice.", 2);
-					messages.addMessage("Anna: It was made for the King's so-called tax collectors.", 2);
-					messages.addMessage("Anna: People hid their valuables when the tax men came. This wand helped find them.", 2);
-					messages.addMessage("Justin: You're also using it to freeze these monsters.", 2);
-					messages.addMessage("Anna: Yes, it can disable automatons.", 2);
-					messages.addMessage("Anna: Also useful when invading people's homes to 'collect tax'.", 4);
+					messages.addMessage("Anna: The Pharos King's men used them to find and steal people's valuable treasures.", 2);
+					messages.addMessage("Anna: It can also freeze the automatons.", 2);
+					messages.addMessage("Justin: You know, when we get out of here, you'll have to give that to me.", 2);
+					messages.addMessage("Anna: What?! It's mine!", 1);
+					messages.addMessage("Justin: Everything in this labyrinth belongs to my employer.", 2);
+					messages.addMessage("Anna: I didn't find it in the labyrinth!", 1);
+					messages.addMessage("Anna: I brought it in with me.", 3);
+					messages.addMessage("Justin: ...", 1);
+					messages.addMessage("Justin: I thought you were teleported in by accident.", 2);
+					messages.addMessage("Anna: I was holding the wand when it happened. It's from my lab.", 2);
+					messages.addMessage("Justin: Oh.", 2);
+					messages.addMessage("Anna: In fact, that's probably why I was pulled in.", 6);
 
 					messages.addMessage("Justin: So where are we going next?", 2);
-					messages.addMessage("Anna: The wand's still recalibrating, let's just explore.", 10);
 
 					//make sure players know to stop now.
 					messages.addMessage("Anna: Actually", 2);
