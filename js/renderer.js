@@ -113,8 +113,26 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	  return shader;
 	}
 
-	function addParticles() {
+	function addLine(vertices, colors, startX, startY) {
+		var start = new Pos(startX, startY);
+		var end = new Pos(gameWindow.width/2-8, gameWindow.height/2-8);
 
+		var angle = start.angleTo(end);
+		var start2 = start.clone();
+		var end2 = end.clone();
+
+		start.moveAtAngle(angle-90, 0.5);
+		end.moveAtAngle(angle-90, 0.5);
+
+		start2.moveAtAngle(angle+90, 0.5);
+		end2.moveAtAngle(angle+90, 0.5);
+
+		var points = [];
+		points.push([start.x, start.y]);
+		points.push([start2.x, start2.y]);
+		points.push([end.x, end.y]);
+		points.push([end2.x, end2.y]);
+		addQuad(vertices, colors, points, green);
 	}
 
 	//p means 'in pixels'
@@ -122,33 +140,29 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		addRect(vertices, colors, pX-camera.pos.x, pY-camera.pos.y, pWidth, pHeight, color);
 	}
 
-	function addQuad(vertices, colors, pX, pY, pX2, pY2, color) {
+	function addQuad(vertices, colors, points, color) {
 	  // Draw rectangles as two triangles:
 	  // 2--1       5\ (repeat of 2)
 	  //  \ |       | \
 	  //   \3       6--4 (repeat of 3)
 
-	  //invert Y
-	  pY = gameWindow.height - pY;
-	  pY2 = gameWindow.height - pY2; 
-
-	  //convert to screen coords
-	  var x = pX / gameWindow.width * 2 - 1;
-	  var y = pY / gameWindow.height * 2 - 1;
-
-	  var x2 = pX2 / gameWindow.width * 2 - 1;
-	  var y2 = pY2 / gameWindow.height * 2 - 1;
+	  //invert Y and convert to screen coords
+	  points.forEach(function (point) {
+	  	point.x = point[0] / gameWindow.width * 2 - 1;
+	  	var invertedY = gameWindow.height - point[1];
+	  	point.y = invertedY / gameWindow.height * 2 - 1;
+	  });
 
 	  //top triangle
 	  vertices.push(
-	  	x2, y2,
-	  	x, y2,
-	  	x2, y);
+	  	points[2].x, points[2].y,
+	  	points[3].x, points[3].y,
+	  	points[1].x, points[1].y);
 	  //bottom triangle
 	  vertices.push(
-	  	x2, y,
-	  	x, y2,
-	  	x, y);
+	  	points[1].x, points[1].y,
+	  	points[3].x, points[3].y,
+	  	points[0].x, points[0].y);
 
 	  for (var i = 0; i < 6; i++) {
 	  	colors.push(color.r, color.g, color.b, 1);
@@ -157,13 +171,22 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 	//p means 'in pixels'
 	function addRect(vertices, colors, pX, pY, pWidth, pHeight, color) {
-		addQuad(vertices, colors, pX, pY, pX+pWidth, pY+pHeight, color);
+		var pX2 = pX+pWidth;
+		var pY2 = pY+pHeight;
+		var points = [];
+		points.push([pX, pY]);
+		points.push([pX2, pY]);
+		points.push([pX2, pY2]);
+		points.push([pX, pY2]);
+		addQuad(vertices, colors, points, color);
 	}
 
 	var frameValue = 0;
 
 	var wandCounter = 0;
 	var wandOffset = 0;
+
+	var randomPoints = [];
 
 	this.draw = function (player, companion, rooms, camera, fps) {
 
@@ -318,6 +341,22 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 		});
 
+		//attack charge particles
+		if (flickerCounter == 0 && player.attackCharge > 0 || randomPoints.length == 0) {
+			//move the lines around
+			randomPoints = [];
+			for (var i = 0; i < 14; i++) {
+				var x = Math.random() * gameWindow.width;
+				var y = Math.random() * gameWindow.height;
+				randomPoints[i] = [x,y];
+			}
+		}
+		if (flicker) {
+			for (var i = 0; i < 14 * player.attackCharge / player.maxAttackCharge; i++) {
+				addLine(vertices, colors, randomPoints[i][0], randomPoints[i][1]);
+			}
+		}
+
 		//draw player
 		var playerColor = (player.invlunerableTime > 0 && flicker) ? black : green;
 		addRectWithCamera(vertices, colors, player.pos.x, player.pos.y, player.size.x, player.size.y, playerColor, camera);
@@ -336,9 +375,6 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 		if (player.health < 4) addRectWithCamera(vertices, colors, insetX+insetSizeX/2, insetY+insetSizeY/2, insetSizeX/2, insetSizeY/2, black, camera);
 		if (player.health < 3) addRectWithCamera(vertices, colors, insetX+insetSizeX/2, insetY, insetSizeX/2, insetSizeY/2, black, camera);
 		if (player.health < 2) addRectWithCamera(vertices, colors, insetX, insetY+insetSizeY/2, insetSizeX/2, insetSizeY/2, black, camera);
-
-		//attack charge particles
-		addParticles(vertices, colors);
 
 		//attack charge bar:
 		var width = Math.floor(gameWindow.width * player.attackCharge / player.maxAttackCharge);
