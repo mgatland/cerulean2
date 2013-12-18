@@ -113,11 +113,15 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	  return shader;
 	}
 
-	function addLine(vertices, colors, startX, startY) {
+	function addLine(vertices, colors, startX, startY, length) {
 		var start = new Pos(startX, startY);
-		var end = new Pos(gameWindow.width/2-8, gameWindow.height/2-8);
+		var endTarget = new Pos(gameWindow.width/2-8, gameWindow.height/2-8);
 
-		var angle = start.angleTo(end);
+		var angle = start.angleTo(endTarget);
+		var end = start.clone();
+		end.moveAtAngle(angle, length);
+
+
 		var start2 = start.clone();
 		var end2 = end.clone();
 
@@ -186,7 +190,10 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	var wandCounter = 0;
 	var wandOffset = 0;
 
-	var randomPoints = [];
+	var chargeParticles = [];
+	var maxChargeParticles = 60;
+	var maxParticleSize = 60;
+	var maxParticleSpeed = 25;
 
 	this.draw = function (player, companion, rooms, camera, fps) {
 
@@ -341,21 +348,30 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 
 		});
 
-		//attack charge particles
-		if (flickerCounter == 0 && player.attackCharge > 0 || randomPoints.length == 0) {
-			//move the lines around
-			randomPoints = [];
-			for (var i = 0; i < 14; i++) {
+		//charging effects
+		if (player.attackCharge == 0) {
+			chargeParticles.length = 0;
+		} else {
+			var attackPower = player.attackCharge / player.maxAttackCharge;
+			var particleSize = maxParticleSize * (attackPower/2+0.5);
+			var particleSpeed = maxParticleSpeed * attackPower * attackPower + 10;
+			while (chargeParticles.length < maxChargeParticles * attackPower) {
 				var x = Math.random() * gameWindow.width;
 				var y = Math.random() * gameWindow.height;
-				randomPoints[i] = [x,y];
+				chargeParticles.push(new Pos(x, y));
 			}
-		}
-		if (flicker) {
-			for (var i = 0; i < 14 * player.attackCharge / player.maxAttackCharge; i++) {
-				addLine(vertices, colors, randomPoints[i][0], randomPoints[i][1]);
+			var end = new Pos(gameWindow.width/2, gameWindow.height/2);
+			chargeParticles.forEach(function (pos) {
+				var angle = pos.angleTo(end);
+				if (pos.distanceTo(end) < particleSpeed + particleSize) {
+					pos.dead = true;
+				} else {
+					pos.moveAtAngle(angle, particleSpeed);
+					addLine(vertices, colors, pos.x, pos.y, particleSize);
+				}
+			});
+			chargeParticles = chargeParticles.filter(function (part) {return !part.dead});
 			}
-		}
 
 		//draw player
 		var playerColor = (player.invlunerableTime > 0 && flicker) ? black : green;
