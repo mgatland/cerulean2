@@ -30,11 +30,12 @@ var WorldGenerator = function (gameConsts, Enemy) {
 	//end of Door.prototype
 
 	var nextRoomId = 0;
-	var Room = function (x, y, width, height) {
+	var Room = function (x, y, width, height, zone) {
 		this.id = nextRoomId;
 		nextRoomId++;
 		this.pos = new Pos(x, y);
 		this.size = new Pos(width, height);
+		this.zone = zone;
 		this.doors = [];
 		this.enemies = [];
 		this.shots = [];
@@ -352,11 +353,39 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		return Math.floor(Math.random() * (max-min) + min);
 	}
 
+	var getRoomZone = function (startRoom, direction, worldWidth, worldHeight) {
+		var pos = startRoom.pos.clone();
+		switch (direction) {
+			case Dir.UP:
+				pos.x += startRoom.size.x/2;
+			break;
+			case Dir.DOWN:
+				pos.x += startRoom.size.x/2;
+				pos.y += startRoom.height/2;
+			break;
+			case Dir.LEFT:
+				pos.y += startRoom.size.y/2;
+			break;
+			case Dir.RIGHT:
+				pos.y += startRoom.size.y/2;
+				pos.x += startRoom.width;
+			break;
+		}
+		pos.x /= worldWidth;
+		pos.y /= worldWidth;
+		if (pos.x < 0.33 || pos.x > 0.66) return "far";
+		if (pos.y < 0.33 || pos.y > 0.66) return "far";
+		return "center";
+
+	}
+
 	var addRoom = function (startRoom, direction, openRooms, filledCells, worldWidth, worldHeight) {
 		var width;
 		var height;
 		var maxExpansions;
 		var hallway = false;
+
+		var zone = getRoomZone(startRoom, direction, worldWidth, worldHeight);
 
 		var randRoomValue = rand(0, 100);
 		if (randRoomValue < 95) { //normal or jumbo rooms
@@ -470,7 +499,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 			}
 		}
 
-		var newRoom = new Room(x, y, width, height);
+		var newRoom = new Room(x, y, width, height, zone);
 		//addDoorsBetween(startRoom, newRoom, direction);
 
 		//Find rooms to add doorways to
@@ -564,7 +593,7 @@ var WorldGenerator = function (gameConsts, Enemy) {
 		var openRooms = [];
 		var closedRooms = [];
 		var filledCells = {};
-		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 11, 11);
+		var firstRoom = new Room(Math.floor(worldWidth / 2)-5, Math.floor(worldHeight / 2)-5, 11, 11, "center");
 		openRooms.push(firstRoom);
 		addFilledCells(filledCells, firstRoom);
 

@@ -242,7 +242,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 			var pWidth = room.size.x * gameConsts.tileSize;
 			var pHeight = room.size.y * gameConsts.tileSize;
 
-			addRect(vertices, colors, pX, pY, pWidth, pHeight, green);
+			addRect(vertices, colors, pX, pY, pWidth, pHeight, room.zone === "center" ? green : red);
 			var wallWidth = gameConsts.wallWidth;
 			addRect(vertices, colors, pX+wallWidth, pY+wallWidth, pWidth-wallWidth*2, pHeight-wallWidth*2, black);
 
