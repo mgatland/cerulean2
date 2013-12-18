@@ -50,6 +50,12 @@ Make the first set of rooms very easy.
 [ ] Artifact - the eyes of devotion.
 [ ] make pressing keyboard keys not make sounds any more!
 
+world regions
+
+2013-12-18
+
+[x] Better charging effect
+
 2013-09-07
 
 [x] don't draw those blue debug dots
