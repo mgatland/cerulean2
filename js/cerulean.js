@@ -150,7 +150,7 @@ var Cerulean = function () {
 						companion.wandTarget = specialItems.eyes;
 					}
 
-					messages.addMessage("Anna: The wand is locating another artefact.", 2);
+					messages.addMessage("Anna: The wand is locating another artifact.", 2);
 					messages.addMessage("Anna: There!", 8, findEyesFunc);
 
 					//Wand of Justice
@@ -173,10 +173,39 @@ var Cerulean = function () {
 				if (storyFrame == 0) messages.clearMessages();
 				storyFrame++;
 
-				if (storyFrame == 1*sec) {
+
+				if (storyFrame == 0.5*sec) {
+					messages.addMessage("Anna: We can't use those.", 2);
+					messages.addMessage("Anna: They're called the Eyes of Devotion.", 2);
+					messages.addMessage("Anna: They let two people read each other's minds.", 2);
+					messages.addMessage("Justin: That sounds useful, if we get separated.", 1);
+					messages.addMessage("Anna: No way! It's permanent.", 2);
+					messages.addMessage("Anna: You'd be in my head forever.", 2);
+					messages.addMessage("Justin: Oh. Doesn't sound so bad...", 2);
+					messages.addMessage("Anna: We are not using those.", 2);
+					messages.addMessage("Anna: Anyway, they're worthless once activated, so your company would be angry if we wasted them.", 2);
+					messages.addMessage("Justin: My boss just wants us to get out safely.", 2);
+					messages.addMessage("Justin: But OK. I'll just hang on to them.", 3);
+					messages.addMessage("Anna: Actually, give me one, just in case.", 3);
+					messages.addMessage("Anna: If something really bad happens, we can activate them.", 3);
+					messages.addMessage("Justin: OK.", 3);
+					messages.addMessage("(You gave Anna one of the Eyes of Devotion.)", 3);
+					messages.addMessage("Anna: I'll find our next destination.", 3);
+
+					//TODO add destination here
+
+					messages.addMessage("Voice: WHO DARES WAKE ME?", 3);
+
+					var that = this;
+					messages.addMessage("Anna: Um. This is awkward.", 1, function() {
+						that.mode = "unfinished_ending";
+						that.storyFrame = 0;
+					});
+				}
+				/*if (storyFrame == 1*sec) {
 					this.mode = "unfinished_ending";
 					storyFrame = 0;
-				}
+				}*/
 
 			} else if (this.mode === "unfinished_ending") {
 
