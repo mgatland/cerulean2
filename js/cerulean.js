@@ -144,6 +144,15 @@ var Cerulean = function () {
 					messages.addMessage("Justin: What can I do with that energy?", 2);
 					messages.addMessage("Anna: I don't know. I guess we'll find out.", 6);
 
+
+
+					var findEyesFunc = function () {
+						companion.wandTarget = specialItems.eyes;
+					}
+
+					messages.addMessage("Anna: The wand is locating another artefact.", 2);
+					messages.addMessage("Anna: There!", 8, findEyesFunc);
+
 					//Wand of Justice
 					messages.addMessage("Justin: What is that wand you're using?", 2);
 					messages.addMessage("Anna: The Wand of Justice.", 2);
@@ -159,30 +168,16 @@ var Cerulean = function () {
 					messages.addMessage("Anna: I was holding the wand when it happened. It's from my lab.", 2);
 					messages.addMessage("Justin: Oh.", 2);
 					messages.addMessage("Anna: In fact, that's probably why I was pulled in.", 6);
-
-					messages.addMessage("Justin: So where are we going next?", 2);
-
-
-					var findEyesFunc = function () {
-						companion.wandTarget = specialItems.eyes;
-					}
-
-					messages.addMessage("Anna: I'm adjusting the wand...", 2);
-					messages.addMessage("Anna: There!", 2, findEyesFunc);
 				}
 			} else if (this.mode === "game4") {
 				if (storyFrame == 0) messages.clearMessages();
 				storyFrame++;
 
-				var testEnding = function (player) {
-						this.mode = "unfinished_ending";
-						storyFrame = 0;
-					}
-
 				if (storyFrame == 1*sec) {
-					messages.addMessage("Anna: Um,", 2, testEnding);
+					this.mode = "unfinished_ending";
+					storyFrame = 0;
 				}
-				
+
 			} else if (this.mode === "unfinished_ending") {
 
 				if (storyFrame == 0) messages.clearMessages();
@@ -483,6 +478,12 @@ var Cerulean = function () {
 				isChargingAttack = false;
 			}
 
+			//cheats
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_Q) && keyboard.isKeyDown(KeyEvent.DOM_VK_L)) {
+				this.cheatMode = true;
+				this.speed = 10;
+			}
+
 			var up = keyboard.isKeyDown(KeyEvent.DOM_VK_UP);
 			var down = keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN);
 			var left = keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT);
@@ -608,6 +609,7 @@ var Cerulean = function () {
 		}
 
 		this.hit = function (audioUtil) {
+			if (this.cheatMode) return;
 			if (this.invlunerableTime > 0 || this.health <= 0) return;
 			this.health--;
 			this.shieldRechange = 0;
