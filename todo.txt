@@ -55,6 +55,7 @@ world regions
 2013-12-18
 
 [x] Better charging effect
+[x] start on room types - rooms far from the start are red instead of green.
 
 2013-09-07
 
