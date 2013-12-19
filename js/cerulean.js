@@ -184,8 +184,8 @@ var Cerulean = function () {
 					messages.addMessage("Justin: Oh. Doesn't sound so bad...", 2);
 					messages.addMessage("Anna: We are not using those.", 2);
 					messages.addMessage("Anna: Anyway, they're worthless once activated, so your company would be angry if we wasted them.", 2);
-					messages.addMessage("Justin: My boss just wants us to get out safely.", 2);
-					messages.addMessage("Justin: But OK. I'll just hang on to them.", 3);
+					messages.addMessage("Justin: My boss would want us to get out safely.", 2);
+					messages.addMessage("Justin: But OK. I'll hang on to them.", 3);
 					messages.addMessage("Anna: Actually, give me one, just in case.", 3);
 					messages.addMessage("Anna: If something really bad happens, we can activate them.", 3);
 					messages.addMessage("Justin: OK.", 3);

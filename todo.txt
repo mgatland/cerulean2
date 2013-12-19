@@ -1,6 +1,3 @@
-
-
-
 Conversation:
 [ ] Only talk when not in combat OR when in full health
 [ ] only talk when Anna and Justin are together
@@ -45,12 +42,13 @@ Presentation:
 
 Make the first set of rooms very easy.
 
-[ ] conversation - on the Wand of Justice
-[ ] conversation - on the Amulet of Might
-[ ] Artifact - the eyes of devotion.
 [ ] make pressing keyboard keys not make sounds any more!
 
 world regions
+
+2013-12-19
+
+[x] eyes of devotion story point
 
 2013-12-18
 
