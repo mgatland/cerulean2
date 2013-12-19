@@ -162,6 +162,32 @@ var Cerulean = function () {
 
 					messages.addMessage("Justin: So where are we going next?", 2);
 
+
+					var findEyesFunc = function () {
+						companion.wandTarget = specialItems.eyes;
+					}
+
+					messages.addMessage("Anna: I'm adjusting the wand...", 2);
+					messages.addMessage("Anna: There!", 2, findEyesFunc);
+				}
+			} else if (this.mode === "game4") {
+				if (storyFrame == 0) messages.clearMessages();
+				storyFrame++;
+
+				var testEnding = function (player) {
+						this.mode = "unfinished_ending";
+						storyFrame = 0;
+					}
+
+				if (storyFrame == 1*sec) {
+					messages.addMessage("Anna: Um,", 2, testEnding);
+				}
+				
+			} else if (this.mode === "unfinished_ending") {
+
+				if (storyFrame == 0) messages.clearMessages();
+				storyFrame++;
+				if (storyFrame == 0.5*sec) {
 					//make sure players know to stop now.
 					messages.addMessage("Anna: Actually", 2);
 					messages.addMessage("Anna: This is the end of the game.", 2);
@@ -207,6 +233,13 @@ var Cerulean = function () {
 				this.mode = "game3";
 				storyFrame = 0;
 				player.canCollectGreenDots = true;
+			}
+		}
+
+		this.gotEyesItem = function (player) {
+			if (this.mode === "game3") {
+				this.mode = "game4";
+				storyFrame = 0;
 			}
 		}
 	}
@@ -856,7 +889,7 @@ var Cerulean = function () {
 		//         |        |
 		//         |        |
 		// 33------+--------+---------
-		//         |        |
+		//         |        |C
 		//         |    A   |
 		//         |      B |
 		// 67------+--------+---------
@@ -866,6 +899,7 @@ var Cerulean = function () {
 
 		//A - firstRoom
 		//B - green collector
+		//C - the eyes
 
 		var itemCollectorRoom = findRoomNear(58, 58, rooms, cells);
 		itemCollectorRoom.special = true;
@@ -876,7 +910,19 @@ var Cerulean = function () {
 		}
 		itemCollectorRoom.enemies = [];
 		itemCollectorRoom.items.push(collectorItem);
-		return {collector: collectorItem};
+
+
+		var eyesRoom = findRoomNear(40, 70, rooms, cells);
+		eyesRoom.special = true;
+		var eyesItem = new Item(eyesRoom.getCenter().multiply(GameConsts.tileSize), true);
+		eyesItem.pos.moveXY(16,16);
+		eyesItem.onCollected = function (player) {
+			player.story.gotEyesItem(player);
+		}
+		eyesRoom.enemies = [];
+		eyesRoom.items.push(eyesItem);
+
+		return {collector: collectorItem, eyes: eyesItem};
 	}
 
 	var start = function (shaders, audioUtil, startTime) {
