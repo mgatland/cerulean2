@@ -9,17 +9,17 @@ function AudioUtil() {
 	var audioContext = null;
 
 	// This is the "initial patch"
-	var currentModWaveform = 0;	// SINE
+	var currentModWaveform = "sine";
 	var currentModFrequency = 21; // Hz * 10 = 2.1
 	var currentModOsc1 = 15;
 	var currentModOsc2 = 17;
 
-	var currentOsc1Waveform = 2; // SAW
+	var currentOsc1Waveform = "sawtooth";
 	var currentOsc1Octave = 0;  // 32'
 	var currentOsc1Detune = 0;	// 0
 	var currentOsc1Mix = 50.0;	// 50%
 
-	var currentOsc2Waveform = 2; // SAW
+	var currentOsc2Waveform = "sawtooth";
 	var currentOsc2Octave = 0;  // 16'
 	var currentOsc2Detune = -25;	// fat detune makes pretty analogue-y sound.  :)
 	var currentOsc2Mix = 50.0;	// 0%
@@ -388,8 +388,8 @@ function AudioUtil() {
 				imag[i]=1.0;
 			}
 
-			var wavetable = audioContext.createWaveTable(real, imag);
-			oscillatorNode.setWaveTable(wavetable);
+			var wavetable = audioContext.createPeriodicWave(real, imag);
+			oscillatorNode.setPeriodicWave(wavetable);
 		} else {
 
 	*/
@@ -442,10 +442,10 @@ function AudioUtil() {
 
 		// create the LP filter
 		this.filter1 = audioContext.createBiquadFilter();
-		this.filter1.type = this.filter1.LOWPASS;
+		this.filter1.type = "lowpass";
 		this.filter1.Q.value = currentFilterQ;
 		this.filter2 = audioContext.createBiquadFilter();
-		this.filter2.type = this.filter2.LOWPASS;
+		this.filter2.type = "lowpass";
 		this.filter2.Q.value = currentFilterQ;
 
 		this.osc1Gain.connect( this.filter1 );
@@ -479,7 +479,7 @@ function AudioUtil() {
 		this.envelope.gain.value = 0.0;
 		this.envelope.gain.setValueAtTime( 0.0, now );
 		this.envelope.gain.linearRampToValueAtTime( 1.0, envAttackEnd );
-		this.envelope.gain.setTargetValueAtTime( (currentEnvS/100.0), envAttackEnd, (currentEnvD/100.0)+0.001 );
+		this.envelope.gain.setTargetAtTime( (currentEnvS/100.0), envAttackEnd, (currentEnvD/100.0)+0.001 );
 
 	    var pitchFrequency = this.originalFrequency;
 	    var filterInitLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 );
@@ -494,11 +494,11 @@ function AudioUtil() {
 		this.filter1.frequency.value = filterInitLevel;
 		this.filter1.frequency.setValueAtTime( filterInitLevel, now );
 		this.filter1.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
-		this.filter1.frequency.setTargetValueAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
+		this.filter1.frequency.setTargetAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
 		this.filter2.frequency.value = filterInitLevel;
 		this.filter2.frequency.setValueAtTime( filterInitLevel, now );
 		this.filter2.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
-		this.filter2.frequency.setTargetValueAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
+		this.filter2.frequency.setTargetAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
 
 		this.osc1.start(now);
 		this.osc2.start(now);
@@ -574,13 +574,13 @@ function AudioUtil() {
 	//    console.log("noteoff: now: " + now + " val: " + this.filter1.frequency.value + " initF: " + initFilter + " fR: " + currentFilterEnvR/100 );
 		this.envelope.gain.cancelScheduledValues(now);
 		this.envelope.gain.setValueAtTime( this.envelope.gain.value, now );  // this is necessary because of the linear ramp
-		this.envelope.gain.setTargetValueAtTime(0.0, now, (currentEnvR/100));
+		this.envelope.gain.setTargetAtTime(0.0, now, (currentEnvR/100));
 		this.filter1.frequency.cancelScheduledValues(now);
 		this.filter1.frequency.setValueAtTime( this.filter1.frequency.value, now );  // this is necessary because of the linear ramp
-		this.filter1.frequency.setTargetValueAtTime( initFilter, now, (currentFilterEnvR/100.0) );
+		this.filter1.frequency.setTargetAtTime( initFilter, now, (currentFilterEnvR/100.0) );
 		this.filter2.frequency.cancelScheduledValues(now);
 		this.filter2.frequency.setValueAtTime( this.filter2.frequency.value, now );  // this is necessary because of the linear ramp
-		this.filter2.frequency.setTargetValueAtTime( initFilter, now, (currentFilterEnvR/100.0) );
+		this.filter2.frequency.setTargetAtTime( initFilter, now, (currentFilterEnvR/100.0) );
 
 		this.osc1.stop( release );
 		this.osc2.stop( release );
