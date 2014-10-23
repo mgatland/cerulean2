@@ -967,8 +967,6 @@ var Cerulean = function () {
 		var camera = new Camera();
 		var worldGenerator = new WorldGenerator(GameConsts, Enemy);
 
-		var desiredFps = 60;
-
 		//fps  counter
 		var currentFps = 0;
 		var framesThisSecond = 0;
@@ -1021,23 +1019,23 @@ var Cerulean = function () {
 		window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
   		window.requestAnimationFrame = requestAnimationFrame;
 
-		window.setInterval(function () {
-			update();
-
+  		var tick = function () {
+  			//logic
+ 			update();
 			camera.pos.x = player.pos.x - gameWindow.width / 2 + GameConsts.tileSize / 2;
 			camera.pos.y = player.pos.y - gameWindow.height / 2 + GameConsts.tileSize / 2;
-
-			requestAnimationFrame(function() {
-				renderer.draw(player, companion, rooms, camera, currentFps);
-				var newSecond = Math.floor(Date.now() / 1000);
-				if (newSecond != thisSecond) {
-					thisSecond = newSecond;
-					currentFps = framesThisSecond;
-					framesThisSecond = 0;
-				}
-				framesThisSecond++;
-			});
-		}, 1000/desiredFps);
+ 			//draw
+			renderer.draw(player, companion, rooms, camera, currentFps);
+			var newSecond = Math.floor(Date.now() / 1000);
+			if (newSecond != thisSecond) {
+				thisSecond = newSecond;
+				currentFps = framesThisSecond;
+				framesThisSecond = 0;
+			}
+			framesThisSecond++;
+			requestAnimationFrame(tick);
+  		};
+  		requestAnimationFrame(tick);
 		console.log("Game started " + (Date.now() - startTime) + " ms after the window loaded.");
 	}
 
