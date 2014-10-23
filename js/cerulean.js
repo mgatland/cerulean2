@@ -9,7 +9,7 @@ var Cerulean = function () {
 			_this.width = window.innerWidth;
 			_this.height = window.innerHeight;
 		}
-		
+
 		this.resize();
 		window.addEventListener("resize", this.resize);
 	}
@@ -617,11 +617,6 @@ var Cerulean = function () {
 				this.story.roomsExplored(this.roomsExplored, messages);
 				if (this.roomsExplored % 10 == 0) {
 					track("explored", ""+this.roomsExplored);
-				}
-
-				//Hack to hide instructions
-				if (this.roomsExplored == 10) {
-					document.getElementById('instructions').style.display = "none";
 				}
 			}
 		}
