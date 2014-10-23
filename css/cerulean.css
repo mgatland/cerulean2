@@ -10,7 +10,9 @@ a {
 }
 
 #gamecontainer {
-	position: relative;
+	position: absolute;
+	top:0;
+	left:0;
 }
 
 #gamecontainer canvas, #gamecontainer #messages {

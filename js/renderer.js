@@ -13,6 +13,20 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	var canvas = document.getElementById('gamescreen');
 	canvas.width = gameWindow.width;
 	canvas.height = gameWindow.height;
+
+	var resize = function () {
+		var resized = false;
+		if (canvas.width != gameWindow.width 
+			|| canvas.height != gameWindow.height) {
+
+			canvas.width = gameWindow.width;
+			canvas.height = gameWindow.height;
+			container.style.width = gameWindow.width;
+			container.style.height = gameWindow.height;
+			gl.viewport(0, 0, canvas.width, canvas.height);
+		}
+	}
+
 	var gl = initWebGL(canvas);
 
 	var squareVerticesBuffer;
@@ -30,6 +44,7 @@ var Renderer = function (gameWindow, gameConsts, shaders) {
 	this.overlay = hudOverlay; //hack to expose this so it can be used by Message
 
 	function drawScene() {
+	  resize();
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	  gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);

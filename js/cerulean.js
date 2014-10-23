@@ -1,8 +1,17 @@
 var Cerulean = function () {
 
 	var GameWindow = function () {
-		this.width = 1024;
-		this.height = 768;
+		this.width = 0;
+		this.height = 0;
+		var _this = this;
+
+		this.resize = function () {
+			_this.width = window.innerWidth;
+			_this.height = window.innerHeight;
+		}
+		
+		this.resize();
+		window.addEventListener("resize", this.resize);
 	}
 
 	var GameConsts = {

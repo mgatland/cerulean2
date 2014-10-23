@@ -1,11 +1,6 @@
 var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 	var canvas2 = document.getElementById(overlayId);
-	canvas2.width = gameWindow.width;
-	canvas2.height = gameWindow.height;
 	var ctx2 = canvas2.getContext("2d");
-
-	ctx2.fillStyle = "#5DE100";
-
 	var roomMargin = gameConsts.wallWidth + 4;
 	var lineHeight = 18;
 	var minimumWidthForText = 88;
@@ -44,6 +39,8 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 	}
 
 	this.drawMessages = function (room, camera, messageWaiting) {
+		resize();
+		ctx2.fillStyle = "#5DE100";
 		if (!room.messages && !messageWaiting) return;
 		this.setContextForMessages();
 		var area = this.getMessageDrawingArea(room, camera);
@@ -86,6 +83,11 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 			}
 		}
 		return lines;
+	}
+
+	var resize = function () {
+		if (canvas2.width != gameWindow.width) canvas2.width = gameWindow.width;
+		if (canvas2.height != gameWindow.height) canvas2.height = gameWindow.height;
 	}
 
 	this.drawHud = function(bitscore, roomsExplored, roomsInTotal, fps) {
