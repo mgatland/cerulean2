@@ -10,6 +10,5 @@ varying lowp vec4 vColor;
 uniform float frameValue;
 
 void main(void) {
-  float slowValue = floor(frameValue / 4.0);
-  gl_FragColor = vColor + rand(gl_FragCoord.xy * vec2(13.0+slowValue,7.0+slowValue) * 0.01) * 0.14;
+  gl_FragColor = vColor + rand(gl_FragCoord.xy * vec2(13.0+frameValue,7.0+frameValue) * 0.01) * 0.14;
 }
