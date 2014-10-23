@@ -729,14 +729,17 @@ function AudioUtil() {
 	//player damage:
 	this.shotHitPlayer = function (healthLeft) {
 			var now = audioContext.currentTime;
-			var lowNotes = [97, 98, 100, 101, 103];
-			scheduleNote(lowNotes[healthLeft], now, 0.25, 0.5, 0.3);
-			scheduleNote(105, now, 0.25, 0.5, 0.3);
+			//var lowNotes = [62, 62, 62, 62, 62, 62];
+			//scheduleNote(lowNotes[healthLeft], now, 0.15, 0.5, 0.7);
+			scheduleNote(68, now, 0.15, 0.5, 1.7);
+			scheduleNote(76, now, 0.15, 0.5, 1.7);
+			scheduleNote(77, now, 0.15, 0.5, 1.7);
 	}
 	this.playerDied = function () {
 		var now = audioContext.currentTime;
-		scheduleNote(97, now, 1.1, 0.5, 0.3);
-		scheduleNote(105, now, 1.1, 0.5, 0.3);
+		scheduleNote(68, now, 1.2, 0.6, 1.3);
+		scheduleNote(61, now, 1.2, 0.6, 1.3);
+		scheduleNote(64, now, 1.2, 0.6, 1.3);
 	}
 
 	var bitCollectionTimer = 0;
