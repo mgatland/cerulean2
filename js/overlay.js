@@ -2,7 +2,7 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 	var canvas2 = document.getElementById(overlayId);
 	var ctx2 = canvas2.getContext("2d");
 	var roomMargin = gameConsts.wallWidth + 4;
-	var lineHeight = 18;
+	var lineHeight = 20;
 	var minimumWidthForText = 88;
 
 	this.clear = function () {
@@ -10,7 +10,7 @@ var HudOverlay = function(overlayId, gameWindow, gameConsts) {
 	}
 
 	this.setContextForMessages = function () {
-		ctx2.font = '14px "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
+		ctx2.font = '18px "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace';
 		ctx2.textAlign = "left";
 		ctx2.textBaseline = "top";
 	}
